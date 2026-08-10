@@ -1,14 +1,12 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// Default placeholders. Prefer setting `window.__SUPABASE_CONFIG` before importing this module.
-const DEFAULT_SUPABASE_URL = 'https://ibumbahrxzxtqruaas.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_RWynYaT0C5XN-JcYKYrO4g_kTikiUwa';
-const _cfg = (typeof window !== 'undefined' && window.__SUPABASE_CONFIG) ? window.__SUPABASE_CONFIG : {};
-const SUPABASE_URL = _cfg.url || DEFAULT_SUPABASE_URL;
-const SUPABASE_ANON_KEY = _cfg.anonKey || DEFAULT_SUPABASE_ANON_KEY;
+// Config is injected by the server via /js/env-config.js before this module loads
+const cfg = (typeof window !== 'undefined' && window.__SUPABASE_CONFIG) || {};
+const SUPABASE_URL = cfg.url || '';
+const SUPABASE_ANON_KEY = cfg.anonKey || '';
 
-if (SUPABASE_URL.includes('YOUR_SUPABASE') || SUPABASE_ANON_KEY.includes('YOUR_SUPABASE')) {
-    console.warn('Supabase client not configured. Set `window.__SUPABASE_CONFIG = { url: "https://...", anonKey: "..." }` in a script before loading js/supabase-client.js');
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    console.error('Supabase not configured. Update SUPABASE_URL and SUPABASE_ANON_KEY in the .env file.');
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -18,10 +16,7 @@ window.supabase = supabase;
 window.supabaseAuth = {
     getCurrentUser: async function () {
         const { data, error } = await supabase.auth.getSession();
-        if (error) {
-            console.error('Supabase auth session error:', error);
-            return null;
-        }
+        if (error) { console.error('Session error:', error); return null; }
         return data?.session?.user ?? null;
     },
     signInUser: async function (email, password) {
@@ -35,10 +30,7 @@ window.supabaseAuth = {
     },
     getSession: async function () {
         const { data, error } = await supabase.auth.getSession();
-        if (error) {
-            console.error('Supabase session error:', error);
-            return null;
-        }
+        if (error) { console.error('Session error:', error); return null; }
         return data?.session ?? null;
     }
 };
