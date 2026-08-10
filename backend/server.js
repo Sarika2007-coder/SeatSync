@@ -65,8 +65,65 @@ app.post("/auth/admin-login", (req, res) => {
     res.status(401).json({ success: false, message: "Invalid admin credentials." });
 });
 
-// Get booked seats for a specific bus on a specific date
-app.get("/seats/booked", async (req, res) => {
+// ── Bus management ───────────────────────────────────────────
+
+// Add a new bus
+app.post("/bus", async (req, res) => {
+    const { route, name, type, time, duration, seats, price, rating } = req.body;
+    if (!route || !name || !type || !time || !price)
+        return res.status(400).json({ success: false, message: "route, name, type, time and price are required." });
+
+    const { data, error } = await supabase.from("buses").insert([{
+        route, name, type, time,
+        duration: duration || "—",
+        seats:    parseInt(seats) || 40,
+        price:    parseFloat(price),
+        rating:   parseFloat(rating) || 4.0,
+        active:   true,
+    }]).select().single();
+
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    console.log("Bus added:", data.id, name);
+    res.json({ success: true, bus: data });
+});
+
+// Get buses for a route
+app.get("/buses/:route", async (req, res) => {
+    const { data, error } = await supabase
+        .from("buses")
+        .select("*")
+        .eq("route", req.params.route)
+        .eq("active", true)
+        .order("time", { ascending: true });
+
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    res.json({ success: true, buses: data || [] });
+});
+
+// Get all buses (admin)
+app.get("/buses", async (req, res) => {
+    const { data, error } = await supabase
+        .from("buses")
+        .select("*")
+        .order("route")
+        .order("time");
+
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    res.json({ success: true, buses: data || [] });
+});
+
+// Delete (deactivate) a bus
+app.delete("/bus/:id", async (req, res) => {
+    const { error } = await supabase
+        .from("buses")
+        .update({ active: false })
+        .eq("id", req.params.id);
+
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    res.json({ success: true, message: "Bus removed." });
+});
+
+// ── Seat availability ─────────────────────────────────────────
     const { busId, date } = req.query;
     if (!busId || !date)
         return res.status(400).json({ success: false, message: "busId and date required." });

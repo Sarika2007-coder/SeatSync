@@ -76,6 +76,85 @@
     </div>
   </div>
 
+  <!-- Add Bus form + Bus management table -->
+  <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:24px;margin-bottom:24px;align-items:start;" id="busGrid">
+
+    <!-- Add Bus form -->
+    <div class="card" style="padding:28px;">
+      <h2>➕ Add New Bus</h2>
+      <p class="sub">Add a bus to any route</p>
+      <div id="busMsg" style="display:none;" class="alert"></div>
+      <div class="form-group">
+        <label>Route</label>
+        <select id="newBusRoute" class="form-control">
+          <option value="">— Select Route —</option>
+          <option value="bangalore-chikmagalur">Bangalore → Chikmagalur</option>
+          <option value="bangalore-tumkur">Bangalore → Tumkur</option>
+          <option value="bangalore-hassan">Bangalore → Hassan</option>
+          <option value="bangalore-mandya">Bangalore → Mandya</option>
+          <option value="bangalore-mysore">Bangalore → Mysore</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Bus Name</label>
+        <input type="text" id="newBusName" class="form-control" placeholder="e.g. VRL Travels">
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label>Bus Type</label>
+          <select id="newBusType" class="form-control">
+            <option>AC Sleeper</option>
+            <option>AC Seater</option>
+            <option>Non-AC Seater</option>
+            <option>Volvo AC</option>
+            <option>Semi-Sleeper</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Departure Time</label>
+          <input type="time" id="newBusTime" class="form-control">
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label>Duration</label>
+          <input type="text" id="newBusDuration" class="form-control" placeholder="e.g. 3h 30m">
+        </div>
+        <div class="form-group">
+          <label>Total Seats</label>
+          <input type="number" id="newBusSeats" class="form-control" placeholder="40" min="1" max="60" value="40">
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label>Price (₹)</label>
+          <input type="number" id="newBusPrice" class="form-control" placeholder="500" min="1">
+        </div>
+        <div class="form-group">
+          <label>Rating (1–5)</label>
+          <input type="number" id="newBusRating" class="form-control" placeholder="4.2" min="1" max="5" step="0.1" value="4.0">
+        </div>
+      </div>
+      <button class="btn-full" onclick="addBus()">Add Bus →</button>
+    </div>
+
+    <!-- Managed buses table -->
+    <div class="card table-card" style="padding:28px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+        <h2 style="margin-bottom:0;">🚌 Managed Buses</h2>
+        <button class="btn-secondary" style="font-size:13px;padding:8px 16px;" onclick="loadManagedBuses()">🔄 Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Route</th><th>Name</th><th>Type</th><th>Time</th><th>Seats</th><th>Price</th><th>Rating</th><th>Action</th></tr></thead>
+          <tbody id="busesTableBody">
+            <tr><td colspan="8" class="text-center text-muted" style="padding:24px;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- Bookings table -->
   <div class="card table-card">
     <h2>All Bookings</h2>
@@ -225,12 +304,100 @@ function showToast(msg, type) {
   setTimeout(() => t.remove(), 3500);
 }
 
+// ── Bus management ───────────────────────────────────────────
+async function addBus() {
+  const route    = document.getElementById('newBusRoute').value;
+  const name     = document.getElementById('newBusName').value.trim();
+  const type     = document.getElementById('newBusType').value;
+  const timeRaw  = document.getElementById('newBusTime').value;
+  const duration = document.getElementById('newBusDuration').value.trim();
+  const seats    = document.getElementById('newBusSeats').value;
+  const price    = document.getElementById('newBusPrice').value;
+  const rating   = document.getElementById('newBusRating').value;
+
+  const msgEl = document.getElementById('busMsg');
+  const showBusMsg = (txt, type) => {
+    msgEl.textContent = txt;
+    msgEl.className = 'alert alert-' + (type === 'error' ? 'error' : 'success');
+    msgEl.style.display = 'flex';
+  };
+
+  if (!route || !name || !timeRaw || !price) {
+    showBusMsg('Please fill in route, name, time and price.', 'error'); return;
+  }
+
+  // Convert HH:MM to "HH:MM AM/PM"
+  const [hh, mm] = timeRaw.split(':').map(Number);
+  const period   = hh >= 12 ? 'PM' : 'AM';
+  const h12      = hh % 12 || 12;
+  const timeStr  = `${String(h12).padStart(2,'0')}:${String(mm).padStart(2,'0')} ${period}`;
+
+  const btn = document.querySelector('#busGrid button.btn-full');
+  btn.disabled = true; btn.textContent = 'Adding…';
+
+  try {
+    const res  = await fetch('/bus', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ route, name, type, time: timeStr, duration, seats, price, rating })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+    showBusMsg(`✅ Bus "${name}" added to ${routeLabel(route)}!`, 'success');
+    document.getElementById('newBusName').value = '';
+    document.getElementById('newBusTime').value = '';
+    document.getElementById('newBusPrice').value = '';
+    loadManagedBuses();
+  } catch (err) {
+    showBusMsg('Error: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Add Bus →';
+  }
+}
+
+async function loadManagedBuses() {
+  const tbody = document.getElementById('busesTableBody');
+  tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted" style="padding:20px;">Loading…</td></tr>';
+  try {
+    const res  = await fetch('/buses');
+    const data = await res.json();
+    if (!data.buses.length) {
+      tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state" style="padding:24px;"><div class="icon">🚌</div><h3>No custom buses added yet</h3></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.buses.map(b => `
+      <tr>
+        <td style="font-size:12px;">${routeLabel(b.route)}</td>
+        <td><strong>${b.name}</strong></td>
+        <td><span class="badge badge-info">${b.type}</span></td>
+        <td>${b.time}</td>
+        <td>${b.seats}</td>
+        <td><strong>₹${b.price}</strong></td>
+        <td>${b.rating} ⭐</td>
+        <td><button class="btn-tbl" onclick="deleteBus('${b.id}','${b.name}')">Remove</button></td>
+      </tr>`).join('');
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="alert alert-error">Error: ${err.message}</div></td></tr>`;
+  }
+}
+
+async function deleteBus(id, name) {
+  if (!confirm(`Remove bus "${name}"? It will no longer appear in search results.`)) return;
+  try {
+    const res  = await fetch('/bus/' + id, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) { showToast('Bus removed.', 'success'); loadManagedBuses(); }
+    else showToast(data.message, 'error');
+  } catch (err) { showToast('Error: ' + err.message, 'error'); }
+}
+
 // Guard admin route
 if (localStorage.getItem('ss_role') !== 'admin') {
   window.location.href = 'admin-login.html';
 }
 
 loadBookings();
+loadManagedBuses();
 </script>
 </body>
 </html>

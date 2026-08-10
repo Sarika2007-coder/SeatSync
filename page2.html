@@ -123,10 +123,34 @@ function applyFilter() {
   const route = document.getElementById('routeFilter').value;
   const date  = document.getElementById('dateFilter').value;
   const pass  = parseInt(document.getElementById('passFilter').value);
-  renderBuses(route, date, pass);
+  loadAndRenderBuses(route, date, pass);
 }
 
-function renderBuses(route, date, passengers) {
+async function loadAndRenderBuses(route, date, passengers) {
+  if (!route) { renderBuses([], route, date, passengers); return; }
+  const list = document.getElementById('busList');
+  list.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><h3>Loading buses…</h3></div>';
+
+  // Merge: hardcoded base data + admin-added buses from backend
+  let buses = [...(BUS_DATA[route] || [])];
+  try {
+    const res  = await fetch('/buses/' + encodeURIComponent(route));
+    const data = await res.json();
+    if (data.success && data.buses.length) {
+      // Add backend buses (avoid duplicates by name)
+      const names = new Set(buses.map(b => b.name.toLowerCase()));
+      data.buses.forEach(b => {
+        if (!names.has(b.name.toLowerCase())) {
+          buses.push({ id: b.id, name: b.name, type: b.type, time: b.time, duration: b.duration, seats: b.seats, price: b.price, rating: b.rating });
+        }
+      });
+    }
+  } catch (_) { /* backend unavailable — use hardcoded only */ }
+
+  renderBuses(buses, route, date, passengers);
+}
+
+function renderBuses(buses, route, date, passengers) {
   const list  = document.getElementById('busList');
   const title = document.getElementById('resultsTitle');
   const count = document.getElementById('resultsCount');
@@ -138,8 +162,7 @@ function renderBuses(route, date, passengers) {
     return;
   }
 
-  const buses = BUS_DATA[route] || [];
-  // Split into available and departed for today's date
+  // buses is now passed in directly (merged hardcoded + backend)
   const active   = buses.filter(b => !isDeparted(b.time, date));
   const departed = buses.filter(b =>  isDeparted(b.time, date));
 
@@ -210,9 +233,9 @@ function selectBus(busId, route, date, passengers) {
   if (route) {
     document.getElementById('routeFilter').value = route;
     document.getElementById('passFilter').value  = pass;
-    renderBuses(route, document.getElementById('dateFilter').value, pass);
+    loadAndRenderBuses(route, document.getElementById('dateFilter').value, pass);
   } else {
-    renderBuses('', '', 1);
+    renderBuses([], '', '', 1);
   }
 })();
 </script>
