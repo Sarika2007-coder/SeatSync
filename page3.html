@@ -84,7 +84,6 @@
 
 <script>
 const bus      = JSON.parse(sessionStorage.getItem('ss_selected_bus') || 'null');
-const selected = new Set();
 
 if (!bus) { window.location.href = 'page2.html'; }
 
@@ -104,19 +103,9 @@ document.getElementById('sumDate').textContent       = bus.date || '—';
 document.getElementById('sumTime').textContent       = bus.time;
 document.getElementById('sumPrice').textContent      = '₹' + bus.price;
 
-// Generate seat grid: rows A–J, 4 seats per row + aisle
-const TOTAL_SEATS = 40;
+// Generate seat grid: rows A–J, cols 1-2 | aisle | 3-4
 const BOOKED = new Set();
-// Pre-book some random seats for realism
-const bookedIds = [];
-const allIds = [];
-for (let r = 0; r < 10; r++) {
-  const row = String.fromCharCode(65 + r);
-  ['1','2','3','4'].forEach(n => allIds.push(row + n));
-}
-// pseudo-random: book seats deterministically based on busId
-const seed = bus.id ? bus.id.charCodeAt(bus.id.length - 1) : 3;
-allIds.forEach((id, i) => { if ((i + seed) % 5 === 0) BOOKED.add(id); });
+const selected = new Set();
 
 function buildGrid() {
   const grid = document.getElementById('seatGrid');
@@ -132,13 +121,36 @@ function buildGrid() {
       }
       const id = row + n;
       const btn = document.createElement('button');
+      btn.id        = 'seat-' + id;
       btn.className = BOOKED.has(id) ? 'seat booked' : 'seat available';
       btn.textContent = id;
-      btn.disabled = BOOKED.has(id);
-      btn.onclick = () => toggleSeat(id, btn);
+      btn.disabled  = BOOKED.has(id);
+      btn.onclick   = () => toggleSeat(id, btn);
       grid.appendChild(btn);
     });
   }
+}
+
+async function loadBookedSeats() {
+  const grid = document.getElementById('seatGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted);font-size:14px;">⏳ Loading seat availability…</div>';
+
+  try {
+    const res  = await fetch(`/seats/booked?busId=${encodeURIComponent(bus.name)}&date=${encodeURIComponent(bus.date || '')}`);
+    const data = await res.json();
+    if (data.success && data.booked.length) {
+      data.booked.forEach(s => BOOKED.add(s));
+    }
+  } catch (_) {
+    // Network error — fall back to showing all seats as available
+  }
+  buildGrid();
+  updateSummary();
+  // Update available count in summary
+  const totalSeats = 40;
+  const avail = totalSeats - BOOKED.size;
+  document.getElementById('sumPrice').textContent = '₹' + bus.price;
+  document.getElementById('availCount') && (document.getElementById('availCount').textContent = avail + ' seats available');
 }
 
 function toggleSeat(id, btn) {
@@ -176,8 +188,8 @@ function proceed() {
   window.location.href = 'page4.html';
 }
 
-buildGrid();
-updateSummary();
+// Fetch real booked seats from Supabase, then render grid
+loadBookedSeats();
 </script>
 </body>
 </html>

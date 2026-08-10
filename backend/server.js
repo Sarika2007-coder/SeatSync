@@ -4,6 +4,9 @@ const path = require("path");
 const crypto = require("crypto");
 const { createClient } = require("@supabase/supabase-js");
 
+// Must be set before any HTTPS calls — allows corporate SSL proxy certificates
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -60,6 +63,32 @@ app.post("/auth/admin-login", (req, res) => {
     if (username === ADMIN_USERNAME && hashPassword(password) === ADMIN_PW_HASH)
         return res.json({ success: true });
     res.status(401).json({ success: false, message: "Invalid admin credentials." });
+});
+
+// Get booked seats for a specific bus on a specific date
+app.get("/seats/booked", async (req, res) => {
+    const { busId, date } = req.query;
+    if (!busId || !date)
+        return res.status(400).json({ success: false, message: "busId and date required." });
+
+    const { data, error } = await supabase
+        .from("bookings")
+        .select("seats")
+        .eq("bus_name", busId)   // busId holds the bus name for matching
+        .eq("date", date)
+        .neq("status", "cancelled");
+
+    if (error) {
+        console.error("Seats query error:", error.message);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+
+    // Flatten all seat strings (comma-separated) into one array
+    const booked = (data || [])
+        .flatMap(row => (row.seats || "").split(",").map(s => s.trim()))
+        .filter(Boolean);
+
+    res.json({ success: true, booked });
 });
 
 // Save a booking to Supabase
