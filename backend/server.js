@@ -93,6 +93,33 @@ app.post("/booking", (req, res) => {
     });
 });
 
+// Cancel a booking by index (admin) or by ref (user)
+app.post("/booking/cancel", (req, res) => {
+    const { index, ref } = req.body;
+    if (index === undefined && !ref)
+        return res.status(400).json({ success: false, message: "Index or ref required." });
+
+    fs.readFile(bookingsFile, "utf8", (err, data) => {
+        let bookings = [];
+        if (!err && data) {
+            try { bookings = JSON.parse(data); } catch (_) {}
+        }
+
+        const idx = ref !== undefined
+            ? bookings.findIndex(b => b.ref === ref)
+            : index;
+
+        if (idx < 0 || idx >= bookings.length)
+            return res.status(404).json({ success: false, message: "Booking not found." });
+
+        bookings.splice(idx, 1);
+        fs.writeFile(bookingsFile, JSON.stringify(bookings, null, 2), (err) => {
+            if (err) return res.status(500).json({ success: false, message: "Could not update bookings." });
+            res.json({ success: true, message: "Booking cancelled." });
+        });
+    });
+});
+
 // Get all bookings for Admin Dashboard
 app.get("/bookings", (req, res) => {
     fs.readFile(bookingsFile, "utf8", (err, data) => {

@@ -1,208 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=2.0">
-
-    <title>SeatSync - Smart Bus Booking</title>
-
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SeatSync – Smart Bus Booking</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-    <!-- Navigation Bar -->
-    <header>
-        <nav class="navbar">
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="logo">🚌 Seat<span>Sync</span></div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="user-login.html" class="btn-nav">Book Now</a></li>
+  </ul>
+  <button class="nav-toggle" onclick="toggleNav()">☰</button>
+</nav>
 
-            <div class="logo">
-                🚌 SeatSync
-            </div>
-
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="#">Routes</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-
-        </nav>
-    </header>
-
-
-    <!-- Hero Section -->
-    <section class="hero">
-
-        <div class="hero-content">
-
-            <p class="welcome">WELCOME TO SEATSYNC</p>
-
-            <h1>
-                Find Your Bus.<br>
-                Choose Your Seat.
-            </h1>
-
-            <p class="description">
-                Your journey, your route, your seat.
-                <br>
-                Disover comfortable travel and make every trip yours.
-            </p>
-
-        </div>
-
-        <img src="images/logo.png"
-         alt="SeatSync Logo"
-         class="hero-logo">
-
-</section>
-                
-<script>
-function goToPage2() {
-    const route = document.getElementById("route").value;
-
-    if (route === "") {
-        alert("Please select a bus route");
-        return;
-    }
-
-    window.location.href = "page2.html?route=" + route;
-}
-</script>
-
-            
-
-        </div>
-
-    </section>
-
-
-<!-- Role Selection Section -->
-
-<section class="role-section">
-
-    <h2>Choose Your Role</h2>
-
-    <p>How would you like to continue?</p>
-
-    <div class="role-cards">
-
-        <!-- USER -->
-        <div class="role-card">
-
-            <div class="role-icon">👤</div>
-
-            <h3>User</h3>
-
-            <p>
-                Search buses, check seats and book your journey.
-            </p>
-
-            <a href="user-login.html">
-                <button class="role-btn">
-                    Continue as User
-                </button>
-            </a>
-
-        </div>
-
-
-        <!-- ADMIN -->
-        <div class="role-card">
-
-            <div class="role-icon">👨‍💼</div>
-
-            <h3>Admin</h3>
-
-            <p>
-                Manage routes, buses, timings and bookings.
-            </p>
-
-            <a href="admin-login.html">
-                <button class="role-btn">
-                    Continue as Admin
-                </button>
-            </a>
-
-        </div>
-
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">🚀 Smart Bus Booking Platform</div>
+    <h1>Travel Smarter,<br><span>Choose Your Seat</span></h1>
+    <p>Book bus tickets across Karnataka instantly. Compare buses, pick your favourite seat, and pay securely — all in minutes.</p>
+    <div class="hero-actions">
+      <a href="user-login.html"><button class="btn-primary">🎟️ Book a Ticket</button></a>
+      <a href="admin-login.html"><button class="btn-outline">Admin Portal</button></a>
     </div>
+  </div>
 
+  <div class="hero-card">
+    <h3>Quick Search</h3>
+    <p class="sub">Find buses in seconds</p>
+    <div class="form-group">
+      <label>Bus Route</label>
+      <select id="quickRoute" class="form-control">
+        <option value="">— Select Route —</option>
+        <option value="bangalore-chikmagalur">Bangalore → Chikmagalur</option>
+        <option value="bangalore-tumkur">Bangalore → Tumkur</option>
+        <option value="bangalore-hassan">Bangalore → Hassan</option>
+        <option value="bangalore-mandya">Bangalore → Mandya</option>
+        <option value="bangalore-mysore">Bangalore → Mysore</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Travel Date</label>
+      <input type="date" id="quickDate" class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Passengers</label>
+      <select id="quickPass" class="form-control">
+        <option value="1">1 Passenger</option>
+        <option value="2">2 Passengers</option>
+        <option value="3">3 Passengers</option>
+        <option value="4">4 Passengers</option>
+        <option value="5">5 Passengers</option>
+      </select>
+    </div>
+    <button class="btn-full" onclick="quickSearch()">Search Buses →</button>
+  </div>
 </section>
 
+<!-- Role Section -->
+<section class="role-section" id="roles">
+  <h2>How Would You Like to Continue?</h2>
+  <p>Choose your role to get started with SeatSync</p>
+  <div class="role-cards">
+    <div class="role-card" onclick="window.location.href='user-login.html'">
+      <div class="role-icon">👤</div>
+      <h3>Passenger</h3>
+      <p>Search buses, check seat availability, book tickets and pay online.</p>
+      <button class="role-btn">Continue as User</button>
+    </div>
+    <div class="role-card" onclick="window.location.href='admin-login.html'">
+      <div class="role-icon">👨‍💼</div>
+      <h3>Admin</h3>
+      <p>Manage routes, buses, timings and view all passenger bookings.</p>
+      <button class="role-btn">Continue as Admin</button>
+    </div>
+  </div>
+</section>
 
-    <!-- Features Section -->
-    <section class="features">
+<!-- Features -->
+<section class="features" id="features">
+  <h2>Why Choose SeatSync?</h2>
+  <p>Everything you need for a hassle-free bus journey</p>
+  <div class="feature-container">
+    <div class="feature-card">
+      <div class="icon">🔍</div>
+      <h3>Instant Search</h3>
+      <p>Search from multiple bus operators and routes across Karnataka in real-time.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💺</div>
+      <h3>Choose Your Seat</h3>
+      <p>Interactive seat map lets you pick exactly where you want to sit.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💳</div>
+      <h3>Secure Payments</h3>
+      <p>Pay via card, UPI or net banking with bank-level 256-bit encryption.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🎟️</div>
+      <h3>E-Ticket</h3>
+      <p>Get instant digital tickets. No printing required — show on your phone.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">⏱️</div>
+      <h3>Real-time Updates</h3>
+      <p>Live seat availability so you always know what's open.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔄</div>
+      <h3>Easy Cancellation</h3>
+      <p>Cancel bookings hassle-free and get quick refunds.</p>
+    </div>
+  </div>
+</section>
 
-        <h2>Why Use SeatSync?</h2>
+<!-- How it works -->
+<section class="role-section" id="how" style="background:#fff;">
+  <h2>Book in 4 Easy Steps</h2>
+  <p>From search to seat in under 2 minutes</p>
+  <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:16px;">
+    <div class="role-card" style="cursor:default;pointer-events:none;">
+      <div class="role-icon">🔍</div>
+      <h3>1. Search</h3>
+      <p>Pick your route and travel date</p>
+    </div>
+    <div class="role-card" style="cursor:default;pointer-events:none;">
+      <div class="role-icon">🚌</div>
+      <h3>2. Select Bus</h3>
+      <p>Compare buses and pick the best one</p>
+    </div>
+    <div class="role-card" style="cursor:default;pointer-events:none;">
+      <div class="role-icon">💺</div>
+      <h3>3. Choose Seat</h3>
+      <p>Pick your preferred seat on the bus</p>
+    </div>
+    <div class="role-card" style="cursor:default;pointer-events:none;">
+      <div class="role-icon">✅</div>
+      <h3>4. Pay &amp; Go</h3>
+      <p>Pay securely and get your e-ticket instantly</p>
+    </div>
+  </div>
+</section>
 
-        <div class="feature-container">
+<footer>
+  <strong>SeatSync</strong> — Smart Bus Booking Platform &copy; 2024. All rights reserved.
+</footer>
 
-            <div class="feature-card">
-                <div class="icon">🔍</div>
-                <h3>Easy Search</h3>
-                <p>
-                    Quickly find buses available on your preferred route.
-                </p>
-            </div>
+<script>
+  // Set default date to today
+  document.getElementById('quickDate').value = new Date().toISOString().split('T')[0];
 
+  function quickSearch() {
+    const route = document.getElementById('quickRoute').value;
+    const date  = document.getElementById('quickDate').value;
+    const pass  = document.getElementById('quickPass').value;
+    if (!route) { alert('Please select a route'); return; }
+    sessionStorage.setItem('ss_route', route);
+    sessionStorage.setItem('ss_date', date);
+    sessionStorage.setItem('ss_passengers', pass);
+    window.location.href = 'user-login.html';
+  }
 
-            <div class="feature-card">
-                <div class="icon">⏰</div>
-                <h3>Choose Timing</h3>
-                <p>
-                    Select the bus timing that is most convenient for you.
-                </p>
-            </div>
-
-
-            <div class="feature-card">
-                <div class="icon">💺</div>
-                <h3>Select Your Seat</h3>
-                <p>
-                    View available and occupied seats before booking.
-                </p>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- Footer -->
-    <footer>
-
-        <p>
-            © 2026 SeatSync | Smart Bus Route & Seat Selection System
-        </p>
-
-    </footer>
-
-
-    <!-- JavaScript -->
-    <script>
-
-        function searchBus() {
-
-            const route = document.getElementById("route").value;
-
-            if (route === "") {
-
-                alert("Please select a bus route.");
-
-            } else {
-
-                // For now, this message confirms that the selection works.
-                alert("Route selected successfully!");
-
-                // Later we will connect this to routes.html
-                // window.location.href = "routes.html";
-
-            }
-
-        }
-        
-
-    </script>
-
+  function toggleNav() {
+    const ul = document.querySelector('.nav-links');
+    ul.style.display = ul.style.display === 'flex' ? 'none' : 'flex';
+    ul.style.flexDirection = 'column';
+    ul.style.position = 'absolute';
+    ul.style.top = '68px'; ul.style.left = '0'; ul.style.right = '0';
+    ul.style.background = '#0f172a'; ul.style.padding = '16px 8%';
+  }
+</script>
 </body>
 </html>

@@ -1,659 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>SeatSync - Passenger Details</title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #eef3ff;
-            color: #172554;
-        }
-
-        /* Navigation Bar */
-
-        nav {
-            background: #172554;
-            color: white;
-            padding: 18px 50px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        nav h1 {
-            margin: 0;
-            font-size: 28px;
-        }
-
-        nav div {
-            display: flex;
-            gap: 25px;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-        }
-
-        /* Main Container */
-
-        .container {
-            max-width: 850px;
-            margin: 40px auto;
-            padding: 20px;
-        }
-
-        /* Cards */
-
-        .card {
-            background: white;
-            padding: 30px;
-            margin-bottom: 25px;
-
-            border-radius: 20px;
-
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        h2 {
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 25px;
-        }
-
-        /* Booking Information */
-
-        .booking-info {
-            line-height: 1.8;
-            font-size: 17px;
-        }
-
-        .booking-info p {
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 10px;
-        }
-
-        .booking-info strong {
-            display: inline-block;
-            width: 170px;
-        }
-
-        /* Total Price */
-
-        .total {
-            font-size: 22px;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 25px;
-        }
-
-        /* Passenger Form */
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        input {
-            width: 100%;
-            padding: 13px;
-
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-
-            font-size: 16px;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #2563eb;
-        }
-
-        /* Confirm Button */
-
-        .confirm-btn {
-            width: 100%;
-            padding: 15px;
-
-            background: #2563eb;
-            color: white;
-
-            border: none;
-            border-radius: 12px;
-
-            font-size: 17px;
-            font-weight: bold;
-
-            cursor: pointer;
-        }
-
-        .confirm-btn:hover {
-            background: #1d4ed8;
-        }
-
-        /* Mobile */
-
-        @media (max-width: 600px) {
-
-            nav {
-                padding: 15px 20px;
-            }
-
-            nav div {
-                gap: 10px;
-            }
-
-            nav a {
-                font-size: 14px;
-            }
-
-            .container {
-                margin: 20px auto;
-                padding: 12px;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            .booking-info strong {
-                width: 130px;
-            }
-
-        }
-
-    </style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Passenger Details – SeatSync</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
-
 <body>
 
+<nav class="navbar">
+  <a class="logo" href="user-dashboard.html">🚌 Seat<span>Sync</span></a>
+  <ul class="nav-links">
+    <li><a href="page3.html">← Back to Seats</a></li>
+  </ul>
+</nav>
 
-    <!-- Navigation Bar -->
+<div class="steps-bar">
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Search</span></div>
+  <div class="step-sep"></div>
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Select Bus</span></div>
+  <div class="step-sep"></div>
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Choose Seats</span></div>
+  <div class="step-sep"></div>
+  <div class="step active"><div class="step-num">4</div><span class="step-label">Passenger Details</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">5</div><span class="step-label">Payment</span></div>
+</div>
 
-    <nav>
+<div class="content-wrap">
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start;" id="mainGrid">
 
-        <h1>SeatSync</h1>
+    <!-- Passenger forms -->
+    <div>
+      <div class="card">
+        <h2>Passenger Details</h2>
+        <p class="sub">Enter details for each passenger</p>
+        <div id="passengerForms"></div>
+      </div>
 
-        <div>
-
-            <a href="index.html">
-                Home
-            </a>
-
-            <a href="search.html">
-                Find Bus
-            </a>
-
+      <div class="card">
+        <h2>Contact Information</h2>
+        <p class="sub">We'll send your booking confirmation here</p>
+        <div class="two-col">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="contactEmail" class="form-control" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="contactPhone" class="form-control" placeholder="+91 9876543210" required>
+          </div>
         </div>
-
-    </nav>
-
-
-
-    <!-- Main Container -->
-
-    <div class="container">
-
-
-        <!-- Booking Summary -->
-
-        <div class="card">
-
-            <h2>
-                Booking Summary
-            </h2>
-
-
-            <div class="booking-info">
-
-
-                <p>
-
-                    <strong>
-                        Route:
-                    </strong>
-
-                    <span id="routeName">
-                        Loading...
-                    </span>
-
-                </p>
-
-
-                <p>
-
-                    <strong>
-                        Bus:
-                    </strong>
-
-                    <span id="busName">
-                        Loading...
-                    </span>
-
-                </p>
-
-
-                <p>
-
-                    <strong>
-                        Departure:
-                    </strong>
-
-                    <span id="busTime">
-                        Loading...
-                    </span>
-
-                </p>
-
-
-                <p>
-
-                    <strong>
-                        Selected Seats:
-                    </strong>
-
-                    <span id="seatNumbers">
-                        Loading...
-                    </span>
-
-                </p>
-
-
-                <p>
-
-                    <strong>
-                        Price per Seat:
-                    </strong>
-
-                    <span id="seatPrice">
-                        Loading...
-                    </span>
-
-                </p>
-
-
-            </div>
-
-
-            <!-- Total -->
-
-            <div class="total">
-
-                Total Price:
-
-                <span id="totalPrice">
-                    ₹0
-                </span>
-
-            </div>
-
-
-        </div>
-
-
-
-        <!-- Passenger Details -->
-
-        <div class="card">
-
-            <h2>
-                Passenger Details
-            </h2>
-
-
-            <!-- Name -->
-
-            <div class="form-group">
-
-                <label for="passengerName">
-                    Full Name
-                </label>
-
-                <input
-                    type="text"
-                    id="passengerName"
-                    placeholder="Enter passenger name"
-                >
-
-            </div>
-
-
-            <!-- Mobile -->
-
-            <div class="form-group">
-
-                <label for="mobileNumber">
-                    Mobile Number
-                </label>
-
-                <input
-                    type="tel"
-                    id="mobileNumber"
-                    placeholder="Enter mobile number"
-                >
-
-            </div>
-
-
-            <!-- Email -->
-
-            <div class="form-group">
-
-                <label for="email">
-                    Email
-                </label>
-
-                <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter email address"
-                >
-
-            </div>
-
-
-            <!-- Confirm -->
-
-            <button
-                class="confirm-btn"
-                id="confirmBtn"
-            >
-
-                Confirm Booking
-
-            </button>
-
-
-        </div>
-
-
+      </div>
+
+      <button class="btn-full" onclick="proceedToPayment()" style="max-width:320px;">
+        Proceed to Payment →
+      </button>
     </div>
 
-    <script src="/js/env-config.js"></script>
-    <script type="module" src="js/supabase-client.js" defer></script>
-
-        const priceNumber =
-            selectedPrice
-                ? parseInt(
-                    selectedPrice.replace("₹", "")
-                )
-                : 0;
-
-
-
-        // ==========================================
-        // CALCULATE TOTAL PRICE
-        // ==========================================
-
-        const total =
-            seats.length * priceNumber;
-
-        async function ensureLoggedInUser() {
-            if (!window.supabaseAuth) {
-                return;
-            }
-
-            const session = await window.supabaseAuth.getSession();
-            const user = session?.user;
-
-            if (!user) {
-                window.location.href = 'user-login.html';
-                return;
-            }
-
-            const emailInput = document.getElementById('email');
-            if (emailInput && user.email) {
-                emailInput.value = user.email;
-            }
-
-            return user;
-        }
-
-        ensureLoggedInUser();
-        // DISPLAY ROUTE
-        // ==========================================
-
-        document.getElementById("routeName").textContent =
-
-            selectedRoute
-                ? selectedRoute.replace("-", " → ")
-                : "Not available";
-
-
-
-        // ==========================================
-        // DISPLAY BUS
-        // ==========================================
-
-        document.getElementById("busName").textContent =
-
-            selectedBus
-                ? selectedBus
-                : "Not available";
-
-
-
-        // ==========================================
-        // DISPLAY DEPARTURE TIME
-        // ==========================================
-
-        document.getElementById("busTime").textContent =
-
-            selectedTime
-                ? selectedTime
-                : "Not available";
-
-
-
-        // ==========================================
-        // DISPLAY SELECTED SEATS
-        // ==========================================
-
-        document.getElementById("seatNumbers").textContent =
-
-            seats.length > 0
-                ? seats.join(", ")
-                : "No seats selected";
-
-
-
-        // ==========================================
-        // DISPLAY PRICE PER SEAT
-        // ==========================================
-
-        document.getElementById("seatPrice").textContent =
-
-            selectedPrice
-                ? selectedPrice
-                : "₹0";
-
-
-
-        // ==========================================
-        // DISPLAY TOTAL PRICE
-        // ==========================================
-
-        document.getElementById("totalPrice").textContent =
-
-            "₹" + total;
-
-
-
-        // ==========================================
-        // CONFIRM BOOKING
-        // ==========================================
-
-     // ==========================================
-// CONFIRM BOOKING
-// ==========================================
-
-document
-    .getElementById("confirmBtn")
-    .addEventListener("click", async function () {
-
-        const name =
-            document
-                .getElementById("passengerName")
-                .value
-                .trim();
-
-        const mobile =
-            document
-                .getElementById("mobileNumber")
-                .value
-                .trim();
-
-        const email =
-            document
-                .getElementById("email")
-                .value
-                .trim();
-
-
-        // Check passenger details
-
-        if (
-            name === "" ||
-            mobile === "" ||
-            email === ""
-        ) {
-
-            alert("Please fill in all passenger details.");
-
-            return;
-        }
-
-
-        // Booking data
-
-        const bookingData = {
-
-            route: selectedRoute,
-
-            bus: selectedBus,
-
-            time: selectedTime,
-
-            price: selectedPrice,
-
-            seats: selectedSeats,
-
-            totalPrice: total,
-
-            name: name,
-
-            mobile: mobile,
-
-            email: email,
-
-            bookingDate: new Date().toLocaleString()
-
-        };
-
-
-        // Send booking to Supabase
-
-        try {
-            const session = await window.supabaseAuth.getSession();
-            const user = session?.user;
-
-            if (!user) {
-                alert('Please log in before confirming your booking.');
-                window.location.href = 'user-login.html';
-                return;
-            }
-
-            const bookingDataWithUser = {
-                user_id: user.id,
-                route: selectedRoute,
-                bus: selectedBus,
-                time: selectedTime,
-                price: selectedPrice,
-                seats: selectedSeats,
-                total_price: total,
-                passenger_name: name,
-                contact_number: mobile,
-                email: email,
-                booking_date: new Date().toISOString(),
-                status: 'confirmed'
-            };
-
-            const { data: insertData, error: insertError } = await window.supabase
-                .from('bookings')
-                .insert([bookingDataWithUser]);
-
-            if (insertError) {
-                console.error('Supabase booking insert error:', insertError);
-                alert('Booking could not be saved. ' + (insertError.message || 'Please try again.'));
-                return;
-            }
-
-            if (!insertData || insertData.length === 0) {
-                alert('Booking could not be saved. Please try again.');
-                return;
-            }
-
-
-            // Go to Page 5
-
-            const bookingRow = insertData[0];
-            const bookingId = bookingRow.id || '';
-            const page5URL =
-                "page5.html" +
-                "?route=" + encodeURIComponent(selectedRoute) +
-                "&bus=" + encodeURIComponent(selectedBus) +
-                "&time=" + encodeURIComponent(selectedTime) +
-                "&price=" + encodeURIComponent(selectedPrice) +
-                "&seats=" + encodeURIComponent(selectedSeats) +
-                "&name=" + encodeURIComponent(name) +
-                "&mobile=" + encodeURIComponent(mobile) +
-                "&email=" + encodeURIComponent(email) +
-                "&bookingId=" + encodeURIComponent(bookingId);
-
-            window.location.href = page5URL;
-
-
-        } catch (error) {
-
-            console.error("Booking error:", error);
-
-            alert(
-                "Unable to connect to SeatSync server. Please make sure the backend is running."
-            );
-
-        }
-
-    });   
-                        
-                
-
-
-
-               
-
-
-    </script>
-
-
+    <!-- Summary -->
+    <div class="card summary-card">
+      <h3>Trip Summary</h3>
+      <div class="summary-row"><span class="lbl">Bus</span><span class="val" id="sumBus">—</span></div>
+      <div class="summary-row"><span class="lbl">Route</span><span class="val" id="sumRoute">—</span></div>
+      <div class="summary-row"><span class="lbl">Date</span><span class="val" id="sumDate">—</span></div>
+      <div class="summary-row"><span class="lbl">Departure</span><span class="val" id="sumTime">—</span></div>
+      <div class="divider"></div>
+      <div class="summary-row"><span class="lbl">Seats</span></div>
+      <div class="seat-chips" id="seatChips"></div>
+      <div class="divider"></div>
+      <div class="summary-row"><span class="lbl">Subtotal</span><span class="val" id="sumSubtotal">₹0</span></div>
+      <div class="summary-row"><span class="lbl">Taxes (5%)</span><span class="val" id="sumTax">₹0</span></div>
+      <div class="summary-total">
+        <span>Grand Total</span>
+        <span class="val" id="sumTotal">₹0</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer><strong>SeatSync</strong> &copy; 2024</footer>
+
+<script>
+const booking = JSON.parse(sessionStorage.getItem('ss_booking') || 'null');
+if (!booking) { window.location.href = 'page3.html'; }
+
+function routeLabel(r) {
+  return r ? r.replace('-', ' → ').replace(/\b\w/g, c => c.toUpperCase()) : '';
+}
+
+// Populate summary
+document.getElementById('sumBus').textContent    = booking.name;
+document.getElementById('sumRoute').textContent  = routeLabel(booking.route);
+document.getElementById('sumDate').textContent   = booking.date || '—';
+document.getElementById('sumTime').textContent   = booking.time;
+
+const seats   = booking.selectedSeats || [];
+const sub     = booking.totalAmount;
+const tax     = Math.round(sub * 0.05);
+const grand   = sub + tax;
+
+document.getElementById('seatChips').innerHTML = seats.map(s => `<span class="seat-chip">${s}</span>`).join('');
+document.getElementById('sumSubtotal').textContent = '₹' + sub;
+document.getElementById('sumTax').textContent      = '₹' + tax;
+document.getElementById('sumTotal').textContent    = '₹' + grand;
+
+// Pre-fill email
+const savedEmail = localStorage.getItem('ss_email') || '';
+if (savedEmail) document.getElementById('contactEmail').value = savedEmail;
+
+// Build passenger forms
+const forms = document.getElementById('passengerForms');
+seats.forEach((seat, i) => {
+  forms.insertAdjacentHTML('beforeend', `
+    <div class="passenger-block">
+      <div class="pax-head">
+        <div class="pax-num">${i + 1}</div>
+        <strong>Passenger ${i + 1}</strong>
+        <span class="pax-seat-tag" style="margin-left:auto;">Seat ${seat}</span>
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" class="form-control pax-fname" data-idx="${i}" placeholder="First name" required>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" class="form-control pax-lname" data-idx="${i}" placeholder="Last name" required>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label>Age</label>
+          <input type="number" class="form-control pax-age" data-idx="${i}" placeholder="Age" min="1" max="120" required>
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select class="form-control pax-gender" data-idx="${i}">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+    </div>`);
+});
+
+// Responsive: stack grid on small screens
+function checkWidth() {
+  const grid = document.getElementById('mainGrid');
+  if (window.innerWidth < 960) grid.style.gridTemplateColumns = '1fr';
+}
+checkWidth();
+window.addEventListener('resize', checkWidth);
+
+function proceedToPayment() {
+  // Validate
+  const email = document.getElementById('contactEmail').value.trim();
+  const phone = document.getElementById('contactPhone').value.trim();
+  if (!email || !phone) { alert('Please fill in your contact details.'); return; }
+
+  const passengers = seats.map((seat, i) => ({
+    seat,
+    firstName: document.querySelector(`.pax-fname[data-idx="${i}"]`).value.trim(),
+    lastName:  document.querySelector(`.pax-lname[data-idx="${i}"]`).value.trim(),
+    age:       document.querySelector(`.pax-age[data-idx="${i}"]`).value,
+    gender:    document.querySelector(`.pax-gender[data-idx="${i}"]`).value,
+  }));
+
+  for (const p of passengers) {
+    if (!p.firstName || !p.lastName || !p.age) {
+      alert('Please fill in all passenger details.'); return;
+    }
+  }
+
+  const fullBooking = {
+    ...booking,
+    passengers,
+    contactEmail: email,
+    contactPhone: phone,
+    tax,
+    grandTotal: grand,
+  };
+  sessionStorage.setItem('ss_booking', JSON.stringify(fullBooking));
+  window.location.href = 'payment.html';
+}
+</script>
 </body>
-
 </html>

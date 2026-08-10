@@ -1,959 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>SeatSync - Booking Confirmed</title>
-
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-
-        body {
-
-            margin: 0;
-
-            font-family: Arial, sans-serif;
-
-            background: #eef3ff;
-
-            color: #172554;
-        }
-
-
-        /* Navigation */
-
-        nav {
-
-            background: #172554;
-
-            color: white;
-
-            padding: 18px 50px;
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-        }
-
-
-        nav h1 {
-
-            margin: 0;
-
-            font-size: 28px;
-        }
-
-
-        nav div {
-
-            display: flex;
-
-            gap: 25px;
-        }
-
-
-        nav a {
-
-            color: white;
-
-            text-decoration: none;
-        }
-
-
-        /* Main container */
-
-        .container {
-
-            max-width: 850px;
-
-            margin: 40px auto;
-
-            padding: 20px;
-        }
-
-
-        /* Success message */
-
-        .success {
-
-            text-align: center;
-
-            margin-bottom: 25px;
-        }
-
-
-        .success-icon {
-
-            width: 70px;
-
-            height: 70px;
-
-            margin: auto;
-
-            border-radius: 50%;
-
-            background: #22c55e;
-
-            color: white;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 38px;
-
-            font-weight: bold;
-        }
-
-
-        .success h2 {
-
-            margin-bottom: 8px;
-
-            font-size: 30px;
-        }
-
-
-        .success p {
-
-            color: #64748b;
-
-            font-size: 16px;
-        }
-
-
-        /* Ticket */
-
-        .ticket {
-
-            background: white;
-
-            border-radius: 20px;
-
-            padding: 30px;
-
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-
-            border-top: 6px solid #2563eb;
-        }
-
-
-        .ticket-header {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            border-bottom: 1px dashed #cbd5e1;
-
-            padding-bottom: 20px;
-
-            margin-bottom: 20px;
-        }
-
-
-        .ticket-header h3 {
-
-            margin: 0;
-
-            font-size: 24px;
-        }
-
-
-        .booking-id {
-
-            background: #eef3ff;
-
-            padding: 8px 12px;
-
-            border-radius: 8px;
-
-            font-weight: bold;
-
-            font-size: 14px;
-        }
-
-
-        /* Ticket information */
-
-        .ticket-info {
-
-            display: grid;
-
-            grid-template-columns: 1fr 1fr;
-
-            gap: 18px;
-
-            line-height: 1.5;
-        }
-
-
-        .info-box {
-
-            background: #f8fafc;
-
-            padding: 15px;
-
-            border-radius: 12px;
-        }
-
-
-        .info-box small {
-
-            display: block;
-
-            color: #64748b;
-
-            margin-bottom: 5px;
-        }
-
-
-        .info-box strong {
-
-            font-size: 16px;
-        }
-
-
-        /* Total */
-
-        .total-box {
-
-            margin-top: 25px;
-
-            padding-top: 20px;
-
-            border-top: 1px dashed #cbd5e1;
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-        }
-
-
-        .total-box span {
-
-            font-size: 23px;
-
-            font-weight: bold;
-        }
-
-
-        /* Buttons */
-
-        .buttons {
-
-            display: flex;
-
-            gap: 15px;
-
-            margin-top: 25px;
-        }
-
-
-        .buttons button {
-
-            flex: 1;
-
-            padding: 14px;
-
-            border: none;
-
-            border-radius: 10px;
-
-            font-size: 16px;
-
-            font-weight: bold;
-
-            cursor: pointer;
-        }
-
-
-        .download-btn {
-
-            background: #2563eb;
-
-            color: white;
-        }
-
-
-        .download-btn:hover {
-
-            background: #1d4ed8;
-        }
-
-
-        .print-btn {
-
-            background: #172554;
-
-            color: white;
-        }
-
-
-        .print-btn:hover {
-
-            background: #0f172a;
-        }
-
-
-        .home-btn {
-
-            display: block;
-
-            text-align: center;
-
-            margin-top: 20px;
-
-            padding: 14px;
-
-            background: #e2e8f0;
-
-            color: #172554;
-
-            text-decoration: none;
-
-            border-radius: 10px;
-
-            font-weight: bold;
-        }
-
-
-        /* Mobile */
-
-        @media (max-width: 600px) {
-
-            nav {
-
-                padding: 15px 20px;
-            }
-
-
-            nav div {
-
-                gap: 10px;
-            }
-
-
-            nav a {
-
-                font-size: 14px;
-            }
-
-
-            .container {
-
-                margin: 20px auto;
-
-                padding: 12px;
-            }
-
-
-            .ticket {
-
-                padding: 20px;
-            }
-
-
-            .ticket-info {
-
-                grid-template-columns: 1fr;
-            }
-
-
-            .ticket-header {
-
-                flex-direction: column;
-
-                gap: 12px;
-
-                align-items: flex-start;
-            }
-
-
-            .buttons {
-
-                flex-direction: column;
-            }
-
-        }
-
-
-        /* Print styling */
-
-        @media print {
-
-            body {
-
-                background: white;
-            }
-
-
-            nav,
-            .success,
-            .buttons,
-            .home-btn {
-
-                display: none;
-            }
-
-
-            .container {
-
-                margin: 0;
-
-                max-width: 100%;
-            }
-
-
-            .ticket {
-
-                box-shadow: none;
-
-                border: 1px solid #ddd;
-            }
-
-        }
-
-    </style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmed – SeatSync</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
-
 <body>
 
-
-    <!-- Navigation -->
-
-    <nav>
-
-        <h1>SeatSync</h1>
-
-        <div>
-
-            <a href="index.html">
-                Home
-            </a>
-
-            <a href="search.html">
-                Find Bus
-            </a>
-
-        </div>
-
-    </nav>
-
-
-
-    <div class="container">
-
-
-        <!-- Success -->
-
-        <div class="success">
-
-            <div class="success-icon">
-                ✓
-            </div>
-
-            <h2>
-                Booking Confirmed!
-            </h2>
-
-            <p>
-                Your SeatSync bus ticket has been successfully booked.
-            </p>
-
-        </div>
-
-
-
-        <!-- Ticket -->
-
-        <div class="ticket"
-             id="ticket">
-
-
-            <div class="ticket-header">
-
-                <h3>
-                    🚌 SeatSync Ticket
-                </h3>
-
-                <div class="booking-id">
-
-                    Booking ID:
-                    <span id="bookingId"></span>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="ticket-info">
-
-
-                <!-- Passenger -->
-
-                <div class="info-box">
-
-                    <small>
-                        Passenger
-                    </small>
-
-                    <strong id="passengerName">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <!-- Mobile -->
-
-                <div class="info-box">
-
-                    <small>
-                        Mobile
-                    </small>
-
-                    <strong id="mobileNumber">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <!-- Route -->
-
-                <div class="info-box">
-
-                    <small>
-                        Route
-                    </small>
-
-                    <strong id="routeName">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <!-- Bus -->
-
-                <div class="info-box">
-
-                    <small>
-                        Bus
-                    </small>
-
-                    <strong id="busName">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <!-- Departure -->
-
-                <div class="info-box">
-
-                    <small>
-                        Departure
-                    </small>
-
-                    <strong id="busTime">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <!-- Seats -->
-
-                <div class="info-box">
-
-                    <small>
-                        Selected Seats
-                    </small>
-
-                    <strong id="seatNumbers">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <!-- Price per seat -->
-
-                <div class="info-box">
-
-                    <small>
-                        Price Per Seat
-                    </small>
-
-                    <strong id="seatPrice">
-                        ₹0
-                    </strong>
-
-                </div>
-
-
-                <!-- Email -->
-
-                <div class="info-box">
-
-                    <small>
-                        Email
-                    </small>
-
-                    <strong id="email">
-                        -
-                    </strong>
-
-                </div>
-
-
-            </div>
-
-
-
-            <!-- Total -->
-
-            <div class="total-box">
-
-                <span>
-                    Total Amount
-                </span>
-
-                <span id="totalPrice">
-                    ₹0
-                </span>
-
-            </div>
-
-
-        </div>
-
-
-
-        <!-- Buttons -->
-
-        <div class="buttons">
-
-            <button
-                class="download-btn"
-                id="downloadBtn">
-
-                ⬇ Download Ticket
-
-            </button>
-
-
-            <button
-                class="print-btn"
-                id="printBtn">
-
-                🖨 Print / Save as PDF
-
-            </button>
-
-        </div>
-
-
-
-        <!-- Home -->
-
-        <a
-            href="index.html"
-            class="home-btn">
-
-            ← Back to Home
-
-        </a>
-
-
+<nav class="navbar">
+  <a class="logo" href="user-dashboard.html">🚌 Seat<span>Sync</span></a>
+  <ul class="nav-links">
+    <li><a href="user-dashboard.html">My Dashboard</a></li>
+    <li><a href="page2.html">Book Another</a></li>
+  </ul>
+</nav>
+
+<div class="content-wrap-sm">
+
+  <!-- Success hero -->
+  <div class="confirm-hero">
+    <div class="confirm-icon">✅</div>
+    <h1>Booking Confirmed!</h1>
+    <p>Your bus ticket has been booked successfully. Have a great journey!</p>
+    <div class="booking-ref" id="bookingRef">SS00000000</div>
+  </div>
+
+  <!-- E-Ticket -->
+  <div class="ticket">
+    <div class="ticket-header">
+      <h2>🎟️ E-Ticket</h2>
+      <span class="paid-badge">✅ PAID</span>
     </div>
-
-
-
-    <!-- JavaScript -->
-
-    <script>
-
-
-        // ==========================================
-        // GET INFORMATION FROM PAGE 4
-        // ==========================================
-
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
-
-
-        const selectedRoute =
-            params.get("route");
-
-
-        const selectedBus =
-            params.get("bus");
-
-
-        const selectedTime =
-            params.get("time");
-
-
-        const selectedPrice =
-            params.get("price");
-
-
-        const selectedSeats =
-            params.get("seats");
-
-
-        const passengerName =
-            params.get("name");
-
-
-        const mobileNumber =
-            params.get("mobile");
-
-
-        const email =
-            params.get("email");
-
-
-
-        // ==========================================
-        // SEATS
-        // ==========================================
-
-        const seats =
-            selectedSeats
-                ? selectedSeats.split(",")
-                : [];
-
-
-
-        // ==========================================
-        // PRICE
-        // ==========================================
-
-        const priceNumber =
-            selectedPrice
-                ? parseInt(
-                    selectedPrice.replace("₹", "")
-                )
-                : 0;
-
-
-
-        // ==========================================
-        // TOTAL
-        // ==========================================
-
-        const total =
-            seats.length * priceNumber;
-
-
-
-        // ==========================================
-        // BOOKING ID
-        // ==========================================
-
-        const bookingId =
-            params.get("bookingId") ||
-            "SS" +
-            Date.now()
-                .toString()
-                .slice(-6);
-
-
-
-        // ==========================================
-        // DISPLAY INFORMATION
-        // ==========================================
-
-        document.getElementById("bookingId")
-            .textContent = bookingId;
-
-
-        document.getElementById("passengerName")
-            .textContent =
-                passengerName || "-";
-
-
-        document.getElementById("mobileNumber")
-            .textContent =
-                mobileNumber || "-";
-
-
-        document.getElementById("email")
-            .textContent =
-                email || "-";
-
-
-        document.getElementById("routeName")
-            .textContent =
-                selectedRoute
-                    ? selectedRoute.replace(
-                        "-",
-                        " → "
-                    )
-                    : "-";
-
-
-        document.getElementById("busName")
-            .textContent =
-                selectedBus || "-";
-
-
-        document.getElementById("busTime")
-            .textContent =
-                selectedTime || "-";
-
-
-        document.getElementById("seatNumbers")
-            .textContent =
-                seats.length > 0
-                    ? seats.join(", ")
-                    : "-";
-
-
-        document.getElementById("seatPrice")
-            .textContent =
-                selectedPrice || "₹0";
-
-
-        document.getElementById("totalPrice")
-            .textContent =
-                "₹" + total;
-
-
-
-        // ==========================================
-        // DOWNLOAD TICKET
-        // ==========================================
-
-        document.getElementById("downloadBtn")
-            .addEventListener(
-                "click",
-                function () {
-
-
-                    const ticketText =
-
-`SEATSYNC - BUS TICKET
-================================
-
-Booking ID: ${bookingId}
-
-Passenger: ${passengerName || "-"}
-Mobile: ${mobileNumber || "-"}
-Email: ${email || "-"}
-
-Route: ${
-    selectedRoute
-        ? selectedRoute.replace("-", " → ")
-        : "-"
+    <div class="ticket-body">
+      <!-- Route display -->
+      <div class="route-row">
+        <div class="city-big" id="tcFrom">—</div>
+        <div class="route-mid">
+          <div class="route-line"></div>
+          <span class="route-bus-icon">🚌</span>
+          <div class="route-line"></div>
+        </div>
+        <div class="city-big" id="tcTo">—</div>
+      </div>
+      <div class="t-divider"></div>
+
+      <div class="t-field"><div class="lbl">Bus Name</div><div class="val" id="tcBus">—</div></div>
+      <div class="t-field"><div class="lbl">Bus Type</div><div class="val" id="tcType">—</div></div>
+      <div class="t-field"><div class="lbl">Travel Date</div><div class="val" id="tcDate">—</div></div>
+      <div class="t-field"><div class="lbl">Departure</div><div class="val" id="tcTime">—</div></div>
+      <div class="t-field"><div class="lbl">Seats</div><div class="val" id="tcSeats">—</div></div>
+      <div class="t-field"><div class="lbl">Passengers</div><div class="val" id="tcPass">—</div></div>
+      <div class="t-divider"></div>
+
+      <div class="t-field"><div class="lbl">Contact Email</div><div class="val" id="tcEmail">—</div></div>
+      <div class="t-field"><div class="lbl">Contact Phone</div><div class="val" id="tcPhone">—</div></div>
+      <div class="t-divider"></div>
+
+      <div class="t-field"><div class="lbl">Ticket Fare</div><div class="val" id="tcFare">—</div></div>
+      <div class="t-field"><div class="lbl">Taxes</div><div class="val" id="tcTax">—</div></div>
+      <div class="t-field" style="grid-column:1/-1;">
+        <div class="lbl">Total Paid</div>
+        <div class="val" id="tcTotal" style="font-size:22px;color:var(--accent);">—</div>
+      </div>
+      <div class="t-field" style="grid-column:1/-1;">
+        <div class="lbl">Payment Method</div><div class="val" id="tcPayMethod">—</div>
+      </div>
+      <div class="t-field" style="grid-column:1/-1;">
+        <div class="lbl">Booked At</div><div class="val" id="tcBookedAt">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Passengers table -->
+  <div class="card" id="paxCard" style="display:none;">
+    <h2>Passenger Details</h2>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Name</th><th>Age</th><th>Gender</th><th>Seat</th></tr></thead>
+        <tbody id="paxTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="action-btns">
+    <button class="btn-primary" onclick="printTicket()">🖨️ Print Ticket</button>
+    <button class="btn-secondary" onclick="window.location.href='page2.html'">Book Another Ticket</button>
+    <button class="btn-secondary" onclick="window.location.href='user-dashboard.html'">Go to Dashboard</button>
+    <button class="btn-danger" id="cancelBtn" onclick="cancelThisBooking()">🚫 Cancel This Booking</button>
+  </div>
+
+</div>
+
+<footer><strong>SeatSync</strong> &copy; 2024</footer>
+
+<script>
+const conf = JSON.parse(sessionStorage.getItem('ss_confirmation') || 'null');
+if (!conf) { window.location.href = 'user-dashboard.html'; }
+
+function routeLabel(r) {
+  return r ? r.replace('-', ' → ').replace(/\b\w/g, c => c.toUpperCase()) : '—';
 }
 
-Bus: ${selectedBus || "-"}
+function cityName(part) {
+  return part ? part.replace(/\b\w/g, c => c.toUpperCase()) : '—';
+}
 
-Departure: ${selectedTime || "-"}
+document.getElementById('bookingRef').textContent = conf.ref || '—';
 
-Selected Seats:
-${seats.join(", ") || "-"}
+const parts = (conf.route || '').split('-');
+document.getElementById('tcFrom').textContent = cityName(parts[0]);
+document.getElementById('tcTo').textContent   = cityName(parts[1]);
 
-Price Per Seat:
-${selectedPrice || "₹0"}
+document.getElementById('tcBus').textContent       = conf.busName || '—';
+document.getElementById('tcType').textContent      = conf.busType || '—';
+document.getElementById('tcDate').textContent      = conf.date || '—';
+document.getElementById('tcTime').textContent      = conf.time || '—';
+document.getElementById('tcSeats').textContent     = conf.seats || '—';
+document.getElementById('tcEmail').textContent     = conf.contactEmail || '—';
+document.getElementById('tcPhone').textContent     = conf.contactPhone || '—';
+document.getElementById('tcFare').textContent      = '₹' + (conf.totalAmount || 0);
+document.getElementById('tcTax').textContent       = '₹' + (conf.tax || 0);
+document.getElementById('tcTotal').textContent     = '₹' + (conf.grandTotal || conf.totalAmount || 0);
+document.getElementById('tcBookedAt').textContent  = conf.bookedAt ? new Date(conf.bookedAt).toLocaleString() : '—';
 
-Total Amount:
-₹${total}
+const payMethodLabels = { card: '💳 Credit/Debit Card', upi: '📱 UPI', nb: '🏦 Net Banking' };
+document.getElementById('tcPayMethod').textContent = payMethodLabels[conf.paymentMethod] || conf.paymentMethod || '—';
 
-================================
-Thank you for booking with SeatSync!
-`;
+const pass = conf.passengers || [];
+if (pass.length) {
+  document.getElementById('paxCard').style.display = 'block';
+  document.getElementById('tcPass').textContent = pass.length + ' passenger(s)';
+  document.getElementById('paxTable').innerHTML = pass.map((p, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><strong>${p.firstName} ${p.lastName}</strong></td>
+      <td>${p.age}</td>
+      <td style="text-transform:capitalize;">${p.gender}</td>
+      <td><span class="badge badge-info">${p.seat}</span></td>
+    </tr>`).join('');
+} else {
+  document.getElementById('tcPass').textContent = conf.seats ? conf.seats.split(',').length + ' passenger(s)' : '—';
+}
 
+function printTicket() {
+  window.print();
+}
 
-                    const blob =
-                        new Blob(
-                            [ticketText],
-                            {
-                                type: "text/plain"
-                            }
-                        );
+async function cancelThisBooking() {
+  if (!conf || !conf.ref) return;
+  if (!confirm(`Cancel booking ${conf.ref}?\nThis cannot be undone.`)) return;
 
+  const btn = document.getElementById('cancelBtn');
+  btn.disabled = true;
+  btn.textContent = 'Cancelling…';
 
-                    const url =
-                        URL.createObjectURL(blob);
+  try {
+    await fetch('/booking/cancel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ref: conf.ref })
+    });
+  } catch (_) {}
 
+  // Update localStorage
+  const myBookings = JSON.parse(localStorage.getItem('ss_my_bookings') || '[]');
+  const idx = myBookings.findIndex(b => b.ref === conf.ref);
+  if (idx !== -1) { myBookings[idx].status = 'cancelled'; localStorage.setItem('ss_my_bookings', JSON.stringify(myBookings)); }
 
-                    const link =
-                        document.createElement("a");
+  // Update ticket UI
+  document.querySelector('.paid-badge').textContent = '🚫 CANCELLED';
+  document.querySelector('.paid-badge').style.background = 'var(--danger)';
+  document.getElementById('cancelBtn').style.display = 'none';
 
-
-                    link.href = url;
-
-
-                    link.download =
-                        "SeatSync-Ticket-" +
-                        bookingId +
-                        ".txt";
-
-
-                    document.body.appendChild(link);
-
-
-                    link.click();
-
-
-                    document.body.removeChild(link);
-
-
-                    URL.revokeObjectURL(url);
-
-                }
-            );
-
-
-
-        // ==========================================
-        // PRINT / SAVE AS PDF
-        // ==========================================
-
-        document.getElementById("printBtn")
-            .addEventListener(
-                "click",
-                function () {
-
-                    window.print();
-
-                }
-            );
-
-
-    </script>
-
-
+  const notice = document.createElement('div');
+  notice.className = 'alert alert-error';
+  notice.style.maxWidth = '640px'; notice.style.margin = '0 auto 16px';
+  notice.textContent = '🚫 This booking has been cancelled. A refund will be processed within 5–7 business days.';
+  document.querySelector('.action-btns').before(notice);
+}
+</script>
 </body>
-
 </html>

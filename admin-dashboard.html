@@ -1,144 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Admin Dashboard - SeatSync</title>
-
-    <link rel="stylesheet" href="css/style.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard – SeatSync</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
-
 <body>
 
-    <header>
+<nav class="navbar">
+  <div class="logo">🚌 Seat<span>Sync</span> <span style="font-size:13px;background:rgba(239,68,68,.3);padding:2px 10px;border-radius:4px;margin-left:8px;font-weight:600;">ADMIN</span></div>
+  <ul class="nav-links">
+    <li><a href="admin-dashboard.html">Dashboard</a></li>
+    <li><a href="#" onclick="loadBookings()">Bookings</a></li>
+  </ul>
+  <button class="btn-logout" onclick="adminLogout()" style="margin-right:0;">Sign Out</button>
+</nav>
 
-        <h1>SeatSync</h1>
+<div class="content-wrap">
 
-        <p>Admin Dashboard</p>
+  <!-- Header -->
+  <div class="dash-header">
+    <div>
+      <h1>Admin Dashboard 👨‍💼</h1>
+      <p class="sub">Manage all bookings, routes and buses</p>
+    </div>
+    <button class="btn-primary" onclick="loadBookings()">🔄 Refresh Bookings</button>
+  </div>
 
-    </header>
+  <!-- Stats -->
+  <div class="admin-stats">
+    <div class="admin-stat">
+      <div class="ico ico-blue">🚌</div>
+      <div><div class="num">5</div><div class="lbl">Total Routes</div></div>
+    </div>
+    <div class="admin-stat">
+      <div class="ico ico-green">🚍</div>
+      <div><div class="num">14</div><div class="lbl">Total Buses</div></div>
+    </div>
+    <div class="admin-stat">
+      <div class="ico ico-orange">🎟️</div>
+      <div><div class="num" id="statTotal">0</div><div class="lbl">Total Bookings</div></div>
+    </div>
+    <div class="admin-stat">
+      <div class="ico ico-purple">💰</div>
+      <div><div class="num" id="statRevenue">₹0</div><div class="lbl">Total Revenue</div></div>
+    </div>
+  </div>
 
+  <!-- Routes info cards -->
+  <div class="card" style="margin-bottom:24px;">
+    <h2>Active Routes</h2>
+    <p class="sub">All currently operating routes</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:8px;">
+      <div style="background:var(--bg);padding:16px;border-radius:var(--r);border:1.5px solid var(--border);">
+        <div style="font-weight:700;">Bangalore → Chikmagalur</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">4 buses • ₹400–₹800</div>
+      </div>
+      <div style="background:var(--bg);padding:16px;border-radius:var(--r);border:1.5px solid var(--border);">
+        <div style="font-weight:700;">Bangalore → Tumkur</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">3 buses • ₹180–₹500</div>
+      </div>
+      <div style="background:var(--bg);padding:16px;border-radius:var(--r);border:1.5px solid var(--border);">
+        <div style="font-weight:700;">Bangalore → Hassan</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">3 buses • ₹350–₹600</div>
+      </div>
+      <div style="background:var(--bg);padding:16px;border-radius:var(--r);border:1.5px solid var(--border);">
+        <div style="font-weight:700;">Bangalore → Mandya</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">4 buses • ₹170–₹500</div>
+      </div>
+      <div style="background:var(--bg);padding:16px;border-radius:var(--r);border:1.5px solid var(--border);">
+        <div style="font-weight:700;">Bangalore → Mysore</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">3 buses • ₹300–₹400</div>
+      </div>
+    </div>
+  </div>
 
-    <main class="dashboard">
+  <!-- Bookings table -->
+  <div class="card table-card">
+    <h2>All Bookings</h2>
+    <div class="table-controls">
+      <input type="text" id="searchInput" class="form-control" placeholder="🔍  Search by ref, route, email…" oninput="filterTable()" style="max-width:320px;">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-secondary" style="font-size:13px;padding:8px 16px;" onclick="exportCSV()">📥 Export CSV</button>
+        <button class="btn-secondary" style="font-size:13px;padding:8px 16px;" onclick="loadBookings()">🔄 Refresh</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Ref #</th>
+            <th>Route</th>
+            <th>Bus</th>
+            <th>Date</th>
+            <th>Seats</th>
+            <th>Passengers</th>
+            <th>Contact</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsTable">
+          <tr><td colspan="11"><div class="empty-state"><div class="icon">🔄</div><h3>Loading bookings…</h3></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-        <h2>Admin Dashboard 👨‍💼</h2>
+</div>
 
-        <p>Manage your SeatSync bus booking system.</p>
+<footer><strong>SeatSync Admin</strong> &copy; 2024</footer>
 
+<script>
+let allBookings = [];
 
-        <div class="admin-stats">
+function adminLogout() {
+  localStorage.removeItem('ss_role');
+  window.location.href = 'admin-login.html';
+}
 
-            <div class="stat-card">
+function routeLabel(r) {
+  return r ? r.replace('-', ' → ').replace(/\b\w/g, c => c.toUpperCase()) : '—';
+}
 
-                <h3>🚌</h3>
-                <h2>5</h2>
-                <p>Total Routes</p>
+async function loadBookings() {
+  const tbody = document.getElementById('bookingsTable');
+  tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><div class="icon">🔄</div><h3>Loading…</h3></div></td></tr>';
+  try {
+    const res  = await fetch('/bookings');
+    const data = await res.json();
+    allBookings = data.bookings || [];
+    updateStats();
+    renderTable(allBookings);
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="11"><div class="alert alert-error">❌ Failed to load bookings: ${err.message}</div></td></tr>`;
+  }
+}
 
-            </div>
+function updateStats() {
+  document.getElementById('statTotal').textContent   = allBookings.length;
+  const rev = allBookings.reduce((s, b) => s + (parseFloat(b.grandTotal) || parseFloat(b.totalAmount) || 0), 0);
+  document.getElementById('statRevenue').textContent = '₹' + rev.toLocaleString('en-IN');
+}
 
+function renderTable(bookings) {
+  const tbody = document.getElementById('bookingsTable');
+  if (!bookings.length) {
+    tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><div class="icon">🎟️</div><h3>No bookings yet</h3><p>Bookings made by users will appear here.</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = bookings.map((b, idx) => {
+    const paxCount = Array.isArray(b.passengers) ? b.passengers.length : (b.seats ? b.seats.split(',').length : '—');
+    const payMethod = { card:'💳 Card', upi:'📱 UPI', nb:'🏦 Net Banking' }[b.paymentMethod] || b.paymentMethod || '—';
+    return `
+    <tr>
+      <td><strong>${b.ref || ('SS' + idx)}</strong></td>
+      <td>${routeLabel(b.route)}</td>
+      <td>${b.busName || '—'}</td>
+      <td>${b.date || '—'}</td>
+      <td><code style="font-size:12px;">${b.seats || '—'}</code></td>
+      <td>${paxCount}</td>
+      <td style="font-size:12px;">${b.contactEmail || '—'}<br><span style="color:var(--muted);">${b.contactPhone || ''}</span></td>
+      <td><strong>₹${b.grandTotal || b.totalAmount || 0}</strong></td>
+      <td style="font-size:12px;">${payMethod}</td>
+      <td><span class="badge badge-success">Confirmed</span></td>
+      <td><button class="btn-tbl" onclick="cancelBooking(${idx})">Cancel</button></td>
+    </tr>`;
+  }).join('');
+}
 
-            <div class="stat-card">
+function filterTable() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allBookings.filter(b =>
+    JSON.stringify(b).toLowerCase().includes(q)
+  );
+  renderTable(filtered);
+}
 
-                <h3>🚍</h3>
-                <h2>12</h2>
-                <p>Total Buses</p>
+async function cancelBooking(idx) {
+  if (!confirm('Cancel this booking? This action cannot be undone.')) return;
+  try {
+    const res  = await fetch('/booking/cancel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index: idx })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Booking cancelled successfully.', 'success');
+      loadBookings();
+    } else {
+      showToast(data.message || 'Cancel failed.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error: ' + err.message, 'error');
+  }
+}
 
-            </div>
+function exportCSV() {
+  if (!allBookings.length) { alert('No bookings to export.'); return; }
+  const headers = ['Ref','Route','Bus','Date','Seats','Email','Phone','Total','Payment','Status'];
+  const rows = allBookings.map(b => [
+    b.ref || '', routeLabel(b.route), b.busName || '',
+    b.date || '', b.seats || '', b.contactEmail || '',
+    b.contactPhone || '', b.grandTotal || b.totalAmount || 0,
+    b.paymentMethod || '', 'Confirmed'
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv,' + encodeURIComponent(csv);
+  a.download = 'seatsync-bookings-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
 
+function showToast(msg, type) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type || '');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
 
-            <div class="stat-card">
+// Guard admin route
+if (localStorage.getItem('ss_role') !== 'admin') {
+  window.location.href = 'admin-login.html';
+}
 
-                <h3>🎟️</h3>
-                <h2 id="bookingCount">0</h2>
-                <p>Bookings</p>
-
-            </div>
-
-        </div>
-
-
-        <div class="dashboard-cards">
-
-
-            <div class="dashboard-card">
-
-                <h3>🛣️ Manage Routes</h3>
-
-                <p>Add or modify bus routes.</p>
-
-                <button onclick="manageRoutes()">
-                    Manage Routes
-                </button>
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-                <h3>🚌 Manage Buses</h3>
-
-                <p>Add buses and update bus details.</p>
-
-                <button onclick="manageBuses()">
-                    Manage Buses
-                </button>
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-                <h3>⏰ Manage Timings</h3>
-
-                <p>Update bus departure timings.</p>
-
-                <button onclick="manageTimings()">
-                    Manage Timings
-                </button>
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-                <h3>📋 View Bookings</h3>
-
-                <p>View passenger bookings.</p>
-
-                <button onclick="viewAllBookings()">
-                    View Bookings
-                </button>
-
-            </div>
-
-            
-
-
-            <div class="dashboard-card">
-
-                <h3>🚪 Logout</h3>
-
-                <button onclick="logout()">
-                    Logout
-                </button>
-
-            </div>
-
-
-        </div>
-
-    </main>
-
-
-    <script src="/js/env-config.js"></script>
-    <script type="module" src="js/supabase-client.js" defer></script>
-    <script src="js/script.js"></script>
-
+loadBookings();
+</script>
 </body>
-
 </html>

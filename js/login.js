@@ -1,149 +1,116 @@
-// ---- Shared auth utilities ----
-
-function checkUserRole() {
-    const role = localStorage.getItem("role");
-    if (!role) window.location.href = "index.html";
+// ── Shared helpers ──────────────────────────────────────────
+function logout() {
+  try { if (window.supabaseAuth) window.supabaseAuth.signOutUser(); } catch (_) {}
+  localStorage.removeItem('ss_role');
+  localStorage.removeItem('ss_email');
+  window.location.href = 'index.html';
 }
 
-async function logout() {
-    try {
-        if (window.supabaseAuth) await window.supabaseAuth.signOutUser();
-    } catch (error) {
-        console.warn('Logout error:', error);
-    }
-    localStorage.removeItem("role");
-    localStorage.removeItem("userEmail");
-    window.location.href = "index.html";
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'auth-message ' + (type || 'info');
+  el.style.display = 'block';
 }
 
-async function showCurrentUserInfo() {
-    if (!window.supabaseAuth) return;
-    const session = await window.supabaseAuth.getSession();
-    const user = session?.user;
-    if (user) {
-        const userInfo = document.getElementById('userInfo');
-        if (userInfo) userInfo.textContent = `Logged in as ${user.email}`;
-    }
+// ── User auth (user-login.html) ─────────────────────────────
+let isSignup = false;
+
+function setMode(signup) {
+  isSignup = signup;
+  const title  = document.getElementById('authTitle');
+  const sub    = document.getElementById('authSub');
+  const btn    = document.getElementById('authBtn');
+  const row    = document.getElementById('confirmRow');
+  const tText  = document.getElementById('toggleText');
+  const tLink  = document.getElementById('toggleLink');
+  const msg    = document.getElementById('authMsg');
+
+  if (title)  title.textContent  = signup ? 'Create Account' : 'Welcome Back';
+  if (sub)    sub.textContent    = signup ? 'Sign up to start booking tickets' : 'Sign in to book your bus tickets';
+  if (btn)    btn.textContent    = signup ? 'Create Account' : 'Sign In';
+  if (row)    row.style.display  = signup ? 'block' : 'none';
+  if (tText)  tText.textContent  = signup ? 'Already have an account?' : "Don't have an account?";
+  if (tLink)  tLink.textContent  = signup ? 'Sign In' : 'Create one';
+  if (msg)    msg.style.display  = 'none';
 }
 
+async function handleAuthSubmit(e) {
+  e.preventDefault();
+  const btn      = document.getElementById('authBtn');
+  const email    = document.getElementById('userEmail').value.trim();
+  const password = document.getElementById('userPassword').value;
+  const confirm  = document.getElementById('confirmPassword');
 
-// ---- User auth (user-login.html) ----
+  if (isSignup && confirm && password !== confirm.value) {
+    return showMsg('authMsg', 'Passwords do not match.', 'error');
+  }
 
-let isSignupMode = false;
+  btn.disabled   = true;
+  btn.innerHTML  = '<span class="spinner"></span>';
+  showMsg('authMsg', isSignup ? 'Creating your account…' : 'Signing you in…', 'info');
 
-function setAuthMode(signup) {
-    isSignupMode = signup;
-    const authButton = document.getElementById('authButton');
-    const authToggleText = document.getElementById('authToggleText');
-    const toggleAuthMode = document.getElementById('toggleAuthMode');
-    const confirmPasswordRow = document.getElementById('confirmPasswordRow');
-    const loginMessage = document.getElementById('loginMessage');
-    if (authButton) authButton.textContent = signup ? 'Sign Up' : 'Login';
-    if (authToggleText) authToggleText.textContent = signup ? 'Already have an account?' : "Don't have an account?";
-    if (toggleAuthMode) toggleAuthMode.textContent = signup ? 'Login' : 'Create one';
-    if (confirmPasswordRow) confirmPasswordRow.style.display = signup ? 'block' : 'none';
-    if (loginMessage) loginMessage.textContent = '';
+  try {
+    if (!window.supabaseAuth) throw new Error('Auth not initialised — check Supabase config.');
+
+    const result = isSignup
+      ? await window.supabaseAuth.signUpUser(email, password)
+      : await window.supabaseAuth.signInUser(email, password);
+
+    if (result.error) throw result.error;
+
+    if (isSignup) {
+      showMsg('authMsg', '✅ Account created! Check your email to confirm, then sign in.', 'success');
+      setMode(false);
+    } else {
+      localStorage.setItem('ss_role', 'user');
+      localStorage.setItem('ss_email', email);
+      window.location.href = 'user-dashboard.html';
+    }
+  } catch (err) {
+    showMsg('authMsg', err.message || 'Authentication failed. Please try again.', 'error');
+  } finally {
+    btn.disabled  = false;
+    btn.textContent = isSignup ? 'Create Account' : 'Sign In';
+  }
 }
 
-async function handleAuthSubmit(event) {
-    event.preventDefault();
-    const loginMessage = document.getElementById('loginMessage');
-    const email = document.getElementById('userEmail').value.trim();
-    const password = document.getElementById('userPassword').value.trim();
-    const confirmPasswordEl = document.getElementById('confirmPassword');
-    const confirmPassword = confirmPasswordEl ? confirmPasswordEl.value.trim() : '';
-
-    if (!email || !password || (isSignupMode && !confirmPassword)) {
-        if (loginMessage) loginMessage.textContent = 'Please fill in all required fields.';
-        return;
-    }
-    if (isSignupMode && password !== confirmPassword) {
-        if (loginMessage) loginMessage.textContent = 'Passwords do not match.';
-        return;
-    }
-
-    if (loginMessage) loginMessage.textContent = isSignupMode ? 'Creating account...' : 'Signing in...';
-
-    try {
-        const result = isSignupMode
-            ? await window.supabaseAuth.signUpUser(email, password)
-            : await window.supabaseAuth.signInUser(email, password);
-
-        if (result.error) {
-            if (loginMessage) loginMessage.textContent = result.error.message || 'Unable to authenticate.';
-            return;
-        }
-        if (isSignupMode) {
-            if (loginMessage) loginMessage.textContent = 'Account created! You can now log in.';
-            setAuthMode(false);
-            return;
-        }
-        window.location.href = 'user-dashboard.html';
-    } catch (error) {
-        console.error('Auth error:', error);
-        if (loginMessage) loginMessage.textContent = 'Authentication failed. Try again.';
-    }
-}
-
-// Wire up toggle only when user-login elements exist
-(function () {
-    const toggleAuthMode = document.getElementById('toggleAuthMode');
-    if (toggleAuthMode) {
-        toggleAuthMode.addEventListener('click', () => setAuthMode(!isSignupMode));
-        setAuthMode(false);
-    }
+// Wire toggle on user-login page
+(function() {
+  const tLink = document.getElementById('toggleLink');
+  if (tLink) {
+    tLink.addEventListener('click', () => setMode(!isSignup));
+    setMode(false);
+  }
 })();
 
+// ── Admin auth (admin-login.html) ───────────────────────────
+async function adminLogin(e) {
+  e.preventDefault();
+  const btn      = document.getElementById('adminBtn');
+  const username = document.getElementById('adminUsername').value.trim();
+  const password = document.getElementById('adminPassword').value;
 
-// ---- Admin auth (admin-login.html) ----
+  if (!username || !password) return showMsg('adminMsg', 'Please fill in all fields.', 'error');
 
-async function adminLogin(event) {
-    event.preventDefault();
-    const adminMessage = document.getElementById('adminMessage');
-    const username = document.getElementById('adminUsername').value.trim();
-    const password = document.getElementById('adminPassword').value.trim();
+  btn.disabled  = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  showMsg('adminMsg', 'Signing in…', 'info');
 
-    if (!username || !password) {
-        if (adminMessage) adminMessage.textContent = 'Please enter username and password.';
-        return;
-    }
-    if (adminMessage) adminMessage.textContent = 'Signing in...';
-
-    try {
-        const res = await fetch('/auth/admin-login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        if (!data.success) {
-            if (adminMessage) adminMessage.textContent = data.message || 'Invalid credentials.';
-            return;
-        }
-        localStorage.setItem('role', 'admin');
-        window.location.href = 'admin-dashboard.html';
-    } catch (error) {
-        console.error('Admin auth error:', error);
-        if (adminMessage) adminMessage.textContent = 'Login failed. Is the server running?';
-    }
+  try {
+    const res  = await fetch('/auth/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Invalid credentials.');
+    localStorage.setItem('ss_role', 'admin');
+    window.location.href = 'admin-dashboard.html';
+  } catch (err) {
+    showMsg('adminMsg', err.message, 'error');
+    btn.disabled    = false;
+    btn.textContent = 'Sign In as Admin';
+  }
 }
-
-
-// ---- Dashboard functions ----
-
-function viewBookings() {
-    alert("My bookings page will be added here.");
-}
-
-function manageRoutes() {
-    alert("Route management section");
-}
-
-function manageBuses() {
-    alert("Bus management section");
-}
-
-function manageTimings() {
-    alert("Bus timing management section");
-}
-

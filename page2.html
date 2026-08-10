@@ -1,238 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SeatSync - Find Your Bus</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Buses – SeatSync</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-    <!-- Navigation Bar -->
-    <nav>
-        <h1>SeatSync</h1>
+<nav class="navbar">
+  <a class="logo" href="user-dashboard.html">🚌 Seat<span>Sync</span></a>
+  <ul class="nav-links">
+    <li><a href="user-dashboard.html">Dashboard</a></li>
+    <li><a href="page2.html">Find Buses</a></li>
+  </ul>
+</nav>
 
-        <div>
-            <a href="index.html">Home</a>
-            <a href="search.html">Find Bus</a>
-        </div>
-    </nav>
+<!-- Steps -->
+<div class="steps-bar">
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Search</span></div>
+  <div class="step-sep"></div>
+  <div class="step active"><div class="step-num">2</div><span class="step-label">Select Bus</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">3</div><span class="step-label">Choose Seats</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">4</div><span class="step-label">Passenger Details</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">5</div><span class="step-label">Payment</span></div>
+</div>
 
-    <!-- Search Section -->
-    <section class="search-section">
+<div class="content-wrap">
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="form-group">
+      <label>Route</label>
+      <select id="routeFilter" class="form-control" onchange="applyFilter()">
+        <option value="">— Select Route —</option>
+        <option value="bangalore-chikmagalur">Bangalore → Chikmagalur</option>
+        <option value="bangalore-tumkur">Bangalore → Tumkur</option>
+        <option value="bangalore-hassan">Bangalore → Hassan</option>
+        <option value="bangalore-mandya">Bangalore → Mandya</option>
+        <option value="bangalore-mysore">Bangalore → Mysore</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Travel Date</label>
+      <input type="date" id="dateFilter" class="form-control" onchange="applyFilter()">
+    </div>
+    <div class="form-group">
+      <label>Passengers</label>
+      <select id="passFilter" class="form-control">
+        <option value="1">1 Passenger</option>
+        <option value="2">2 Passengers</option>
+        <option value="3">3 Passengers</option>
+        <option value="4">4 Passengers</option>
+        <option value="5">5 Passengers</option>
+      </select>
+    </div>
+    <button class="btn-full" onclick="applyFilter()" style="max-width:160px;margin-bottom:0;">Search →</button>
+  </div>
 
-        <h2>Find Your Bus</h2>
-        <p>Search buses, check availability and choose your preferred seat.</p>
+  <!-- Results -->
+  <div class="results-header">
+    <h2 id="resultsTitle">Select a route to see buses</h2>
+    <span class="results-count" id="resultsCount"></span>
+  </div>
 
-        <div class="search-box">
+  <div id="busList"></div>
+</div>
 
-            
-
-            <div class="input-group">
-                <label>Travel Date</label>
-                <input type="date">
-            </div>
-
-            <div class="input-group">
-                <label>Passengers</label>
-                <select>
-                    <option>1 Passenger</option>
-                    <option>2 Passengers</option>
-                    <option>3 Passengers</option>
-                    <option>4 Passengers</option>
-                    <option>5 Passengers</option>
-                    <option>6 Passengers</option>
-                    <option>7 Passengers</option>
-                    <option>8 Passengers</option>
-                    <option>9 Passengers</option>
-                    <option>10 Passengers</option>
-                    <option>11 Passengers</option>
-                    <option>12 Passengers</option>
-                    <option>13 Passengers</option>
-                    <option>14 passengers</option>
-                    <option>15 Passengers</option>
-                    <option>16 Passengers</option>
-                    <option>17 Passengers</option>
-                    <option>18 Passengers</option>
-                    <option>19 Passengers</option>
-                    <option>20 Passengers</option>
-                </select>
-            </div>
-            
-            
-               
-            
-
-            
-
-        </div>
-
-    </section>
-
-    <!-- Bus Results -->
-     <h2>Available Buses</h2>
-
-<div id="bus-list"></div>
+<footer><strong>SeatSync</strong> &copy; 2024</footer>
 
 <script>
-const buses = {
-    "bangalore-chikmagalur": [
-        {
-            name: "KSRTC Airavat",
-            time: "7:00 AM",
-            price: "₹750"
-        },
-        {
-            name: "KSRTC Ordinary",
-            time: "8:00 AM",
-            price: "₹400"
-        },
-        {
-            name: "VRL Travels",
-            time: "9:30 AM",
-            price: "₹800"
-        },
-        {
-            name: "Sugama Tourist",
-            time: "2:00 PM",
-            price: "₹500"
-        }
-    ],
-
-    "bangalore-tumkur": [
-        {
-            name: "KSRTC Express",
-            time: "6:30 AM",
-            price: "₹180"
-        },
-        {
-            name: "VRL Travels",
-            time: "8:00 AM",
-            price: "₹480"
-        },
-        {
-            name: "KSRTC Rajahamsa",
-            time: "10:00 AM",
-            price: "₹500"
-        }
-    ],
-
-    "bangalore-hassan": [
-        {
-            name: "KSRTC Airavat",
-            time: "7:30 AM",
-            price: "₹350"
-        },
-        {
-            name: "KSRTC Rajahamsa",
-            time: "9:00 AM",
-            price: "₹600"
-        },
-        {
-            name: "VRL Travels",
-            time: "11:00 AM",
-            price: "₹400"
-        }
-    ],
-
-    "bangalore-mandya": [
-        {
-            name: "KSRTC Express",
-            time: "8:00 AM",
-            price: "₹200"
-        },
-        {
-            name: "KSRTC Rajahamsa",
-            time: "10:30 AM",
-            price: "₹500"
-        },
-        {
-            name: "VRL Travels",
-            time: "11:00 AM",
-            price: "₹350"
-        },
-        {
-            name: "KSRTC Ordinary",
-            time: "1:00 PM",
-            price: "₹170"
-        }
-    ],
-
-    "bangalore-mysore": [
-        {
-            name: "KSRTC Airavat",
-            time: "6:00 AM",
-            price: "₹350"
-        },
-        {
-            name: "KSRTC Rajahamsa",
-            time: "9:00 AM",
-            price: "₹300"
-        },
-        {
-            name: "VRL Travels",
-            time: "4:00 PM",
-            price: "₹400"
-        }
-    ]
+const BUS_DATA = {
+  "bangalore-chikmagalur": [
+    { id:'bc1', name:'KSRTC Airavat',      type:'AC Sleeper',     time:'07:00 AM', duration:'4h 30m', seats:18, price:750,  rating:4.5 },
+    { id:'bc2', name:'KSRTC Ordinary',     type:'Non-AC Seater',  time:'08:00 AM', duration:'5h 00m', seats:32, price:400,  rating:3.8 },
+    { id:'bc3', name:'VRL Travels',        type:'Volvo AC',       time:'09:30 AM', duration:'4h 00m', seats:8,  price:800,  rating:4.7 },
+    { id:'bc4', name:'Sugama Tourist',     type:'AC Seater',      time:'02:00 PM', duration:'4h 45m', seats:22, price:500,  rating:4.2 },
+  ],
+  "bangalore-tumkur": [
+    { id:'bt1', name:'KSRTC Express',      type:'Non-AC Seater',  time:'06:30 AM', duration:'1h 30m', seats:40, price:180,  rating:3.9 },
+    { id:'bt2', name:'VRL Travels',        type:'AC Seater',      time:'08:00 AM', duration:'1h 15m', seats:15, price:480,  rating:4.3 },
+    { id:'bt3', name:'KSRTC Rajahamsa',    type:'AC Seater',      time:'10:00 AM', duration:'1h 30m', seats:25, price:500,  rating:4.4 },
+  ],
+  "bangalore-hassan": [
+    { id:'bh1', name:'KSRTC Airavat',      type:'AC Sleeper',     time:'07:30 AM', duration:'3h 00m', seats:12, price:350,  rating:4.5 },
+    { id:'bh2', name:'KSRTC Rajahamsa',    type:'AC Seater',      time:'09:00 AM', duration:'3h 30m', seats:20, price:600,  rating:4.3 },
+    { id:'bh3', name:'VRL Travels',        type:'Volvo AC',       time:'11:00 AM', duration:'2h 45m', seats:5,  price:400,  rating:4.6 },
+  ],
+  "bangalore-mandya": [
+    { id:'bm1', name:'KSRTC Express',      type:'Non-AC Seater',  time:'08:00 AM', duration:'2h 00m', seats:35, price:200,  rating:4.0 },
+    { id:'bm2', name:'KSRTC Rajahamsa',    type:'AC Seater',      time:'10:30 AM', duration:'1h 45m', seats:18, price:500,  rating:4.4 },
+    { id:'bm3', name:'VRL Travels',        type:'AC Seater',      time:'11:00 AM', duration:'2h 00m', seats:22, price:350,  rating:4.2 },
+    { id:'bm4', name:'KSRTC Ordinary',     type:'Non-AC Seater',  time:'01:00 PM', duration:'2h 30m', seats:40, price:170,  rating:3.7 },
+  ],
+  "bangalore-mysore": [
+    { id:'by1', name:'KSRTC Airavat',      type:'AC Sleeper',     time:'06:00 AM', duration:'2h 30m', seats:10, price:350,  rating:4.6 },
+    { id:'by2', name:'KSRTC Rajahamsa',    type:'AC Seater',      time:'09:00 AM', duration:'2h 45m', seats:24, price:300,  rating:4.4 },
+    { id:'by3', name:'VRL Travels',        type:'Volvo AC',       time:'04:00 PM', duration:'2h 15m', seats:6,  price:400,  rating:4.7 },
+  ]
 };
 
-
-const params = new URLSearchParams(window.location.search);
-const selectedRoute = params.get("route");
-
-const busList = document.getElementById("bus-list");
-
-if (buses[selectedRoute]) {
-
-    buses[selectedRoute].forEach(bus => {
-
-        const busCard = document.createElement("div");
-
-        busCard.className = "bus-card";
-
-        busCard.innerHTML = `
-    <h3>${bus.name}</h3>
-    <p>Route: ${selectedRoute.replace("-", " → ")}</p>
-    <p>Departure: ${bus.time}</p>
-    <p>Price: ${bus.price}</p>
-
-    
-    
-    <a href="page3.html?route=${encodeURIComponent(selectedRoute)}&bus=${encodeURIComponent(bus.name)}&time=${encodeURIComponent(bus.time)}&price=${encodeURIComponent(bus.price)}">
-        <button >Select Bus</button>
-    
-`;
-
-
-        busList.appendChild(busCard);
-    });
-
-} else {
-
-    busList.innerHTML = "<p>No buses available for this route.</p>";
-
+function routeLabel(r) {
+  if (!r) return '';
+  return r.replace('-', ' → ').replace(/\b\w/g, c => c.toUpperCase());
 }
-function selectBus(route, bus, time, price) {
 
-    sessionStorage.setItem("selectedRoute", route);
-    sessionStorage.setItem("selectedBus", bus);
-    sessionStorage.setItem("selectedTime", time);
-    sessionStorage.setItem("selectedPrice", price);
-
-    window.location.href = "page3.html";
+function applyFilter() {
+  const route = document.getElementById('routeFilter').value;
+  const date  = document.getElementById('dateFilter').value;
+  const pass  = parseInt(document.getElementById('passFilter').value);
+  renderBuses(route, date, pass);
 }
+
+function renderBuses(route, date, passengers) {
+  const list  = document.getElementById('busList');
+  const title = document.getElementById('resultsTitle');
+  const count = document.getElementById('resultsCount');
+
+  if (!route) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><h3>Select a Route</h3><p>Choose a route above to see available buses.</p></div>';
+    title.textContent = 'Available Buses';
+    count.textContent = '';
+    return;
+  }
+
+  const buses = BUS_DATA[route] || [];
+  title.textContent = routeLabel(route);
+  count.textContent = buses.length + ' buses found';
+
+  if (!buses.length) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">🚌</div><h3>No buses found</h3><p>Try a different route or date.</p></div>';
+    return;
+  }
+
+  list.innerHTML = buses.map(b => {
+    const avail = b.seats > 10 ? `✅ ${b.seats} seats` : b.seats > 0 ? `⚠️ Only ${b.seats} left` : '❌ Full';
+    const cls   = b.seats > 10 ? 'bus-avail' : b.seats > 0 ? 'bus-avail low' : 'bus-avail low';
+    const stars = '⭐'.repeat(Math.floor(b.rating)) + (b.rating % 1 >= .5 ? '½' : '');
+    return `
+    <div class="bus-card">
+      <div>
+        <div class="bus-name">${b.name}</div>
+        <div class="bus-type">${b.type}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px;">${stars} ${b.rating}</div>
+      </div>
+      <div>
+        <div class="bus-time-big">${b.time}</div>
+        <div class="bus-time-lbl">Departure</div>
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:600;">${b.duration}</div>
+        <div class="bus-time-lbl">Duration</div>
+      </div>
+      <div>
+        <div class="${cls}">${avail}</div>
+        <div class="bus-price-big" style="margin-top:4px;">₹${b.price}</div>
+        <div class="bus-price-lbl">per seat</div>
+      </div>
+      <button class="btn-select" onclick="selectBus('${b.id}','${route}','${date}',${passengers})">Select →</button>
+    </div>`;
+  }).join('');
+}
+
+function selectBus(busId, route, date, passengers) {
+  const buses = Object.values(BUS_DATA).flat();
+  const bus   = buses.find(b => b.id === busId);
+  if (!bus) return;
+  sessionStorage.setItem('ss_selected_bus', JSON.stringify({ ...bus, route, date, passengers }));
+  window.location.href = 'page3.html';
+}
+
+// Init
+(function() {
+  const date = new Date().toISOString().split('T')[0];
+  document.getElementById('dateFilter').value = sessionStorage.getItem('ss_date') || date;
+  const route = sessionStorage.getItem('ss_route') || '';
+  const pass  = parseInt(sessionStorage.getItem('ss_passengers') || '1');
+  if (route) {
+    document.getElementById('routeFilter').value = route;
+    document.getElementById('passFilter').value  = pass;
+    renderBuses(route, document.getElementById('dateFilter').value, pass);
+  } else {
+    renderBuses('', '', 1);
+  }
+})();
 </script>
-
-               
-                
-            </div>
-
-        </div>
-
-    </section>
-    
-    
 </body>
 </html>

@@ -1,60 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Admin Login - SeatSync</title>
-
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login – SeatSync</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
+<div class="auth-page">
+  <div class="auth-box">
+    <div class="auth-logo">🚌 Seat<span>Sync</span></div>
+    <h2>Admin Portal</h2>
+    <p class="auth-sub">Sign in with your administrator credentials</p>
 
-    <div class="login-container">
+    <div id="adminMsg" class="auth-message" style="display:none;"></div>
 
-        <div class="login-box">
-
-            <h1>SeatSync</h1>
-            <h2>Admin Login</h2>
-
-            <p>Login to manage SeatSync</p>
-
-            <form onsubmit="adminLogin(event)">
-
-                <label>Username</label>
-
-                <input
-                    type="text"
-                    id="adminUsername"
-                    placeholder="Enter admin username"
-                    required
-                >
-
-                <label>Password</label>
-
-                <input
-                    type="password"
-                    id="adminPassword"
-                    placeholder="Enter admin password"
-                    required
-                >
-
-                <button type="submit" class="login-btn">
-                    Admin Login
-                </button>
-
-            </form>
-
-            <p id="adminMessage"></p>
-
-            <a href="index.html">← Back to Home</a>
-
+    <form onsubmit="adminLogin(event)">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="adminUsername" class="form-control" placeholder="Admin username" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <input type="password" id="adminPassword" class="form-control" placeholder="Admin password" required autocomplete="current-password">
+          <button type="button" class="toggle-pw" onclick="togglePw()">👁</button>
         </div>
+      </div>
+      <button type="submit" class="btn-full" id="adminBtn">Sign In as Admin</button>
+    </form>
 
-    </div>
+    <a href="index.html" class="auth-back">← Back to Home</a>
+  </div>
+</div>
 
-    <script src="js/login.js"></script>
-
+<script>
+  function togglePw() {
+    const el = document.getElementById('adminPassword');
+    const btn = document.querySelector('.toggle-pw');
+    if (el.type === 'password') { el.type = 'text'; btn.textContent = '🙈'; }
+    else { el.type = 'password'; btn.textContent = '👁'; }
+  }
+</script>
+<script src="js/login.js" defer></script>
 </body>
 </html>
