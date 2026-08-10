@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync - Select Seats</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <h1>SeatSync</h1>
+
+        <div>
+            <a href="index.html">Home</a>
+            <a href="search.html">Find Bus</a>
+        </div>
+    </nav>
+
+    <!-- Page Heading -->
+    <section class="seat-page">
+
+        <h2>Select Your Seats</h2>
+        <p>Choose your preferred seats from the available seats.</p>
+
+        <!-- Bus Information -->
+        <div class="bus-info">
+            <h3 id="busName">Bus</h3>
+            <p id="routeName">Route</p>
+            <p id="busTime">Departure Time</p>
+            <p id="busPrice">Prices</p>
+        </div>
+
+        <!-- Seat Layout -->
+        <div class="seat-container">
+
+            <h3>Bus Seat Layout</h3>
+
+            <div class="driver">
+                🚍 Driver
+            </div>
+
+            <div class="seats">
+
+                <button class="seat available">A1</button>
+                <button class="seat available">A2</button>
+
+                <span></span>
+
+                <button class="seat available">A3</button>
+                <button class="seat available">A4</button>
+
+                <button class="seat available">B1</button>
+                <button class="seat available">B2</button>
+
+                <span></span>
+
+                <button class="seat available">B3</button>
+                <button class="seat available">B4</button>
+
+                <button class="seat available">C1</button>
+                <button class="seat available">C2</button>
+
+                <span></span>
+
+                <button class="seat available">C3</button>
+                <button class="seat available">C4</button>
+
+                <button class="seat available">D1</button>
+                <button class="seat available">D2</button>
+
+                <span></span>
+
+                <button class="seat available">D3</button>
+                <button class="seat available">D4</button>
+
+                <button class="seat available">E1</button>
+                <button class="seat available">E2</button>
+
+                <span></span>
+
+                <button class="seat available">E3</button>
+                <button class="seat available">E4</button>
+
+            </div>
+
+            <!-- Seat Legend -->
+
+            <div class="legend">
+
+                <div>
+                    <span class="legend-box available-box"></span>
+                    Available
+                </div>
+
+                <div>
+                    <span class="legend-box selected-box"></span>
+                    Selected
+                </div>
+
+                <div>
+                    <span class="legend-box booked-box"></span>
+                    Booked
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Booking Summary -->
+
+        <div class="booking-summary">
+
+            <h3>Booking Summary</h3>
+
+            <p>Selected Seats:
+                <span id="selectedSeats">None</span>
+            </p>
+
+            <p>Total Price:
+                ₹<span id="totalPrice">0</span>
+            </p>
+        
+        
+        <button id="continueBtn">
+         Continue
+        </button>
+
+        </div>
+
+    </section>
+
+   
+<script>
+
+    // ==========================================
+    // GET BUS INFORMATION
+    // ==========================================
+
+    const params = new URLSearchParams(window.location.search);
+
+    const selectedRoute = params.get("route");
+    const selectedBus = params.get("bus");
+    const selectedTime = params.get("time");
+    const selectedPrice = params.get("price");
+
+
+    // ==========================================
+    // DISPLAY BUS INFORMATION
+    // ==========================================
+
+    document.getElementById("routeName").textContent =
+        selectedRoute
+            ? selectedRoute.replace("-", " → ")
+            : "Route not available";
+
+    document.getElementById("busName").textContent =
+        selectedBus || "Bus not available";
+
+    document.getElementById("busTime").textContent =
+        selectedTime
+            ? "Departure: " + selectedTime
+            : "Time not available";
+
+    document.getElementById("busPrice").textContent =
+        selectedPrice
+            ? "Price: " + selectedPrice
+            : "Price not available";
+
+
+    // ==========================================
+    // SEAT ELEMENTS
+    // ==========================================
+
+    const allSeats = document.querySelectorAll(".seat");
+
+    const selectedSeatsDisplay =
+        document.getElementById("selectedSeats");
+
+    const totalPrice =
+        document.getElementById("totalPrice");
+
+    const seatPrice =
+        selectedPrice
+            ? parseInt(selectedPrice.replace("₹", ""))
+            : 0;
+
+    let selected = [];
+
+
+    // ==========================================
+    // LOAD ALREADY BOOKED SEATS
+    // ==========================================
+
+    async function loadBookedSeats() {
+
+        try {
+
+            const response =
+                await fetch("http://localhost:3000/bookings");
+
+            const data = await response.json();
+
+            if (!data.success) {
+                return;
+            }
+
+
+            // Find bookings for the SAME route,
+            // SAME bus and SAME timing
+
+            const matchingBookings =
+                data.bookings.filter(booking =>
+
+                    booking.route === selectedRoute &&
+                    booking.bus === selectedBus &&
+                    booking.time === selectedTime
+
+                );
+
+
+            // Collect all booked seats
+
+            let bookedSeats = [];
+
+
+            matchingBookings.forEach(booking => {
+
+                if (booking.seats) {
+
+                    const seats =
+                        booking.seats.split(",");
+
+                    bookedSeats.push(...seats);
+
+                }
+
+            });
+
+
+            // Mark booked seats
+
+            allSeats.forEach(seat => {
+
+                const seatNumber =
+                    seat.textContent.trim();
+
+
+                if (bookedSeats.includes(seatNumber)) {
+
+                    seat.classList.remove("available");
+                    seat.classList.remove("selected");
+
+                    seat.classList.add("booked");
+
+                    seat.disabled = true;
+
+                }
+
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                "Could not load booked seats:",
+                error
+            );
+
+        }
+
+    }
+
+
+    // Load booked seats when page opens
+
+    loadBookedSeats();
+
+
+    // ==========================================
+    // SELECT AVAILABLE SEATS
+    // ==========================================
+
+    allSeats.forEach(seat => {
+
+        seat.addEventListener("click", () => {
+
+            // Don't allow clicking booked seats
+
+            if (seat.classList.contains("booked")) {
+                return;
+            }
+
+
+            const seatNumber =
+                seat.textContent.trim();
+
+
+            if (seat.classList.contains("selected")) {
+
+                seat.classList.remove("selected");
+
+                selected =
+                    selected.filter(
+                        item => item !== seatNumber
+                    );
+
+            } else {
+
+                seat.classList.add("selected");
+
+                selected.push(seatNumber);
+
+            }
+
+
+            // Display selected seats
+
+            if (selected.length === 0) {
+
+                selectedSeatsDisplay.textContent =
+                    "None";
+
+            } else {
+
+                selectedSeatsDisplay.textContent =
+                    selected.join(", ");
+
+            }
+
+
+            // Calculate total
+
+            totalPrice.textContent =
+                selected.length * seatPrice;
+
+        });
+
+    });
+
+
+    // ==========================================
+    // CONTINUE TO PAGE 4
+    // ==========================================
+
+    document
+        .getElementById("continueBtn")
+        .addEventListener("click", function () {
+
+            if (selected.length === 0) {
+
+                alert(
+                    "Please select at least one seat."
+                );
+
+                return;
+            }
+
+
+            const seats =
+                selected.join(",");
+
+
+            const page4URL =
+                "page4.html" +
+                "?route=" +
+                encodeURIComponent(selectedRoute) +
+                "&bus=" +
+                encodeURIComponent(selectedBus) +
+                "&time=" +
+                encodeURIComponent(selectedTime) +
+                "&price=" +
+                encodeURIComponent(selectedPrice) +
+                "&seats=" +
+                encodeURIComponent(seats);
+
+
+            window.location.href = page4URL;
+
+        });
+
+</script>
+        
+                
+</body>
+</html>

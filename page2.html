@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync - Find Your Bus</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <h1>SeatSync</h1>
+
+        <div>
+            <a href="index.html">Home</a>
+            <a href="search.html">Find Bus</a>
+        </div>
+    </nav>
+
+    <!-- Search Section -->
+    <section class="search-section">
+
+        <h2>Find Your Bus</h2>
+        <p>Search buses, check availability and choose your preferred seat.</p>
+
+        <div class="search-box">
+
+            
+
+            <div class="input-group">
+                <label>Travel Date</label>
+                <input type="date">
+            </div>
+
+            <div class="input-group">
+                <label>Passengers</label>
+                <select>
+                    <option>1 Passenger</option>
+                    <option>2 Passengers</option>
+                    <option>3 Passengers</option>
+                    <option>4 Passengers</option>
+                    <option>5 Passengers</option>
+                    <option>6 Passengers</option>
+                    <option>7 Passengers</option>
+                    <option>8 Passengers</option>
+                    <option>9 Passengers</option>
+                    <option>10 Passengers</option>
+                    <option>11 Passengers</option>
+                    <option>12 Passengers</option>
+                    <option>13 Passengers</option>
+                    <option>14 passengers</option>
+                    <option>15 Passengers</option>
+                    <option>16 Passengers</option>
+                    <option>17 Passengers</option>
+                    <option>18 Passengers</option>
+                    <option>19 Passengers</option>
+                    <option>20 Passengers</option>
+                </select>
+            </div>
+            
+            
+               
+            
+
+            
+
+        </div>
+
+    </section>
+
+    <!-- Bus Results -->
+     <h2>Available Buses</h2>
+
+<div id="bus-list"></div>
+
+<script>
+const buses = {
+    "bangalore-chikmagalur": [
+        {
+            name: "KSRTC Airavat",
+            time: "7:00 AM",
+            price: "₹450"
+        },
+        {
+            name: "VRL Travels",
+            time: "9:30 AM",
+            price: "₹500"
+        },
+        {
+            name: "Sugama Tourist",
+            time: "2:00 PM",
+            price: "₹400"
+        }
+    ],
+
+    "bangalore-tumkur": [
+        {
+            name: "KSRTC Express",
+            time: "6:30 AM",
+            price: "₹180"
+        },
+        {
+            name: "KSRTC Rajahamsa",
+            time: "10:00 AM",
+            price: "₹220"
+        }
+    ],
+
+    "bangalore-hassan": [
+        {
+            name: "KSRTC Airavat",
+            time: "7:30 AM",
+            price: "₹350"
+        },
+        {
+            name: "VRL Travels",
+            time: "11:00 AM",
+            price: "₹400"
+        }
+    ],
+
+    "bangalore-mandya": [
+        {
+            name: "KSRTC Express",
+            time: "8:00 AM",
+            price: "₹200"
+        },
+        {
+            name: "VRL Travels",
+            time: "11:00 AM",
+            price: "₹350"
+        },
+        {
+            name: "KSRTC Ordinary",
+            time: "1:00 PM",
+            price: "₹170"
+        }
+    ],
+
+    "bangalore-mysore": [
+        {
+            name: "KSRTC Airavat",
+            time: "6:00 AM",
+            price: "₹350"
+        },
+        {
+            name: "KSRTC Rajahamsa",
+            time: "9:00 AM",
+            price: "₹300"
+        },
+        {
+            name: "VRL Travels",
+            time: "4:00 PM",
+            price: "₹400"
+        }
+    ]
+};
+
+
+const params = new URLSearchParams(window.location.search);
+const selectedRoute = params.get("route");
+
+const busList = document.getElementById("bus-list");
+
+if (buses[selectedRoute]) {
+
+    buses[selectedRoute].forEach(bus => {
+
+        const busCard = document.createElement("div");
+
+        busCard.className = "bus-card";
+
+        busCard.innerHTML = `
+    <h3>${bus.name}</h3>
+    <p>Route: ${selectedRoute.replace("-", " → ")}</p>
+    <p>Departure: ${bus.time}</p>
+    <p>Price: ${bus.price}</p>
+
+    
+    
+    <a href="page3.html?route=${encodeURIComponent(selectedRoute)}&bus=${encodeURIComponent(bus.name)}&time=${encodeURIComponent(bus.time)}&price=${encodeURIComponent(bus.price)}">
+        <button >Select Bus</button>
+    
+`;
+
+
+        busList.appendChild(busCard);
+    });
+
+} else {
+
+    busList.innerHTML = "<p>No buses available for this route.</p>";
+
+}
+function selectBus(route, bus, time, price) {
+
+    sessionStorage.setItem("selectedRoute", route);
+    sessionStorage.setItem("selectedBus", bus);
+    sessionStorage.setItem("selectedTime", time);
+    sessionStorage.setItem("selectedPrice", price);
+
+    window.location.href = "page3.html";
+}
+</script>
+
+               
+                
+            </div>
+
+        </div>
+
+    </section>
+    
+    
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>User Dashboard - SeatSync</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <header>
+
+        <h1>SeatSync</h1>
+
+        <p>User Dashboard</p>
+
+    </header>
+
+
+    <main class="dashboard">
+
+        <h2>Welcome to SeatSync 👋</h2>
+
+        <p>Book your bus seat easily.</p>
+
+
+        <div class="dashboard-cards">
+
+            
+
+            
+        <div class="search-box">
+
+            <h2>Find Your Bus</h2>
+
+            <p>Select your route to see available buses</p>
+
+            <label for="route">Bus Route</label>
+
+            <select id="route">
+                <option value="">-- Select Bus Route --</option>
+
+                <option value="bangalore-chikmagalur">
+                    Bangalore → chikmagalur
+                </option>
+
+                <option value="bangalore-tumkur">
+                    Bangalore → Tumkur
+                </option>
+
+                <option value="bangalore-hassan">
+                    Bangalore → Hassan
+                </option>
+
+                <option value="bangalore-mandya">
+                    Bangalore → Mandya
+                </option>
+
+                <option value="bangalore-mysore">
+                    Bangalore → mysore
+                </option>
+            </select>
+            <button onclick="goToPage2()">Get Started</button>
+
+<script>
+function goToPage2() {
+    const route = document.getElementById("route").value;
+
+    if (route === "") {
+        alert("Please select a bus route");
+        return;
+    }
+
+    window.location.href = "page2.html?route=" + route;
+}
+</script>
+
+            
+
+        </div>
+
+    </section>
+
+
+            <div class="dashboard-card">
+
+                <h3>🎟️ My Bookings</h3>
+
+                <p>View your booking details.</p>
+                <a href="page5.html">
+                <button onclick="viewBookings()">
+                    My Bookings
+                </button>
+                </a>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <h3>🚪 Logout</h3>
+
+                <button onclick="logout()">
+                    Logout
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>

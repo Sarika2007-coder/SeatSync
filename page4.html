@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SeatSync - Passenger Details</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef3ff;
+            color: #172554;
+        }
+
+        /* Navigation Bar */
+
+        nav {
+            background: #172554;
+            color: white;
+            padding: 18px 50px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        nav div {
+            display: flex;
+            gap: 25px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Main Container */
+
+        .container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        /* Cards */
+
+        .card {
+            background: white;
+            padding: 30px;
+            margin-bottom: 25px;
+
+            border-radius: 20px;
+
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        /* Booking Information */
+
+        .booking-info {
+            line-height: 1.8;
+            font-size: 17px;
+        }
+
+        .booking-info p {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .booking-info strong {
+            display: inline-block;
+            width: 170px;
+        }
+
+        /* Total Price */
+
+        .total {
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        /* Passenger Form */
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        /* Confirm Button */
+
+        .confirm-btn {
+            width: 100%;
+            padding: 15px;
+
+            background: #2563eb;
+            color: white;
+
+            border: none;
+            border-radius: 12px;
+
+            font-size: 17px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .confirm-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* Mobile */
+
+        @media (max-width: 600px) {
+
+            nav {
+                padding: 15px 20px;
+            }
+
+            nav div {
+                gap: 10px;
+            }
+
+            nav a {
+                font-size: 14px;
+            }
+
+            .container {
+                margin: 20px auto;
+                padding: 12px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .booking-info strong {
+                width: 130px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- Navigation Bar -->
+
+    <nav>
+
+        <h1>SeatSync</h1>
+
+        <div>
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="search.html">
+                Find Bus
+            </a>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- Main Container -->
+
+    <div class="container">
+
+
+        <!-- Booking Summary -->
+
+        <div class="card">
+
+            <h2>
+                Booking Summary
+            </h2>
+
+
+            <div class="booking-info">
+
+
+                <p>
+
+                    <strong>
+                        Route:
+                    </strong>
+
+                    <span id="routeName">
+                        Loading...
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Bus:
+                    </strong>
+
+                    <span id="busName">
+                        Loading...
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Departure:
+                    </strong>
+
+                    <span id="busTime">
+                        Loading...
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Selected Seats:
+                    </strong>
+
+                    <span id="seatNumbers">
+                        Loading...
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Price per Seat:
+                    </strong>
+
+                    <span id="seatPrice">
+                        Loading...
+                    </span>
+
+                </p>
+
+
+            </div>
+
+
+            <!-- Total -->
+
+            <div class="total">
+
+                Total Price:
+
+                <span id="totalPrice">
+                    ₹0
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- Passenger Details -->
+
+        <div class="card">
+
+            <h2>
+                Passenger Details
+            </h2>
+
+
+            <!-- Name -->
+
+            <div class="form-group">
+
+                <label for="passengerName">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="passengerName"
+                    placeholder="Enter passenger name"
+                >
+
+            </div>
+
+
+            <!-- Mobile -->
+
+            <div class="form-group">
+
+                <label for="mobileNumber">
+                    Mobile Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="mobileNumber"
+                    placeholder="Enter mobile number"
+                >
+
+            </div>
+
+
+            <!-- Email -->
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter email address"
+                >
+
+            </div>
+
+
+            <!-- Confirm -->
+
+            <button
+                class="confirm-btn"
+                id="confirmBtn"
+            >
+
+                Confirm Booking
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- JavaScript -->
+
+    <script>
+
+
+        // ==========================================
+        // GET INFORMATION FROM PAGE 3
+        // ==========================================
+
+        const params =
+            new URLSearchParams(window.location.search);
+
+
+        const selectedRoute =
+            params.get("route");
+
+
+        const selectedBus =
+            params.get("bus");
+
+
+        const selectedTime =
+            params.get("time");
+
+
+        const selectedPrice =
+            params.get("price");
+
+
+        const selectedSeats =
+            params.get("seats");
+
+
+
+        // ==========================================
+        // CONVERT SEATS INTO ARRAY
+        // ==========================================
+
+        const seats =
+            selectedSeats
+                ? selectedSeats.split(",")
+                : [];
+
+
+
+        // ==========================================
+        // CONVERT PRICE INTO NUMBER
+        // ==========================================
+
+        const priceNumber =
+            selectedPrice
+                ? parseInt(
+                    selectedPrice.replace("₹", "")
+                )
+                : 0;
+
+
+
+        // ==========================================
+        // CALCULATE TOTAL PRICE
+        // ==========================================
+
+        const total =
+            seats.length * priceNumber;
+
+
+
+        // ==========================================
+        // DISPLAY ROUTE
+        // ==========================================
+
+        document.getElementById("routeName").textContent =
+
+            selectedRoute
+                ? selectedRoute.replace("-", " → ")
+                : "Not available";
+
+
+
+        // ==========================================
+        // DISPLAY BUS
+        // ==========================================
+
+        document.getElementById("busName").textContent =
+
+            selectedBus
+                ? selectedBus
+                : "Not available";
+
+
+
+        // ==========================================
+        // DISPLAY DEPARTURE TIME
+        // ==========================================
+
+        document.getElementById("busTime").textContent =
+
+            selectedTime
+                ? selectedTime
+                : "Not available";
+
+
+
+        // ==========================================
+        // DISPLAY SELECTED SEATS
+        // ==========================================
+
+        document.getElementById("seatNumbers").textContent =
+
+            seats.length > 0
+                ? seats.join(", ")
+                : "No seats selected";
+
+
+
+        // ==========================================
+        // DISPLAY PRICE PER SEAT
+        // ==========================================
+
+        document.getElementById("seatPrice").textContent =
+
+            selectedPrice
+                ? selectedPrice
+                : "₹0";
+
+
+
+        // ==========================================
+        // DISPLAY TOTAL PRICE
+        // ==========================================
+
+        document.getElementById("totalPrice").textContent =
+
+            "₹" + total;
+
+
+
+        // ==========================================
+        // CONFIRM BOOKING
+        // ==========================================
+
+     // ==========================================
+// CONFIRM BOOKING
+// ==========================================
+
+document
+    .getElementById("confirmBtn")
+    .addEventListener("click", async function () {
+
+        const name =
+            document
+                .getElementById("passengerName")
+                .value
+                .trim();
+
+        const mobile =
+            document
+                .getElementById("mobileNumber")
+                .value
+                .trim();
+
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim();
+
+
+        // Check passenger details
+
+        if (
+            name === "" ||
+            mobile === "" ||
+            email === ""
+        ) {
+
+            alert("Please fill in all passenger details.");
+
+            return;
+        }
+
+
+        // Booking data
+
+        const bookingData = {
+
+            route: selectedRoute,
+
+            bus: selectedBus,
+
+            time: selectedTime,
+
+            price: selectedPrice,
+
+            seats: selectedSeats,
+
+            totalPrice: total,
+
+            name: name,
+
+            mobile: mobile,
+
+            email: email,
+
+            bookingDate: new Date().toLocaleString()
+
+        };
+
+
+        // Send booking to Express backend
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:3000/booking",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(bookingData)
+                }
+            );
+
+
+            const result = await response.json();
+
+
+            if (!result.success) {
+
+                alert("Booking could not be saved.");
+
+                return;
+            }
+
+
+            // Go to Page 5
+
+            const page5URL =
+                "page5.html" +
+                "?route=" + encodeURIComponent(selectedRoute) +
+                "&bus=" + encodeURIComponent(selectedBus) +
+                "&time=" + encodeURIComponent(selectedTime) +
+                "&price=" + encodeURIComponent(selectedPrice) +
+                "&seats=" + encodeURIComponent(selectedSeats) +
+                "&name=" + encodeURIComponent(name) +
+                "&mobile=" + encodeURIComponent(mobile) +
+                "&email=" + encodeURIComponent(email);
+
+            window.location.href = page5URL;
+
+
+        } catch (error) {
+
+            console.error("Booking error:", error);
+
+            alert(
+                "Unable to connect to SeatSync server. Please make sure the backend is running."
+            );
+
+        }
+
+    });   
+                        
+                
+
+
+
+               
+
+
+    </script>
+
+
+</body>
+
+</html>

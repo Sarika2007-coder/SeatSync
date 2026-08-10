@@ -1,0 +1,810 @@
+/* Remove default spacing */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* Body */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f7fb;
+    color: #222;
+}
+
+
+/* Navigation Bar */
+
+.navbar {
+    height: 70px;
+    background-color:#080332;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 8%;
+}
+
+
+/* Logo */
+
+.logo {
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+
+/* Navigation Links */
+
+.nav-links {
+    list-style: none;
+
+    display: flex;
+    gap: 35px;
+}
+
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+
+.nav-links a:hover {
+    color: #011119;
+}
+
+
+/* Hero Section */
+
+.hero {
+    min-height: 560px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 70px 10%;
+
+    background: linear-gradient(
+        135deg,
+        rgb(16, 69, 105),
+        #13118e
+    );
+
+    color: white;
+}
+
+
+/* Hero Text */
+
+.hero-content {
+    max-width: 550px;
+}
+
+
+.welcome {
+    color: #5ec8ff;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+
+.hero-content h1 {
+    font-size: 55px;
+    line-height: 1.1;
+    margin-bottom: 25px;
+}
+
+
+.description {
+    font-size: 18px;
+    line-height: 1.7;
+    color: #dce8f2;
+}
+
+
+/* Search Box */
+
+.search-box {
+    width: 380px;
+
+    background-color: white;
+    color: #222;
+
+    padding: 35px;
+
+    border-radius: 15px;
+
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+
+.search-box h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+
+.search-box p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+
+.search-box label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+
+/* Dropdown */
+
+.search-box select {
+    width: 100%;
+
+    padding: 14px;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    background-color: white;
+
+    margin-bottom: 20px;
+}
+
+
+/* Search Button */
+
+.search-box button {
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: #0b1f3a;
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+.search-box button:hover {
+    background-color: #164b75;
+}
+
+
+/* Features */
+
+.features {
+    padding: 60px 10%;
+    text-align: center;
+}
+
+
+.features > h2 {
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+
+/* Feature Cards */
+
+.feature-container {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+
+
+.feature-card {
+    background-color: white;
+
+    width: 30%;
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+
+    transition: 0.3s;
+}
+
+
+.feature-card:hover {
+    transform: translateY(-8px);
+}
+
+
+.icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+}
+
+
+.feature-card h3 {
+    margin-bottom: 12px;
+}
+
+
+.feature-card p {
+    color: #666;
+    line-height: 1.6;
+}
+
+
+/* Footer */
+
+footer {
+    background-color: #0b1f3a;
+    color: white;
+
+    text-align: center;
+
+    padding: 20px;
+}
+
+
+/* Mobile Responsive Design */
+
+@media (max-width: 800px) {
+
+    .navbar {
+        padding: 0 5%;
+    }
+
+    .nav-links {
+        gap: 15px;
+    }
+
+    .hero {
+        flex-direction: column;
+
+        text-align: center;
+
+        gap: 40px;
+
+        padding: 50px 5%;
+    }
+
+    .hero-content h1 {
+        font-size: 40px;
+    }
+
+    .search-box {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .feature-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .feature-card {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+/* Search Page */
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #222;
+}
+
+/* Navigation */
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 8%;
+    background: #ffffff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+nav h1 {
+    color: #2563eb;
+    margin: 0;
+}
+
+nav a {
+    text-decoration: none;
+    color: #333;
+    margin-left: 25px;
+    font-weight: 600;
+}
+
+/* Search Section */
+
+.search-section {
+    text-align: center;
+    padding: 50px 8%;
+}
+
+.search-section h2 {
+    font-size: 35px;
+    margin-bottom: 10px;
+}
+
+.search-section p {
+    color: #666;
+}
+
+.search-box {
+    background: white;
+    padding: 30px;
+    margin-top: 30px;
+    border-radius: 15px;
+    display: flex;
+    gap: 15px;
+    align-items: end;
+    justify-content: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.input-group label {
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.input-group input,
+.input-group select {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 170px;
+}
+
+.search-btn,
+.seat-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 13px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.search-btn:hover,
+.seat-btn:hover {
+    background: #1d4ed8;
+}
+
+/* Bus Results */
+
+.bus-results {
+    padding: 20px 8% 60px;
+}
+
+.bus-results h2 {
+    margin-bottom: 25px;
+}
+
+.bus-card {
+    background: white;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.2fr 1fr;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+}
+
+.bus-card h3 {
+    margin: 0 0 8px;
+}
+
+.bus-card p {
+    color: #666;
+    margin: 5px 0;
+}
+
+/* Mobile */
+
+@media (max-width: 800px) {
+
+    .search-box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .input-group input,
+    .input-group select {
+        width: auto;
+    }
+
+    .bus-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    nav {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+}
+
+/* Seat Selection Page */
+
+.seat-page {
+    text-align: center;
+    padding: 40px 8%;
+}
+
+.seat-page h2 {
+    font-size: 35px;
+    margin-bottom: 10px;
+}
+
+.bus-info {
+    background: white;
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.bus-info h3 {
+    color: #2563eb;
+}
+
+/* Seat Container */
+
+.seat-container {
+    background: white;
+    max-width: 450px;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.driver {
+    background: #e5e7eb;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    font-weight: bold;
+}
+
+.seats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 40px 1fr 1fr;
+    gap: 12px;
+    align-items: center;
+    justify-items: center;
+}
+
+.seat {
+    width: 55px;
+    height: 45px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Available Seat */
+
+.seat.available {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+/* Selected Seat */
+
+.seat.selected {
+    background: #22c55e;
+    color: white;
+}
+
+/* Booked Seat */
+
+.seat.booked {
+    background: #ef4444;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+/* Legend */
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.legend div {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.legend-box {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+}
+
+.available-box {
+    background: #dbeafe;
+}
+
+.selected-box {
+    background: #22c55e;
+}
+
+.booked-box {
+    background: #d1d5db;
+}
+
+/* Booking Summary */
+
+.booking-summary {
+    background: white;
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.booking-summary p {
+    font-size: 18px;
+}
+
+.continue-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.continue-btn:hover {
+    background: #1d4ed8;
+}
+
+/* ROLE SELECTION */
+
+.role-container {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.role-cards {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.role-card {
+    width: 280px;
+    padding: 30px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.role-icon {
+    font-size: 50px;
+}
+
+.role-btn,
+.login-btn,
+.dashboard-card button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+
+/* LOGIN */
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-box {
+    width: 350px;
+    padding: 35px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.login-box input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 18px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.login-btn {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+
+/* DASHBOARD */
+
+.dashboard {
+    padding: 40px;
+    text-align: center;
+}
+
+.dashboard-cards {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+}
+
+.dashboard-card {
+    width: 230px;
+    padding: 25px;
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.dashboard-card button {
+    margin-top: 15px;
+}
+
+
+/* ADMIN STATISTICS */
+
+.admin-stats {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin: 30px 0;
+}
+
+.stat-card {
+    width: 180px;
+    padding: 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ROLE SELECTION */
+
+.role-section {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.role-section h2 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.role-section > p {
+    margin-bottom: 35px;
+}
+
+.role-cards {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.role-card {
+    width: 280px;
+    padding: 30px;
+    border-radius: 20px;
+    background: white;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    text-align: center;
+}
+
+.role-icon {
+    font-size: 45px;
+    margin-bottom: 15px;
+}
+
+.role-card h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.role-card p {
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.role-btn {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+
+.hero {
+    position: relative;
+}
+
+.hero-logo {
+    position: absolute;
+    width: 300px;
+    height: auto;
+    right: 8%;
+    top: 50%;
+    transform: translateY(-50%);
+    object-fit: contain;
+}
+
+
+.back-button-container {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.back-button-container button {
+    padding: 12px 30px;
+    background: #172554;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.back-button-container button:hover {
+    background: #2563eb;
+}

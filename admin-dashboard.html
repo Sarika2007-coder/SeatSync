@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - SeatSync</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <h1>SeatSync</h1>
+
+        <p>Admin Dashboard</p>
+
+    </header>
+
+
+    <main class="dashboard">
+
+        <h2>Admin Dashboard 👨‍💼</h2>
+
+        <p>Manage your SeatSync bus booking system.</p>
+
+
+        <div class="admin-stats">
+
+            <div class="stat-card">
+
+                <h3>🚌</h3>
+                <h2>5</h2>
+                <p>Total Routes</p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>🚍</h3>
+                <h2>12</h2>
+                <p>Total Buses</p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>🎟️</h3>
+                <h2 id="bookingCount">0</h2>
+                <p>Bookings</p>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-cards">
+
+
+            <div class="dashboard-card">
+
+                <h3>🛣️ Manage Routes</h3>
+
+                <p>Add or modify bus routes.</p>
+
+                <button onclick="manageRoutes()">
+                    Manage Routes
+                </button>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <h3>🚌 Manage Buses</h3>
+
+                <p>Add buses and update bus details.</p>
+
+                <button onclick="manageBuses()">
+                    Manage Buses
+                </button>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <h3>⏰ Manage Timings</h3>
+
+                <p>Update bus departure timings.</p>
+
+                <button onclick="manageTimings()">
+                    Manage Timings
+                </button>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <h3>📋 View Bookings</h3>
+
+                <p>View passenger bookings.</p>
+
+                <button onclick="viewAllBookings()">
+                    View Bookings
+                </button>
+
+            </div>
+
+            
+
+
+            <div class="dashboard-card">
+
+                <h3>🚪 Logout</h3>
+
+                <button onclick="logout()">
+                    Logout
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>

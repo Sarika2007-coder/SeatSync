@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=2.0">
+
+    <title>SeatSync - Smart Bus Booking</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <header>
+        <nav class="navbar">
+
+            <div class="logo">
+                🚌 SeatSync
+            </div>
+
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#">Routes</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+
+        </nav>
+    </header>
+
+
+    <!-- Hero Section -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <p class="welcome">WELCOME TO SEATSYNC</p>
+
+            <h1>
+                Find Your Bus.<br>
+                Choose Your Seat.
+            </h1>
+
+            <p class="description">
+                Your journey, your route, your seat.
+                <br>
+                Disover comfortable travel and make every trip yours.
+            </p>
+
+        </div>
+
+        <img src="images/logo.png"
+         alt="SeatSync Logo"
+         class="hero-logo">
+
+</section>
+                
+<script>
+function goToPage2() {
+    const route = document.getElementById("route").value;
+
+    if (route === "") {
+        alert("Please select a bus route");
+        return;
+    }
+
+    window.location.href = "page2.html?route=" + route;
+}
+</script>
+
+            
+
+        </div>
+
+    </section>
+
+
+<!-- Role Selection Section -->
+
+<section class="role-section">
+
+    <h2>Choose Your Role</h2>
+
+    <p>How would you like to continue?</p>
+
+    <div class="role-cards">
+
+        <!-- USER -->
+        <div class="role-card">
+
+            <div class="role-icon">👤</div>
+
+            <h3>User</h3>
+
+            <p>
+                Search buses, check seats and book your journey.
+            </p>
+
+            <a href="user-login.html">
+                <button class="role-btn">
+                    Continue as User
+                </button>
+            </a>
+
+        </div>
+
+
+        <!-- ADMIN -->
+        <div class="role-card">
+
+            <div class="role-icon">👨‍💼</div>
+
+            <h3>Admin</h3>
+
+            <p>
+                Manage routes, buses, timings and bookings.
+            </p>
+
+            <a href="admin-login.html">
+                <button class="role-btn">
+                    Continue as Admin
+                </button>
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+    <!-- Features Section -->
+    <section class="features">
+
+        <h2>Why Use SeatSync?</h2>
+
+        <div class="feature-container">
+
+            <div class="feature-card">
+                <div class="icon">🔍</div>
+                <h3>Easy Search</h3>
+                <p>
+                    Quickly find buses available on your preferred route.
+                </p>
+            </div>
+
+
+            <div class="feature-card">
+                <div class="icon">⏰</div>
+                <h3>Choose Timing</h3>
+                <p>
+                    Select the bus timing that is most convenient for you.
+                </p>
+            </div>
+
+
+            <div class="feature-card">
+                <div class="icon">💺</div>
+                <h3>Select Your Seat</h3>
+                <p>
+                    View available and occupied seats before booking.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Footer -->
+    <footer>
+
+        <p>
+            © 2026 SeatSync | Smart Bus Route & Seat Selection System
+        </p>
+
+    </footer>
+
+
+    <!-- JavaScript -->
+    <script>
+
+        function searchBus() {
+
+            const route = document.getElementById("route").value;
+
+            if (route === "") {
+
+                alert("Please select a bus route.");
+
+            } else {
+
+                // For now, this message confirms that the selection works.
+                alert("Route selected successfully!");
+
+                // Later we will connect this to routes.html
+                // window.location.href = "routes.html";
+
+            }
+
+        }
+        
+
+    </script>
+
+</body>
+</html>
