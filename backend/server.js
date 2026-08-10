@@ -1,61 +1,51 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const crypto = require("crypto");
-const { createClient } = require("@supabase/supabase-js");
-
-// Must be set before any HTTPS calls — allows corporate SSL proxy certificates
+// Must be first — allows corporate SSL proxy certificates
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+const express = require("express");
+const cors    = require("cors");
+const path    = require("path");
+const crypto  = require("crypto");
+const { createClient } = require("@supabase/supabase-js");
 
-// Load .env from project root (Node 22+ built-in)
-try {
-    process.loadEnvFile(path.join(__dirname, '..', '.env'));
-} catch {
-    // .env not found — fall back to system environment variables
-}
+// Load .env before anything that reads process.env
+try { process.loadEnvFile(path.join(__dirname, "..", ".env")); } catch (_) {}
 
-// Serve Supabase config to the frontend — publishable key only, never the secret key
-app.get('/js/env-config.js', (req, res) => {
-    const config = {
-        url: process.env.SUPABASE_URL || '',
-        anonKey: process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || ''
-    };
-    res.type('application/javascript');
-    res.send(`window.__SUPABASE_CONFIG = ${JSON.stringify(config)};`);
-});
-
-// Serve frontend from project root
-app.use(express.static(path.join(__dirname, "..")));
-
-// Supabase client — uses service role key to bypass RLS (server-side only)
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SECRET_KEY
-);
-
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SECRET_KEY) {
-    console.error("ERROR: SUPABASE_URL and SUPABASE_SECRET_KEY must be set in .env");
+// Validate required env vars
+const required = ["SUPABASE_URL","SUPABASE_SECRET_KEY","ADMIN_USERNAME","ADMIN_PASSWORD"];
+const missing  = required.filter(k => !process.env[k]);
+if (missing.length) {
+    console.error("Missing env vars:", missing.join(", "));
     process.exit(1);
 }
 
-if (!process.env.ADMIN_USERNAME || !process.env.ADMIN_PASSWORD) {
-    console.error("ERROR: ADMIN_USERNAME and ADMIN_PASSWORD must be set in .env");
-    process.exit(1);
-}
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY);
+
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
-const ADMIN_PW_HASH = crypto.createHash("sha256")
-    .update(process.env.ADMIN_PASSWORD + "ss_salt")
-    .digest("hex");
+const ADMIN_PW_HASH  = crypto.createHash("sha256")
+    .update(process.env.ADMIN_PASSWORD + "ss_salt").digest("hex");
 
 function hashPassword(pw) {
     return crypto.createHash("sha256").update(pw + "ss_salt").digest("hex");
 }
 
-// Admin login (uses username/password, separate from Supabase user auth)
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Serve publishable Supabase config to frontend only
+app.get("/js/env-config.js", (req, res) => {
+    res.type("application/javascript");
+    res.send(`window.__SUPABASE_CONFIG = ${JSON.stringify({
+        url:     process.env.SUPABASE_URL || "",
+        anonKey: process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || ""
+    })};`);
+});
+
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, "..")));
+
+// ── Auth ─────────────────────────────────────────────────────
+
 app.post("/auth/admin-login", (req, res) => {
     const { username, password } = req.body;
     if (!username || !password)
@@ -65,9 +55,8 @@ app.post("/auth/admin-login", (req, res) => {
     res.status(401).json({ success: false, message: "Invalid admin credentials." });
 });
 
-// ── Bus management ───────────────────────────────────────────
+// ── Bus management ────────────────────────────────────────────
 
-// Add a new bus
 app.post("/bus", async (req, res) => {
     const { route, name, type, time, duration, seats, price, rating } = req.body;
     if (!route || !name || !type || !time || !price)
@@ -76,79 +65,64 @@ app.post("/bus", async (req, res) => {
     const { data, error } = await supabase.from("buses").insert([{
         route, name, type, time,
         duration: duration || "—",
-        seats:    parseInt(seats) || 40,
+        seats:    parseInt(seats)  || 40,
         price:    parseFloat(price),
         rating:   parseFloat(rating) || 4.0,
         active:   true,
     }]).select().single();
 
     if (error) return res.status(500).json({ success: false, message: error.message });
-    console.log("Bus added:", data.id, name);
+    console.log("Bus added:", name, "on", route);
     res.json({ success: true, bus: data });
 });
 
-// Get buses for a route
-app.get("/buses/:route", async (req, res) => {
-    const { data, error } = await supabase
-        .from("buses")
-        .select("*")
-        .eq("route", req.params.route)
-        .eq("active", true)
-        .order("time", { ascending: true });
-
-    if (error) return res.status(500).json({ success: false, message: error.message });
-    res.json({ success: true, buses: data || [] });
-});
-
-// Get all buses (admin)
+// All buses — admin view (must be before /buses/:route)
 app.get("/buses", async (req, res) => {
     const { data, error } = await supabase
-        .from("buses")
-        .select("*")
-        .order("route")
-        .order("time");
-
+        .from("buses").select("*")
+        .order("route").order("time");
     if (error) return res.status(500).json({ success: false, message: error.message });
     res.json({ success: true, buses: data || [] });
 });
 
-// Delete (deactivate) a bus
-app.delete("/bus/:id", async (req, res) => {
-    const { error } = await supabase
-        .from("buses")
-        .update({ active: false })
-        .eq("id", req.params.id);
+// Buses for a specific route — user search
+app.get("/buses/:route", async (req, res) => {
+    const { data, error } = await supabase
+        .from("buses").select("*")
+        .eq("route", req.params.route)
+        .eq("active", true)
+        .order("time");
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    res.json({ success: true, buses: data || [] });
+});
 
+app.delete("/bus/:id", async (req, res) => {
+    const { error } = await supabase.from("buses")
+        .update({ active: false }).eq("id", req.params.id);
     if (error) return res.status(500).json({ success: false, message: error.message });
     res.json({ success: true, message: "Bus removed." });
 });
 
 // ── Seat availability ─────────────────────────────────────────
+
+app.get("/seats/booked", async (req, res) => {
     const { busId, date } = req.query;
     if (!busId || !date)
         return res.status(400).json({ success: false, message: "busId and date required." });
 
-    const { data, error } = await supabase
-        .from("bookings")
-        .select("seats")
-        .eq("bus_name", busId)   // busId holds the bus name for matching
-        .eq("date", date)
-        .neq("status", "cancelled");
+    const { data, error } = await supabase.from("bookings").select("seats")
+        .eq("bus_name", busId).eq("date", date).neq("status", "cancelled");
 
-    if (error) {
-        console.error("Seats query error:", error.message);
-        return res.status(500).json({ success: false, message: error.message });
-    }
+    if (error) return res.status(500).json({ success: false, message: error.message });
 
-    // Flatten all seat strings (comma-separated) into one array
     const booked = (data || [])
-        .flatMap(row => (row.seats || "").split(",").map(s => s.trim()))
+        .flatMap(r => (r.seats || "").split(",").map(s => s.trim()))
         .filter(Boolean);
-
     res.json({ success: true, booked });
 });
 
-// Save a booking to Supabase
+// ── Bookings ──────────────────────────────────────────────────
+
 app.post("/booking", async (req, res) => {
     const b = req.body;
     const { error } = await supabase.from("bookings").insert([{
@@ -170,45 +144,22 @@ app.post("/booking", async (req, res) => {
         status:         b.status || "confirmed",
         booked_at:      b.bookedAt || new Date().toISOString(),
     }]);
-
-    if (error) {
-        console.error("Supabase insert error:", error.message);
-        return res.status(500).json({ success: false, message: error.message });
-    }
-    console.log("Booking saved to Supabase:", b.ref);
+    if (error) { console.error("Insert error:", error.message); return res.status(500).json({ success: false, message: error.message }); }
+    console.log("Booking saved:", b.ref);
     res.json({ success: true, message: "Booking saved successfully!" });
 });
 
-// Cancel a booking by ref (marks status = 'cancelled' in Supabase)
 app.post("/booking/cancel", async (req, res) => {
     const { ref } = req.body;
     if (!ref) return res.status(400).json({ success: false, message: "ref required." });
-
-    const { error } = await supabase
-        .from("bookings")
-        .update({ status: "cancelled" })
-        .eq("ref", ref);
-
-    if (error) {
-        console.error("Cancel error:", error.message);
-        return res.status(500).json({ success: false, message: error.message });
-    }
+    const { error } = await supabase.from("bookings").update({ status: "cancelled" }).eq("ref", ref);
+    if (error) return res.status(500).json({ success: false, message: error.message });
     res.json({ success: true, message: "Booking cancelled." });
 });
 
-// Get all bookings for Admin Dashboard
 app.get("/bookings", async (req, res) => {
-    const { data, error } = await supabase
-        .from("bookings")
-        .select("*")
-        .order("booked_at", { ascending: false });
-
-    if (error) {
-        console.error("Fetch bookings error:", error.message);
-        return res.status(500).json({ success: false, message: error.message });
-    }
-
-    // Normalise column names to match existing frontend expectations
+    const { data, error } = await supabase.from("bookings").select("*").order("booked_at", { ascending: false });
+    if (error) return res.status(500).json({ success: false, message: error.message });
     const bookings = (data || []).map(r => ({
         ref:           r.ref,
         route:         r.route,
@@ -227,11 +178,8 @@ app.get("/bookings", async (req, res) => {
         status:        r.status,
         bookedAt:      r.booked_at,
     }));
-
     res.json({ success: true, bookings });
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`SeatSync server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`SeatSync server running on http://localhost:${PORT}`));
