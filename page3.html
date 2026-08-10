@@ -132,8 +132,8 @@
 
     </section>
 
-   
-<script>
+    <script type="module" src="js/supabase-client.js" defer></script>
+<script defer>
 
     // ==========================================
     // GET BUS INFORMATION
@@ -197,81 +197,50 @@
     async function loadBookedSeats() {
 
         try {
+            const { data, error } = await window.supabase
+                .from('bookings')
+                .select('seats')
+                .eq('route', selectedRoute)
+                .eq('bus', selectedBus)
+                .eq('time', selectedTime);
 
-            const response =
-                await fetch("http://localhost:3000/bookings");
-
-            const data = await response.json();
-
-            if (!data.success) {
+            if (error) {
+                console.error('Error loading booked seats from Supabase:', error);
                 return;
             }
 
-
-            // Find bookings for the SAME route,
-            // SAME bus and SAME timing
-
-            const matchingBookings =
-                data.bookings.filter(booking =>
-
-                    booking.route === selectedRoute &&
-                    booking.bus === selectedBus &&
-                    booking.time === selectedTime
-
-                );
-
-
             // Collect all booked seats
-
             let bookedSeats = [];
 
-
-            matchingBookings.forEach(booking => {
-
+            data.forEach(booking => {
                 if (booking.seats) {
-
-                    const seats =
-                        booking.seats.split(",");
-
+                    const seats = booking.seats.split(',');
                     bookedSeats.push(...seats);
-
                 }
-
             });
-
 
             // Mark booked seats
-
             allSeats.forEach(seat => {
-
-                const seatNumber =
-                    seat.textContent.trim();
-
-
+                const seatNumber = seat.textContent.trim();
                 if (bookedSeats.includes(seatNumber)) {
-
-                    seat.classList.remove("available");
-                    seat.classList.remove("selected");
-
-                    seat.classList.add("booked");
-
+                    seat.classList.remove('available');
+                    seat.classList.remove('selected');
+                    seat.classList.add('booked');
                     seat.disabled = true;
-
                 }
-
             });
-
 
         } catch (error) {
 
             console.error(
-                "Could not load booked seats:",
+                'Could not load booked seats:',
                 error
             );
 
         }
 
     }
+
 
 
     // Load booked seats when page opens

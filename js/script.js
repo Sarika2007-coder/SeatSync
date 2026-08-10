@@ -13,13 +13,34 @@ function checkUserRole() {
 
 
 // Logout
-function logout() {
+async function logout() {
+    try {
+        if (window.supabaseAuth) {
+            await window.supabaseAuth.signOutUser();
+        }
+    } catch (error) {
+        console.warn('Supabase logout error:', error);
+    }
 
     localStorage.removeItem("role");
     localStorage.removeItem("userEmail");
 
     window.location.href = "index.html";
+}
 
+async function showCurrentUserInfo() {
+    if (!window.supabaseAuth) {
+        return;
+    }
+
+    const session = await window.supabaseAuth.getSession();
+    const user = session?.user;
+    if (user) {
+        const userInfo = document.getElementById('userInfo');
+        if (userInfo) {
+            userInfo.textContent = `Logged in as ${user.email}`;
+        }
+    }
 }
 
 
@@ -59,7 +80,7 @@ async function viewAllBookings() {
 
     try {
 
-        const response = await fetch("http://localhost:3000/bookings");
+        const response = await fetch("");
 
         const data = await response.json();
 
@@ -196,30 +217,28 @@ async function viewAllBookings() {
 // ==========================================
 
 async function loadBookingCount() {
-
-    try {
-
-        const response = await fetch("http://localhost:3000/bookings");
-
-        const data = await response.json();
-
-        if (data.success) {
-
-            const countElement =
-                document.getElementById("bookingCount");
-
-            if (countElement) {
-                countElement.textContent = data.bookings.length;
-            }
-
-        }
-
-    } catch (error) {
-
-        console.error("Error loading booking count:", error);
-
+    if (!window.supabase) {
+        return;
     }
 
+    try {
+        const { data: bookings, error } = await window.supabase
+            .from('bookings')
+            .select('id');
+
+        if (error) {
+            console.error('Supabase booking count error:', error);
+            return;
+        }
+
+        const countElement = document.getElementById("bookingCount");
+        if (countElement) {
+            countElement.textContent = bookings ? bookings.length : '0';
+        }
+    } catch (error) {
+        console.error("Error loading booking count:", error);
+    }
 }
 
 window.addEventListener("DOMContentLoaded", loadBookingCount);
+window.addEventListener('DOMContentLoaded', showCurrentUserInfo);

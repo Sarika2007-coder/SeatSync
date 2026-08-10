@@ -780,6 +780,7 @@
         // ==========================================
 
         const bookingId =
+            params.get("bookingId") ||
             "SS" +
             Date.now()
                 .toString()

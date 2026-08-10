@@ -388,56 +388,7 @@
 
     </div>
 
-
-
-    <!-- JavaScript -->
-
-    <script>
-
-
-        // ==========================================
-        // GET INFORMATION FROM PAGE 3
-        // ==========================================
-
-        const params =
-            new URLSearchParams(window.location.search);
-
-
-        const selectedRoute =
-            params.get("route");
-
-
-        const selectedBus =
-            params.get("bus");
-
-
-        const selectedTime =
-            params.get("time");
-
-
-        const selectedPrice =
-            params.get("price");
-
-
-        const selectedSeats =
-            params.get("seats");
-
-
-
-        // ==========================================
-        // CONVERT SEATS INTO ARRAY
-        // ==========================================
-
-        const seats =
-            selectedSeats
-                ? selectedSeats.split(",")
-                : [];
-
-
-
-        // ==========================================
-        // CONVERT PRICE INTO NUMBER
-        // ==========================================
+    <script type="module" src="js/supabase-client.js" defer></script>
 
         const priceNumber =
             selectedPrice
@@ -455,9 +406,28 @@
         const total =
             seats.length * priceNumber;
 
+        async function ensureLoggedInUser() {
+            if (!window.supabaseAuth) {
+                return;
+            }
 
+            const session = await window.supabaseAuth.getSession();
+            const user = session?.user;
 
-        // ==========================================
+            if (!user) {
+                window.location.href = 'user-login.html';
+                return;
+            }
+
+            const emailInput = document.getElementById('email');
+            if (emailInput && user.email) {
+                emailInput.value = user.email;
+            }
+
+            return user;
+        }
+
+        ensureLoggedInUser();
         // DISPLAY ROUTE
         // ==========================================
 
@@ -599,37 +569,53 @@ document
         };
 
 
-        // Send booking to Express backend
+        // Send booking to Supabase
 
         try {
+            const session = await window.supabaseAuth.getSession();
+            const user = session?.user;
 
-            const response = await fetch(
-                "http://localhost:3000/booking",
-                {
-                    method: "POST",
+            if (!user) {
+                alert('Please log in before confirming your booking.');
+                window.location.href = 'user-login.html';
+                return;
+            }
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+            const bookingDataWithUser = {
+                user_id: user.id,
+                route: selectedRoute,
+                bus: selectedBus,
+                time: selectedTime,
+                price: selectedPrice,
+                seats: selectedSeats,
+                total_price: total,
+                passenger_name: name,
+                contact_number: mobile,
+                email: email,
+                booking_date: new Date().toISOString(),
+                status: 'confirmed'
+            };
 
-                    body: JSON.stringify(bookingData)
-                }
-            );
+            const { data: insertData, error: insertError } = await window.supabase
+                .from('bookings')
+                .insert([bookingDataWithUser]);
 
+            if (insertError) {
+                console.error('Supabase booking insert error:', insertError);
+                alert('Booking could not be saved. ' + (insertError.message || 'Please try again.'));
+                return;
+            }
 
-            const result = await response.json();
-
-
-            if (!result.success) {
-
-                alert("Booking could not be saved.");
-
+            if (!insertData || insertData.length === 0) {
+                alert('Booking could not be saved. Please try again.');
                 return;
             }
 
 
             // Go to Page 5
 
+            const bookingRow = insertData[0];
+            const bookingId = bookingRow.id || '';
             const page5URL =
                 "page5.html" +
                 "?route=" + encodeURIComponent(selectedRoute) +
@@ -639,7 +625,8 @@ document
                 "&seats=" + encodeURIComponent(selectedSeats) +
                 "&name=" + encodeURIComponent(name) +
                 "&mobile=" + encodeURIComponent(mobile) +
-                "&email=" + encodeURIComponent(email);
+                "&email=" + encodeURIComponent(email) +
+                "&bookingId=" + encodeURIComponent(bookingId);
 
             window.location.href = page5URL;
 

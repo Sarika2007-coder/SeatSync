@@ -154,5 +154,17 @@
     "mobile": "4545454545",
     "email": "gowdasarika6@gmail.com",
     "bookingDate": "8/10/2026, 12:42:53 PM"
+  },
+  {
+    "route": "bangalore-hassan",
+    "bus": "KSRTC Airavat",
+    "time": "7:30 AM",
+    "price": "₹350",
+    "seats": "C1,D1",
+    "totalPrice": 700,
+    "name": "sammuu",
+    "mobile": "4521452377",
+    "email": "sammuu@10",
+    "bookingDate": "8/10/2026, 2:03:44 PM"
   }
 ]

@@ -1,46 +1,74 @@
-function userLogin(event) {
+const loginMessage = document.getElementById('loginMessage');
+const authForm = document.getElementById('authForm');
+const authButton = document.getElementById('authButton');
+const toggleAuthMode = document.getElementById('toggleAuthMode');
+const authToggleText = document.getElementById('authToggleText');
+const confirmPasswordRow = document.getElementById('confirmPasswordRow');
 
+let isSignupMode = false;
+
+function setAuthMode(signup) {
+    isSignupMode = signup;
+    authButton.textContent = signup ? 'Sign Up' : 'Login';
+    authToggleText.textContent = signup ? 'Already have an account?' : "Don't have an account?";
+    toggleAuthMode.textContent = signup ? 'Login' : 'Create one';
+    confirmPasswordRow.style.display = signup ? 'block' : 'none';
+    loginMessage.textContent = '';
+}
+
+async function handleAuthSubmit(event) {
     event.preventDefault();
 
-    const email = document.getElementById("userEmail").value;
-    const password = document.getElementById("userPassword").value;
+    const email = document.getElementById('userEmail').value.trim();
+    const password = document.getElementById('userPassword').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
 
-    if (email !== "" && password !== "") {
+    if (!email || !password || (isSignupMode && !confirmPassword)) {
+        loginMessage.textContent = 'Please fill in all required fields.';
+        return;
+    }
 
-        // Store the role
-        localStorage.setItem("role", "user");
-        localStorage.setItem("userEmail", email);
+    if (isSignupMode && password !== confirmPassword) {
+        loginMessage.textContent = 'Passwords do not match.';
+        return;
+    }
 
-        // Go to user dashboard
-        window.location.href = "user-dashboard.html";
+    loginMessage.textContent = isSignupMode ? 'Creating account...' : 'Signing in...';
 
-    } else {
+    try {
+        let result;
+        if (isSignupMode) {
+            result = await window.supabaseAuth.signUpUser(email, password);
+        } else {
+            result = await window.supabaseAuth.signInUser(email, password);
+        }
 
-        document.getElementById("loginMessage").textContent =
-            "Please enter your details.";
+        if (result.error) {
+            loginMessage.textContent = result.error.message || 'Unable to authenticate.';
+            return;
+        }
 
+        if (isSignupMode) {
+            loginMessage.textContent = 'Account created. Please check your email to confirm your account.';
+            return;
+        }
+
+        if (result.data?.session?.user) {
+            window.location.href = 'user-dashboard.html';
+            return;
+        }
+
+        loginMessage.textContent = 'Login succeeded. Redirecting...';
+        window.location.href = 'user-dashboard.html';
+
+    } catch (error) {
+        console.error('Auth error:', error);
+        loginMessage.textContent = 'Authentication failed. Try again.';
     }
 }
 
+toggleAuthMode.addEventListener('click', () => {
+    setAuthMode(!isSignupMode);
+});
 
-function adminLogin(event) {
-
-    event.preventDefault();
-
-    const username = document.getElementById("adminUsername").value;
-    const password = document.getElementById("adminPassword").value;
-
-    // Demo admin credentials
-    if (username === "admin" && password === "1234") {
-
-        localStorage.setItem("role", "admin");
-
-        window.location.href = "admin-dashboard.html";
-
-    } else {
-
-        document.getElementById("adminMessage").textContent =
-            "Invalid admin username or password.";
-
-    }
-}
+setAuthMode(false);

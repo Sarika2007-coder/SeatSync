@@ -20,7 +20,7 @@
 
             <p>Login to book your bus seat</p>
 
-            <form onsubmit="userLogin(event)">
+            <form id="authForm" onsubmit="handleAuthSubmit(event)">
 
                 <label>Email</label>
                 <input
@@ -38,7 +38,16 @@
                     required
                 >
 
-                <button type="submit" class="login-btn">
+                <div id="confirmPasswordRow" style="display:none;">
+                    <label>Confirm Password</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        placeholder="Re-enter your password"
+                    >
+                </div>
+
+                <button type="submit" class="login-btn" id="authButton">
                     Login
                 </button>
 
@@ -46,13 +55,21 @@
 
             <p id="loginMessage"></p>
 
+            <p style="margin-top: 16px; font-size: 14px; color: #4b5563;">
+                <span id="authToggleText">Don't have an account?</span>
+                <button type="button" id="toggleAuthMode" style="background:none;border:none;color:#2563eb;cursor:pointer;padding:0;">
+                    Create one
+                </button>
+            </p>
+
             <a href="index.html">← Back to Home</a>
 
         </div>
 
     </div>
 
-    <script src="js/login.js"></script>
+    <script type="module" src="js/supabase-client.js" defer></script>
+    <script src="js/login.js" defer></script>
 
 </body>
 </html>
