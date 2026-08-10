@@ -166,8 +166,8 @@ function renderTable(bookings) {
       <td style="font-size:12px;">${b.contactEmail || '—'}<br><span style="color:var(--muted);">${b.contactPhone || ''}</span></td>
       <td><strong>₹${b.grandTotal || b.totalAmount || 0}</strong></td>
       <td style="font-size:12px;">${payMethod}</td>
-      <td><span class="badge badge-success">Confirmed</span></td>
-      <td><button class="btn-tbl" onclick="cancelBooking(${idx})">Cancel</button></td>
+      <td>${b.status === 'cancelled' ? '<span class="badge badge-danger">Cancelled</span>' : '<span class="badge badge-success">Confirmed</span>'}</td>
+      <td><button class="btn-tbl" onclick="cancelBooking('${b.ref || ''}')" ${b.status==='cancelled'?'disabled style="opacity:.4;cursor:not-allowed;"':''}>Cancel</button></td>
     </tr>`;
   }).join('');
 }
@@ -180,17 +180,18 @@ function filterTable() {
   renderTable(filtered);
 }
 
-async function cancelBooking(idx) {
-  if (!confirm('Cancel this booking? This action cannot be undone.')) return;
+async function cancelBooking(ref) {
+  if (!ref) { showToast('No ref found for this booking.', 'error'); return; }
+  if (!confirm('Cancel booking ' + ref + '?\nThis will mark it as cancelled in the database.')) return;
   try {
     const res  = await fetch('/booking/cancel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ index: idx })
+      body: JSON.stringify({ ref })
     });
     const data = await res.json();
     if (data.success) {
-      showToast('Booking cancelled successfully.', 'success');
+      showToast('Booking ' + ref + ' cancelled.', 'success');
       loadBookings();
     } else {
       showToast(data.message || 'Cancel failed.', 'error');

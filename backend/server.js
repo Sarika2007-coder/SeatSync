@@ -1,8 +1,8 @@
 const express = require("express");
 const cors = require("cors");
-const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 app.use(cors());
@@ -28,7 +28,16 @@ app.get('/js/env-config.js', (req, res) => {
 // Serve frontend from project root
 app.use(express.static(path.join(__dirname, "..")));
 
-const bookingsFile = path.join(__dirname, "bookings.json");
+// Supabase client — uses service role key to bypass RLS (server-side only)
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SECRET_KEY
+);
+
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SECRET_KEY) {
+    console.error("ERROR: SUPABASE_URL and SUPABASE_SECRET_KEY must be set in .env");
+    process.exit(1);
+}
 
 if (!process.env.ADMIN_USERNAME || !process.env.ADMIN_PASSWORD) {
     console.error("ERROR: ADMIN_USERNAME and ADMIN_PASSWORD must be set in .env");
@@ -53,96 +62,87 @@ app.post("/auth/admin-login", (req, res) => {
     res.status(401).json({ success: false, message: "Invalid admin credentials." });
 });
 
-// Save a booking
-app.post("/booking", (req, res) => {
-    const newBooking = req.body;
+// Save a booking to Supabase
+app.post("/booking", async (req, res) => {
+    const b = req.body;
+    const { error } = await supabase.from("bookings").insert([{
+        ref:            b.ref,
+        user_email:     b.contactEmail,
+        route:          b.route,
+        bus_name:       b.busName,
+        bus_type:       b.busType,
+        date:           b.date,
+        time:           b.time,
+        seats:          b.seats,
+        passengers:     b.passengers,
+        contact_email:  b.contactEmail,
+        contact_phone:  b.contactPhone,
+        total_amount:   b.totalAmount,
+        tax:            b.tax,
+        grand_total:    b.grandTotal,
+        payment_method: b.paymentMethod,
+        status:         b.status || "confirmed",
+        booked_at:      b.bookedAt || new Date().toISOString(),
+    }]);
 
-    fs.readFile(bookingsFile, "utf8", (err, data) => {
-        let bookings = [];
-
-        if (!err && data) {
-            try {
-                bookings = JSON.parse(data);
-            } catch (error) {
-                bookings = [];
-            }
-        }
-
-        bookings.push(newBooking);
-
-        fs.writeFile(
-            bookingsFile,
-            JSON.stringify(bookings, null, 2),
-            (err) => {
-                if (err) {
-                    console.error("Error saving booking:", err);
-                    return res.status(500).json({
-                        success: false,
-                        message: "Could not save booking"
-                    });
-                }
-
-                console.log("New booking saved:", newBooking);
-
-                res.json({
-                    success: true,
-                    message: "Booking saved successfully!"
-                });
-            }
-        );
-    });
+    if (error) {
+        console.error("Supabase insert error:", error.message);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+    console.log("Booking saved to Supabase:", b.ref);
+    res.json({ success: true, message: "Booking saved successfully!" });
 });
 
-// Cancel a booking by index (admin) or by ref (user)
-app.post("/booking/cancel", (req, res) => {
-    const { index, ref } = req.body;
-    if (index === undefined && !ref)
-        return res.status(400).json({ success: false, message: "Index or ref required." });
+// Cancel a booking by ref (marks status = 'cancelled' in Supabase)
+app.post("/booking/cancel", async (req, res) => {
+    const { ref } = req.body;
+    if (!ref) return res.status(400).json({ success: false, message: "ref required." });
 
-    fs.readFile(bookingsFile, "utf8", (err, data) => {
-        let bookings = [];
-        if (!err && data) {
-            try { bookings = JSON.parse(data); } catch (_) {}
-        }
+    const { error } = await supabase
+        .from("bookings")
+        .update({ status: "cancelled" })
+        .eq("ref", ref);
 
-        const idx = ref !== undefined
-            ? bookings.findIndex(b => b.ref === ref)
-            : index;
-
-        if (idx < 0 || idx >= bookings.length)
-            return res.status(404).json({ success: false, message: "Booking not found." });
-
-        bookings.splice(idx, 1);
-        fs.writeFile(bookingsFile, JSON.stringify(bookings, null, 2), (err) => {
-            if (err) return res.status(500).json({ success: false, message: "Could not update bookings." });
-            res.json({ success: true, message: "Booking cancelled." });
-        });
-    });
+    if (error) {
+        console.error("Cancel error:", error.message);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+    res.json({ success: true, message: "Booking cancelled." });
 });
 
 // Get all bookings for Admin Dashboard
-app.get("/bookings", (req, res) => {
-    fs.readFile(bookingsFile, "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).json({
-                success: false,
-                message: "Could not read bookings"
-            });
-        }
+app.get("/bookings", async (req, res) => {
+    const { data, error } = await supabase
+        .from("bookings")
+        .select("*")
+        .order("booked_at", { ascending: false });
 
-        let bookings = [];
+    if (error) {
+        console.error("Fetch bookings error:", error.message);
+        return res.status(500).json({ success: false, message: error.message });
+    }
 
-        try {
-            bookings = data ? JSON.parse(data) : [];
-        } catch (error) {
-            bookings = [];
-        }
+    // Normalise column names to match existing frontend expectations
+    const bookings = (data || []).map(r => ({
+        ref:           r.ref,
+        route:         r.route,
+        busName:       r.bus_name,
+        busType:       r.bus_type,
+        date:          r.date,
+        time:          r.time,
+        seats:         r.seats,
+        passengers:    r.passengers,
+        contactEmail:  r.contact_email,
+        contactPhone:  r.contact_phone,
+        totalAmount:   r.total_amount,
+        tax:           r.tax,
+        grandTotal:    r.grand_total,
+        paymentMethod: r.payment_method,
+        status:        r.status,
+        bookedAt:      r.booked_at,
+    }));
 
-        res.json({
-            success: true,
-            bookings: bookings
-        });
-    });
+    res.json({ success: true, bookings });
 });
 
 const PORT = process.env.PORT || 3000;
