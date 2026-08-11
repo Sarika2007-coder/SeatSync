@@ -104,7 +104,12 @@ async function adminLogin(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch (_) {
+      throw new Error('Admin backend is not reachable. If deployed on Vercel, deploy backend APIs (or use /api routes).');
+    }
     if (!data.success) throw new Error(data.message || 'Invalid credentials.');
     localStorage.setItem('ss_role', 'admin');
     window.location.href = 'admin-dashboard.html';
