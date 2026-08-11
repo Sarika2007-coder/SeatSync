@@ -136,7 +136,7 @@ async function loadBookedSeats() {
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted);font-size:14px;">⏳ Loading seat availability…</div>';
 
   try {
-    const res  = await fetch(`/seats/booked?busId=${encodeURIComponent(bus.name)}&date=${encodeURIComponent(bus.date || '')}`);
+    const res  = await fetch(`/api/seats/booked?busId=${encodeURIComponent(bus.name)}&date=${encodeURIComponent(bus.date || '')}`);
     const data = await res.json();
     if (data.success && data.booked.length) {
       data.booked.forEach(s => BOOKED.add(s));

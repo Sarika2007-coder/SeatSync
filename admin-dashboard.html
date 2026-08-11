@@ -209,7 +209,7 @@ async function loadBookings() {
   const tbody = document.getElementById('bookingsTable');
   tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><div class="icon">🔄</div><h3>Loading…</h3></div></td></tr>';
   try {
-    const res  = await fetch('/bookings');
+    const res  = await fetch('/api/bookings');
     const data = await res.json();
     allBookings = data.bookings || [];
     updateStats();
@@ -263,7 +263,7 @@ async function cancelBooking(ref) {
   if (!ref) { showToast('No ref found for this booking.', 'error'); return; }
   if (!confirm('Cancel booking ' + ref + '?\nThis will mark it as cancelled in the database.')) return;
   try {
-    const res  = await fetch('/booking/cancel', {
+    const res  = await fetch('/api/booking/cancel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ref })
@@ -336,7 +336,7 @@ async function addBus() {
   btn.disabled = true; btn.textContent = 'Adding…';
 
   try {
-    const res  = await fetch('/bus', {
+    const res  = await fetch('/api/bus', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ route, name, type, time: timeStr, duration, seats, price, rating })
@@ -359,7 +359,7 @@ async function loadManagedBuses() {
   const tbody = document.getElementById('busesTableBody');
   tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted" style="padding:20px;">Loading…</td></tr>';
   try {
-    const res  = await fetch('/buses');
+    const res  = await fetch('/api/buses');
     const data = await res.json();
     if (!data.buses.length) {
       tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state" style="padding:24px;"><div class="icon">🚌</div><h3>No custom buses added yet</h3></div></td></tr>';
@@ -384,7 +384,7 @@ async function loadManagedBuses() {
 async function deleteBus(id, name) {
   if (!confirm(`Remove bus "${name}"? It will no longer appear in search results.`)) return;
   try {
-    const res  = await fetch('/bus/' + id, { method: 'DELETE' });
+    const res  = await fetch('/api/bus/' + id, { method: 'DELETE' });
     const data = await res.json();
     if (data.success) { showToast('Bus removed.', 'success'); loadManagedBuses(); }
     else showToast(data.message, 'error');

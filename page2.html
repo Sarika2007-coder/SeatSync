@@ -134,7 +134,7 @@ async function loadAndRenderBuses(route, date, passengers) {
   // Merge: hardcoded base data + admin-added buses from backend
   let buses = [...(BUS_DATA[route] || [])];
   try {
-    const res  = await fetch('/buses/' + encodeURIComponent(route));
+    const res  = await fetch('/api/buses/' + encodeURIComponent(route));
     const data = await res.json();
     if (data.success && data.buses.length) {
       // Add backend buses (avoid duplicates by name)

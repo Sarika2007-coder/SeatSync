@@ -99,20 +99,38 @@ async function adminLogin(e) {
   showMsg('adminMsg', 'Signing in…', 'info');
 
   try {
-    const res  = await fetch('/auth/admin-login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    let data;
-    try {
-      data = await res.json();
-    } catch (_) {
-      throw new Error('Admin backend is not reachable. If deployed on Vercel, deploy backend APIs (or use /api routes).');
+    const endpoints = ['/api/auth/admin-login', '/auth/admin-login'];
+    let lastError = null;
+
+    for (const endpoint of endpoints) {
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        let data = null;
+        try {
+          data = await res.json();
+        } catch (_) {
+          continue;
+        }
+
+        if (!res.ok || !data.success) {
+          lastError = new Error(data.message || 'Invalid credentials.');
+          continue;
+        }
+
+        localStorage.setItem('ss_role', 'admin');
+        window.location.href = 'admin-dashboard.html';
+        return;
+      } catch (err) {
+        lastError = err;
+      }
     }
-    if (!data.success) throw new Error(data.message || 'Invalid credentials.');
-    localStorage.setItem('ss_role', 'admin');
-    window.location.href = 'admin-dashboard.html';
+
+    throw lastError || new Error('Admin backend is not reachable.');
   } catch (err) {
     showMsg('adminMsg', err.message, 'error');
     btn.disabled    = false;
