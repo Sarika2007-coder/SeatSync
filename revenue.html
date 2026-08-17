@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Revenue - SeatSync</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+    <link rel="stylesheet"
+          href="css/superadmin.css">
+
+</head>
+
+
+<body>
+
+<div class="dashboard">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="auth-logo">
+            Seat<span>Sync</span>
+        </div>
+
+        <h3>Super Admin</h3>
+
+        <nav>
+
+            <a href="superadmin-dashboard.html">
+                🏠 Dashboard
+            </a>
+
+            <a href="manage-admins.html">
+                👨‍💼 Manage Admins
+            </a>
+
+            <a href="manage-users.html">
+                👥 Manage Users
+            </a>
+
+            <a href="manage-buses.html">
+                🚌 Manage Buses
+            </a>
+
+            <a href="manage-routes.html">
+                🛣️ Manage Routes
+            </a>
+
+            <a href="manage-schedules.html">
+                📅 Manage Schedules
+            </a>
+
+            <a href="manage-bookings.html">
+                🎟️ Manage Bookings
+            </a>
+
+            <a href="revenue.html">
+                💰 Revenue
+            </a>
+
+            <a href="activity-logs.html">
+                📋 Activity Logs
+            </a>
+
+        </nav>
+
+        <button
+            onclick="logout()"
+            class="btn-full">
+
+            Logout
+
+        </button>
+
+    </aside>
+
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="dashboard-content">
+
+
+        <div class="dashboard-header">
+
+            <h1>
+                Revenue
+            </h1>
+
+            <p>
+                Total revenue from all confirmed bookings.
+            </p>
+
+        </div>
+
+
+
+        <!-- STATISTICS -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <h3>
+                    Total Revenue
+                </h3>
+
+                <p id="totalRevenue">
+                    ₹0
+                </p>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3>
+                    Total Bookings
+                </h3>
+
+                <p id="totalBookings">
+                    0
+                </p>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3>
+                    Average per Booking
+                </h3>
+
+                <p id="avgRevenue">
+                    ₹0
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- REVENUE BREAKDOWN -->
+
+        <section class="dashboard-section">
+
+            <h2>
+                Revenue by Booking
+            </h2>
+
+            <div id="revenueBreakdown">
+
+                <p>
+                    Loading revenue data...
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<!-- SUPABASE CONFIG -->
+
+<script src="js/env-config.js"></script>
+
+
+<!-- SUPABASE + REVENUE LOGIC -->
+
+<script type="module">
+
+    import {
+        createClient
+    }
+    from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+
+    const cfg =
+        window.__SUPABASE_CONFIG || {};
+
+
+    if (!cfg.url || !cfg.anonKey) {
+
+        console.error(
+            "Supabase configuration missing."
+        );
+
+        throw new Error(
+            "Supabase configuration missing"
+        );
+
+    }
+
+
+    const supabase =
+        createClient(
+            cfg.url,
+            cfg.anonKey
+        );
+
+
+    window.supabase = supabase;
+
+
+    // ========================================
+    // LOAD REVENUE
+    // ========================================
+
+    async function loadRevenue() {
+
+        const breakdown =
+            document.getElementById(
+                "revenueBreakdown"
+            );
+
+
+        try {
+
+            const {
+                data: bookings,
+                error
+            } =
+                await supabase
+                    .from("bookings")
+                    .select("*")
+                    .order(
+                        "booked_at",
+                        {
+                            ascending: false
+                        }
+                    );
+
+
+            if (error) {
+
+                console.error(
+                    "Revenue error:",
+                    error
+                );
+
+                breakdown.innerHTML = `
+                    <p>Unable to load revenue data.</p>
+                `;
+
+                return;
+
+            }
+
+
+            if (
+                !bookings ||
+                bookings.length === 0
+            ) {
+
+                breakdown.innerHTML = `
+                    <p>No bookings found.</p>
+                `;
+
+                return;
+
+            }
+
+
+            let totalRevenue = 0;
+
+
+            bookings.forEach(b => {
+
+                totalRevenue +=
+                    Number(
+                        b.grand_total || 0
+                    );
+
+            });
+
+
+            // Update stat cards
+
+            const totalEl =
+                document.getElementById(
+                    "totalRevenue"
+                );
+
+            if (totalEl) {
+
+                totalEl.textContent =
+                    "₹" +
+                    totalRevenue.toLocaleString(
+                        "en-IN"
+                    );
+
+            }
+
+
+            const countEl =
+                document.getElementById(
+                    "totalBookings"
+                );
+
+            if (countEl) {
+
+                countEl.textContent =
+                    bookings.length;
+
+            }
+
+
+            const avgEl =
+                document.getElementById(
+                    "avgRevenue"
+                );
+
+            if (avgEl) {
+
+                const avg =
+                    totalRevenue /
+                    bookings.length;
+
+                avgEl.textContent =
+                    "₹" +
+                    Math.round(
+                        avg
+                    ).toLocaleString(
+                        "en-IN"
+                    );
+
+            }
+
+
+            // Build breakdown list
+
+            breakdown.innerHTML = "";
+
+
+            bookings.forEach(booking => {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "bus-card";
+
+
+                card.innerHTML = `
+
+                    <h3>
+                        🎟️ ${booking.ref || booking.id}
+                    </h3>
+
+                    <p>
+                        <strong>Route:</strong>
+                        ${booking.route || "—"}
+                    </p>
+
+                    <p>
+                        <strong>Bus:</strong>
+                        ${booking.bus_name || "—"}
+                    </p>
+
+                    <p>
+                        <strong>Date:</strong>
+                        ${booking.date || "—"}
+                    </p>
+
+                    <p>
+                        <strong>Total Amount:</strong>
+                        ₹${Number(booking.total_amount || 0).toLocaleString("en-IN")}
+                    </p>
+
+                    <p>
+                        <strong>Tax:</strong>
+                        ₹${Number(booking.tax || 0).toLocaleString("en-IN")}
+                    </p>
+
+                    <p>
+                        <strong>Grand Total:</strong>
+                        ₹${Number(booking.grand_total || 0).toLocaleString("en-IN")}
+                    </p>
+
+                    <p>
+                        <strong>Payment:</strong>
+                        ${booking.payment_method || "—"}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        ${booking.status || "—"}
+                    </p>
+
+                `;
+
+
+                breakdown.appendChild(card);
+
+            });
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            breakdown.innerHTML =
+                "<p>Error loading revenue data.</p>";
+
+        }
+
+    }
+
+
+    // ========================================
+    // START
+    // ========================================
+
+    // ========================================
+    // AUTH GUARD
+    // ========================================
+
+    if (
+        localStorage.getItem("ss_role") !==
+        "superadmin"
+    ) {
+
+        window.location.href =
+            "superadmin-login.html";
+
+        throw new Error(
+            "Not authenticated"
+        );
+
+    }
+
+
+    // ========================================
+    // LOGOUT
+    // ========================================
+
+    window.logout = function () {
+
+        localStorage.removeItem("ss_role");
+
+        window.location.href =
+            "superadmin-login.html";
+
+    };
+
+
+    loadRevenue();
+
+
+</script>
+
+
+</body>
+
+</html>

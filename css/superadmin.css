@@ -1,0 +1,163 @@
+/* ================================
+   SUPER ADMIN MODULE STYLES
+   ================================ */
+
+/* Override bus-card for super admin context */
+.dashboard .bus-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    grid-template-columns: none;
+}
+
+.dashboard .bus-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.dashboard .bus-card p {
+    font-size: 14px;
+    color: #4b5563;
+    margin: 0;
+}
+
+.dashboard .bus-card p strong {
+    color: #374151;
+}
+
+/* Action buttons container */
+.bus-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #e5e7eb;
+    width: 100%;
+}
+
+.bus-actions button {
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', Arial, sans-serif;
+    border: 1.5px solid;
+}
+
+/* Edit buttons */
+.edit-bus-btn,
+.edit-route-btn,
+.edit-schedule-btn,
+.edit-booking-btn,
+.edit-admin-btn {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+
+.edit-bus-btn:hover,
+.edit-route-btn:hover,
+.edit-schedule-btn:hover,
+.edit-booking-btn:hover,
+.edit-admin-btn:hover {
+    background: #dbeafe;
+    border-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+/* Toggle (activate/deactivate) buttons */
+.toggle-bus-btn,
+.toggle-route-btn,
+.toggle-schedule-btn {
+    background: #fff7ed;
+    color: #c2410c;
+    border-color: #fed7aa;
+}
+
+.toggle-bus-btn:hover,
+.toggle-route-btn:hover,
+.toggle-schedule-btn:hover {
+    background: #ffedd5;
+    border-color: #ea580c;
+    transform: translateY(-1px);
+}
+
+/* Delete buttons */
+.delete-admin-btn,
+.delete-user-btn,
+.delete-bus-btn,
+.delete-route-btn,
+.delete-schedule-btn,
+.delete-booking-btn {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.delete-admin-btn:hover,
+.delete-user-btn:hover,
+.delete-bus-btn:hover,
+.delete-route-btn:hover,
+.delete-schedule-btn:hover,
+.delete-booking-btn:hover {
+    background: #fee2e2;
+    border-color: #dc2626;
+    transform: translateY(-1px);
+}
+
+/* Activity items */
+.activity-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-item p {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+}
+
+.activity-item small {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+/* Stats grid responsive */
+.stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .bus-actions {
+        flex-direction: column;
+    }
+
+    .bus-actions button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

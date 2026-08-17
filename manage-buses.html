@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Buses - SeatSync</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/superadmin.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="auth-logo">
+            Seat<span>Sync</span>
+        </div>
+
+        <h3>Super Admin</h3>
+
+        <nav>
+            <a href="superadmin-dashboard.html">🏠 Dashboard</a>
+            <a href="manage-admins.html">👨‍💼 Manage Admins</a>
+            <a href="manage-users.html">👥 Manage Users</a>
+            <a href="manage-buses.html">🚌 Manage Buses</a>
+            <a href="manage-routes.html">🛣️ Manage Routes</a>
+            <a href="manage-schedules.html">📅 Manage Schedules</a>
+            <a href="manage-bookings.html">🎟️ Manage Bookings</a>
+            <a href="revenue.html">💰 Revenue</a>
+            <a href="activity-logs.html">📋 Activity Logs</a>
+        </nav>
+
+        <button onclick="logout()" class="btn-full">
+            Logout
+        </button>
+
+    </aside>
+
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+
+        <div class="dashboard-header">
+
+            <h1>Manage Buses</h1>
+
+            <p>
+                Add and manage SeatSync buses.
+            </p>
+
+        </div>
+
+
+        <!-- Add Bus -->
+        <section class="dashboard-section">
+
+            <h2>Add New Bus</h2>
+
+            <form id="addBusForm">
+
+                <div class="form-group">
+                    <label for="busRoute">Route</label>
+
+                    <input
+                        type="text"
+                        id="busRoute"
+                        class="form-control"
+                        placeholder="Enter route"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="busName">Bus Name</label>
+
+                    <input
+                        type="text"
+                        id="busName"
+                        class="form-control"
+                        placeholder="Enter bus name"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="busType">Bus Type</label>
+
+                    <input
+                        type="text"
+                        id="busType"
+                        class="form-control"
+                        placeholder="Example: AC Sleeper"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="busTime">Time</label>
+
+                    <input
+                        type="time"
+                        id="busTime"
+                        class="form-control"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="busDuration">Duration</label>
+
+                    <input
+                        type="text"
+                        id="busDuration"
+                        class="form-control"
+                        placeholder="Example: 6h 30m"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="busSeats">Seats</label>
+
+                    <input
+                        type="number"
+                        id="busSeats"
+                        class="form-control"
+                        placeholder="Enter number of seats"
+                        min="1"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="busPrice">Price</label>
+
+                    <input
+                        type="number"
+                        id="busPrice"
+                        class="form-control"
+                        placeholder="Enter ticket price"
+                        min="0"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label for="busRating">Rating</label>
+
+                    <input
+                        type="number"
+                        id="busRating"
+                        class="form-control"
+                        placeholder="Example: 4.5"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        required
+                    >
+                </div>
+
+
+                <button type="submit" class="btn-full">
+                    Add Bus
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- Existing Buses -->
+        <section class="dashboard-section">
+
+            <h2>Existing Buses</h2>
+
+            <div id="busList">
+
+                <p>Loading buses...</p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- JavaScript -->
+<script src="js/env-config.js"></script>
+
+<script type="module" src="js/supabase-client.js"></script>
+
+<script type="module" src="js/superadmin.js"></script>
+
+</body>
+</html>
