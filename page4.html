@@ -1,658 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>SeatSync - Passenger Details</title>
-
+    <link rel="stylesheet" href="css/style.css">
     <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #eef3ff;
-            color: #172554;
-        }
-
-        /* Navigation Bar */
-
-        nav {
-            background: #172554;
-            color: white;
-            padding: 18px 50px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        nav h1 {
-            margin: 0;
-            font-size: 28px;
-        }
-
-        nav div {
-            display: flex;
-            gap: 25px;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-        }
-
-        /* Main Container */
-
-        .container {
-            max-width: 850px;
-            margin: 40px auto;
-            padding: 20px;
-        }
-
-        /* Cards */
-
-        .card {
-            background: white;
-            padding: 30px;
-            margin-bottom: 25px;
-
-            border-radius: 20px;
-
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        h2 {
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 25px;
-        }
-
-        /* Booking Information */
-
-        .booking-info {
-            line-height: 1.8;
-            font-size: 17px;
-        }
-
-        .booking-info p {
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 10px;
-        }
-
-        .booking-info strong {
-            display: inline-block;
-            width: 170px;
-        }
-
-        /* Total Price */
-
-        .total {
-            font-size: 22px;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 25px;
-        }
-
-        /* Passenger Form */
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        input {
-            width: 100%;
-            padding: 13px;
-
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-
-            font-size: 16px;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #2563eb;
-        }
-
-        /* Confirm Button */
-
+        .booking-info { line-height: 1.8; font-size: 17px; }
+        .booking-info p { border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+        .booking-info strong { display: inline-block; width: 170px; }
+        .total { font-size: 22px; font-weight: bold; text-align: center; margin-top: 25px; }
         .confirm-btn {
-            width: 100%;
-            padding: 15px;
-
-            background: #2563eb;
-            color: white;
-
-            border: none;
-            border-radius: 12px;
-
-            font-size: 17px;
-            font-weight: bold;
-
-            cursor: pointer;
+            width: 100%; padding: 15px; background: var(--accent); color: white;
+            border: none; border-radius: 12px; font-size: 17px; font-weight: bold;
+            cursor: pointer; font-family: inherit;
         }
-
-        .confirm-btn:hover {
-            background: #1d4ed8;
-        }
-
-        /* Mobile */
-
-        @media (max-width: 600px) {
-
-            nav {
-                padding: 15px 20px;
-            }
-
-            nav div {
-                gap: 10px;
-            }
-
-            nav a {
-                font-size: 14px;
-            }
-
-            .container {
-                margin: 20px auto;
-                padding: 12px;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            .booking-info strong {
-                width: 130px;
-            }
-
-        }
-
+        .confirm-btn:hover { background: var(--accent-h); }
     </style>
-
 </head>
-
-
 <body>
 
+<nav class="navbar">
+  <a class="logo" href="user-dashboard.html">🚌 Seat<span>Sync</span></a>
+  <ul class="nav-links">
+    <li><a href="user-dashboard.html">Dashboard</a></li>
+    <li><a href="page2.html">Find Buses</a></li>
+  </ul>
+</nav>
 
-    <!-- Navigation Bar -->
+<div class="steps-bar">
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Search</span></div>
+  <div class="step-sep"></div>
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Select Bus</span></div>
+  <div class="step-sep"></div>
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Choose Seats</span></div>
+  <div class="step-sep"></div>
+  <div class="step active"><div class="step-num">4</div><span class="step-label">Passenger Details</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">5</div><span class="step-label">Payment</span></div>
+</div>
 
-    <nav>
+<div class="content-wrap">
 
-        <h1>SeatSync</h1>
-
-        <div>
-
-            <a href="index.html">
-                Home
-            </a>
-
-            <a href="search.html">
-                Find Bus
-            </a>
-
+    <!-- Booking Summary -->
+    <div class="card">
+        <h2>Booking Summary</h2>
+        <div class="booking-info">
+            <p><strong>Route:</strong> <span id="routeName">Loading...</span></p>
+            <p><strong>Bus:</strong> <span id="busName">Loading...</span></p>
+            <p><strong>Departure:</strong> <span id="busTime">Loading...</span></p>
+            <p><strong>Selected Seats:</strong> <span id="seatNumbers">Loading...</span></p>
+            <p><strong>Price per Seat:</strong> <span id="seatPrice">Loading...</span></p>
         </div>
-
-    </nav>
-
-
-
-    <!-- Main Container -->
-
-    <div class="container">
-
-
-        <!-- Booking Summary -->
-
-        <div class="card">
-
-            <h2>
-                Booking Summary
-            </h2>
-
-
-            <div class="booking-info">
-
-
-                <p>
-
-                    <strong>
-                        Route:
-                    </strong>
-
-                    <span id="routeName">
-                        Loading...
-                    </span>
-
-                </p>
-
-
-                <p>
-
-                    <strong>
-                        Bus:
-                    </strong>
-
-                    <span id="busName">
-                        Loading...
-                    </span>
-
-                </p>
-
-
-                <p>
-
-                    <strong>
-                        Departure:
-                    </strong>
-
-                    <span id="busTime">
-                        Loading...
-                    </span>
-
-                </p>
-
-
-                <p>
-
-                    <strong>
-                        Selected Seats:
-                    </strong>
-
-                    <span id="seatNumbers">
-                        Loading...
-                    </span>
-
-                </p>
-
-
-                <p>
-
-                    <strong>
-                        Price per Seat:
-                    </strong>
-
-                    <span id="seatPrice">
-                        Loading...
-                    </span>
-
-                </p>
-
-
-            </div>
-
-
-            <!-- Total -->
-
-            <div class="total">
-
-                Total Price:
-
-                <span id="totalPrice">
-                    ₹0
-                </span>
-
-            </div>
-
-
+        <div class="total">
+            Total Price: <span id="totalPrice">₹0</span>
         </div>
-
-
-
-        <!-- Passenger Details -->
-
-        <div class="card">
-
-            <h2>
-                Passenger Details
-            </h2>
-
-
-            <!-- Name -->
-
-            <div class="form-group">
-
-                <label for="passengerName">
-                    Full Name
-                </label>
-
-                <input
-                    type="text"
-                    id="passengerName"
-                    placeholder="Enter passenger name"
-                >
-
-            </div>
-
-
-            <!-- Mobile -->
-
-            <div class="form-group">
-
-                <label for="mobileNumber">
-                    Mobile Number
-                </label>
-
-                <input
-                    type="tel"
-                    id="mobileNumber"
-                    placeholder="Enter mobile number"
-                >
-
-            </div>
-
-
-            <!-- Email -->
-
-            <div class="form-group">
-
-                <label for="email">
-                    Email
-                </label>
-
-                <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter email address"
-                >
-
-            </div>
-
-
-            <!-- Confirm -->
-
-            <button
-                class="confirm-btn"
-                id="confirmBtn"
-            >
-
-                Confirm Booking
-
-            </button>
-
-
-        </div>
-
-
     </div>
 
-    <script type="module" src="js/supabase-client.js" defer></script>
+    <!-- Passenger Details -->
+    <div class="card">
+        <h2>Passenger Details</h2>
+        <div class="form-group">
+            <label for="passengerName">Full Name</label>
+            <input type="text" id="passengerName" class="form-control" placeholder="Enter passenger name">
+        </div>
+        <div class="form-group">
+            <label for="mobileNumber">Mobile Number</label>
+            <input type="tel" id="mobileNumber" class="form-control" placeholder="Enter mobile number">
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" class="form-control" placeholder="Enter email address">
+        </div>
+        <button class="confirm-btn" id="confirmBtn">Continue to Payment →</button>
+    </div>
 
-        const priceNumber =
-            selectedPrice
-                ? parseInt(
-                    selectedPrice.replace("₹", "")
-                )
-                : 0;
+</div>
+
+<footer><strong>SeatSync</strong> &copy; 2024</footer>
+
+<script src="js/env-config.js"></script>
+<script type="module" src="js/supabase-client.js" defer></script>
+<script defer>
+
+    // ==========================================
+    // PARSE URL PARAMETERS
+    // ==========================================
+
+    const params = new URLSearchParams(window.location.search);
+    const selectedRoute = params.get("route") || "";
+    const selectedBus = params.get("bus") || "";
+    const selectedTime = params.get("time") || "";
+    const selectedPrice = params.get("price") || "";
+    const seatsParam = params.get("seats") || "";
+    const busType = params.get("busType") || "";
+    const travelDate = params.get("date") || new Date().toISOString().split('T')[0];
+
+    const seats = seatsParam ? seatsParam.split(",") : [];
+
+    const priceNumber = selectedPrice
+        ? parseInt(selectedPrice.replace("₹", ""))
+        : 0;
+
+    const total = seats.length * priceNumber;
+    const tax = Math.round(total * 0.05);
+    const grandTotal = total + tax;
 
 
+    // ==========================================
+    // ENSURE LOGGED-IN USER
+    // ==========================================
 
-        // ==========================================
-        // CALCULATE TOTAL PRICE
-        // ==========================================
+    async function ensureLoggedInUser() {
+        if (!window.supabaseAuth) return null;
 
-        const total =
-            seats.length * priceNumber;
+        const session = await window.supabaseAuth.getSession();
+        const user = session?.user;
 
-        async function ensureLoggedInUser() {
-            if (!window.supabaseAuth) {
-                return;
-            }
-
-            const session = await window.supabaseAuth.getSession();
-            const user = session?.user;
-
-            if (!user) {
-                window.location.href = 'user-login.html';
-                return;
-            }
-
-            const emailInput = document.getElementById('email');
-            if (emailInput && user.email) {
-                emailInput.value = user.email;
-            }
-
-            return user;
+        if (!user) {
+            window.location.href = 'user-login.html';
+            return null;
         }
 
-        ensureLoggedInUser();
-        // DISPLAY ROUTE
-        // ==========================================
-
-        document.getElementById("routeName").textContent =
-
-            selectedRoute
-                ? selectedRoute.replace("-", " → ")
-                : "Not available";
-
-
-
-        // ==========================================
-        // DISPLAY BUS
-        // ==========================================
-
-        document.getElementById("busName").textContent =
-
-            selectedBus
-                ? selectedBus
-                : "Not available";
-
-
-
-        // ==========================================
-        // DISPLAY DEPARTURE TIME
-        // ==========================================
-
-        document.getElementById("busTime").textContent =
-
-            selectedTime
-                ? selectedTime
-                : "Not available";
-
-
-
-        // ==========================================
-        // DISPLAY SELECTED SEATS
-        // ==========================================
-
-        document.getElementById("seatNumbers").textContent =
-
-            seats.length > 0
-                ? seats.join(", ")
-                : "No seats selected";
-
-
-
-        // ==========================================
-        // DISPLAY PRICE PER SEAT
-        // ==========================================
-
-        document.getElementById("seatPrice").textContent =
-
-            selectedPrice
-                ? selectedPrice
-                : "₹0";
-
-
-
-        // ==========================================
-        // DISPLAY TOTAL PRICE
-        // ==========================================
-
-        document.getElementById("totalPrice").textContent =
-
-            "₹" + total;
-
-
-
-        // ==========================================
-        // CONFIRM BOOKING
-        // ==========================================
-
-     // ==========================================
-// CONFIRM BOOKING
-// ==========================================
-
-document
-    .getElementById("confirmBtn")
-    .addEventListener("click", async function () {
-
-        const name =
-            document
-                .getElementById("passengerName")
-                .value
-                .trim();
-
-        const mobile =
-            document
-                .getElementById("mobileNumber")
-                .value
-                .trim();
-
-        const email =
-            document
-                .getElementById("email")
-                .value
-                .trim();
-
-
-        // Check passenger details
-
-        if (
-            name === "" ||
-            mobile === "" ||
-            email === ""
-        ) {
-
-            alert("Please fill in all passenger details.");
-
-            return;
+        const emailInput = document.getElementById('email');
+        if (emailInput && user.email) {
+            emailInput.value = user.email;
         }
 
+        return user;
+    }
 
-        // Booking data
-
-        const bookingData = {
-
-            route: selectedRoute,
-
-            bus: selectedBus,
-
-            time: selectedTime,
-
-            price: selectedPrice,
-
-            seats: selectedSeats,
-
-            totalPrice: total,
-
-            name: name,
-
-            mobile: mobile,
-
-            email: email,
-
-            bookingDate: new Date().toLocaleString()
-
-        };
+    ensureLoggedInUser();
 
 
-        // Send booking to Supabase
+    // ==========================================
+    // DISPLAY BOOKING SUMMARY
+    // ==========================================
 
-        try {
-            const session = await window.supabaseAuth.getSession();
-            const user = session?.user;
+    document.getElementById("routeName").textContent =
+        selectedRoute ? selectedRoute.replace("-", " → ") : "Not available";
 
-            if (!user) {
-                alert('Please log in before confirming your booking.');
-                window.location.href = 'user-login.html';
+    document.getElementById("busName").textContent =
+        selectedBus || "Not available";
+
+    document.getElementById("busTime").textContent =
+        selectedTime || "Not available";
+
+    document.getElementById("seatNumbers").textContent =
+        seats.length > 0 ? seats.join(", ") : "No seats selected";
+
+    document.getElementById("seatPrice").textContent =
+        selectedPrice || "₹0";
+
+    document.getElementById("totalPrice").textContent = "₹" + grandTotal;
+
+
+    // ==========================================
+    // CONFIRM → STORE & REDIRECT TO PAYMENT
+    // ==========================================
+
+    document
+        .getElementById("confirmBtn")
+        .addEventListener("click", async function () {
+
+            const name = document.getElementById("passengerName").value.trim();
+            const mobile = document.getElementById("mobileNumber").value.trim();
+            const email = document.getElementById("email").value.trim();
+
+            if (!name || !mobile || !email) {
+                alert("Please fill in all passenger details.");
                 return;
             }
 
-            const bookingDataWithUser = {
-                user_id: user.id,
+            // Build the ss_booking object that payment.html expects
+            const ssBooking = {
+                name: selectedBus,
+                type: busType,
                 route: selectedRoute,
-                bus: selectedBus,
+                date: travelDate,
                 time: selectedTime,
-                price: selectedPrice,
-                seats: selectedSeats,
-                total_price: total,
-                passenger_name: name,
-                contact_number: mobile,
-                email: email,
-                booking_date: new Date().toISOString(),
-                status: 'confirmed'
+                selectedSeats: seats,
+                totalAmount: total,
+                tax: tax,
+                grandTotal: grandTotal,
+                contactEmail: email,
+                contactPhone: mobile,
+                passengers: []
             };
 
-            const { data: insertData, error: insertError } = await window.supabase
-                .from('bookings')
-                .insert([bookingDataWithUser]);
+            sessionStorage.setItem('ss_booking', JSON.stringify(ssBooking));
+            window.location.href = 'payment.html';
+        });
 
-            if (insertError) {
-                console.error('Supabase booking insert error:', insertError);
-                alert('Booking could not be saved. ' + (insertError.message || 'Please try again.'));
-                return;
-            }
-
-            if (!insertData || insertData.length === 0) {
-                alert('Booking could not be saved. Please try again.');
-                return;
-            }
-
-
-            // Go to Page 5
-
-            const bookingRow = insertData[0];
-            const bookingId = bookingRow.id || '';
-            const page5URL =
-                "page5.html" +
-                "?route=" + encodeURIComponent(selectedRoute) +
-                "&bus=" + encodeURIComponent(selectedBus) +
-                "&time=" + encodeURIComponent(selectedTime) +
-                "&price=" + encodeURIComponent(selectedPrice) +
-                "&seats=" + encodeURIComponent(selectedSeats) +
-                "&name=" + encodeURIComponent(name) +
-                "&mobile=" + encodeURIComponent(mobile) +
-                "&email=" + encodeURIComponent(email) +
-                "&bookingId=" + encodeURIComponent(bookingId);
-
-            window.location.href = page5URL;
-
-
-        } catch (error) {
-
-            console.error("Booking error:", error);
-
-            alert(
-                "Unable to connect to SeatSync server. Please make sure the backend is running."
-            );
-
-        }
-
-    });   
-                        
-                
-
-
-
-               
-
-
-    </script>
-
+</script>
 
 </body>
-
 </html>

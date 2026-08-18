@@ -6,133 +6,100 @@
     <title>SeatSync - Select Seats</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-    <!-- Navigation -->
-    <nav>
-        <h1>SeatSync</h1>
+<nav class="navbar">
+  <a class="logo" href="user-dashboard.html">🚌 Seat<span>Sync</span></a>
+  <ul class="nav-links">
+    <li><a href="user-dashboard.html">Dashboard</a></li>
+    <li><a href="page2.html">Find Buses</a></li>
+  </ul>
+</nav>
 
+<div class="steps-bar">
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Search</span></div>
+  <div class="step-sep"></div>
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Select Bus</span></div>
+  <div class="step-sep"></div>
+  <div class="step active"><div class="step-num">3</div><span class="step-label">Choose Seats</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">4</div><span class="step-label">Passenger Details</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">5</div><span class="step-label">Payment</span></div>
+</div>
+
+<div class="content-wrap">
+  <div class="seat-page-wrap">
+
+    <!-- Left: Seat layout -->
+    <div>
+      <div class="bus-front">
         <div>
-            <a href="index.html">Home</a>
-            <a href="search.html">Find Bus</a>
+          <div class="bus-front-label" id="routeName">Route</div>
+          <div style="font-size:18px;font-weight:700;" id="busName">Bus</div>
         </div>
-    </nav>
-
-    <!-- Page Heading -->
-    <section class="seat-page">
-
-        <h2>Select Your Seats</h2>
-        <p>Choose your preferred seats from the available seats.</p>
-
-        <!-- Bus Information -->
-        <div class="bus-info">
-            <h3 id="busName">Bus</h3>
-            <p id="routeName">Route</p>
-            <p id="busTime">Departure Time</p>
-            <p id="busPrice">Prices</p>
+        <div style="text-align:right;">
+          <div style="font-size:18px;font-weight:700;" id="busTime">Departure Time</div>
+          <div style="font-size:13px;opacity:.7;" id="busPrice">Prices</div>
         </div>
+        <div class="bus-front-icon">🚌</div>
+      </div>
 
-        <!-- Seat Layout -->
-        <div class="seat-container">
+      <div class="seat-grid" id="seatGrid">
+        <button class="seat available">A1</button>
+        <button class="seat available">A2</button>
+        <div class="seat aisle"></div>
+        <button class="seat available">A3</button>
+        <button class="seat available">A4</button>
 
-            <h3>Bus Seat Layout</h3>
+        <button class="seat available">B1</button>
+        <button class="seat available">B2</button>
+        <div class="seat aisle"></div>
+        <button class="seat available">B3</button>
+        <button class="seat available">B4</button>
 
-            <div class="driver">
-                🚍 Driver
-            </div>
+        <button class="seat available">C1</button>
+        <button class="seat available">C2</button>
+        <div class="seat aisle"></div>
+        <button class="seat available">C3</button>
+        <button class="seat available">C4</button>
 
-            <div class="seats">
+        <button class="seat available">D1</button>
+        <button class="seat available">D2</button>
+        <div class="seat aisle"></div>
+        <button class="seat available">D3</button>
+        <button class="seat available">D4</button>
 
-                <button class="seat available">A1</button>
-                <button class="seat available">A2</button>
+        <button class="seat available">E1</button>
+        <button class="seat available">E2</button>
+        <div class="seat aisle"></div>
+        <button class="seat available">E3</button>
+        <button class="seat available">E4</button>
+      </div>
 
-                <span></span>
+      <div class="seat-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#dbeafe;border:1.5px solid #bfdbfe;"></div> Available</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--success);"></div> Selected</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fee2e2;"></div> Booked</div>
+      </div>
+    </div>
 
-                <button class="seat available">A3</button>
-                <button class="seat available">A4</button>
+    <!-- Right: Summary -->
+    <div class="card summary-card">
+      <h3>Booking Summary</h3>
+      <div class="summary-row"><span class="lbl">Selected Seats</span><span class="val" id="selectedSeats">None</span></div>
+      <div class="seat-chips" id="seatChips"></div>
+      <div class="summary-total"><span>Total</span><span class="val">₹<span id="totalPrice">0</span></span></div>
+      <button class="btn-full" id="continueBtn" style="margin-top:20px;">Continue →</button>
+    </div>
 
-                <button class="seat available">B1</button>
-                <button class="seat available">B2</button>
+  </div>
+</div>
 
-                <span></span>
+<footer><strong>SeatSync</strong> &copy; 2024</footer>
 
-                <button class="seat available">B3</button>
-                <button class="seat available">B4</button>
-
-                <button class="seat available">C1</button>
-                <button class="seat available">C2</button>
-
-                <span></span>
-
-                <button class="seat available">C3</button>
-                <button class="seat available">C4</button>
-
-                <button class="seat available">D1</button>
-                <button class="seat available">D2</button>
-
-                <span></span>
-
-                <button class="seat available">D3</button>
-                <button class="seat available">D4</button>
-
-                <button class="seat available">E1</button>
-                <button class="seat available">E2</button>
-
-                <span></span>
-
-                <button class="seat available">E3</button>
-                <button class="seat available">E4</button>
-
-            </div>
-
-            <!-- Seat Legend -->
-
-            <div class="legend">
-
-                <div>
-                    <span class="legend-box available-box"></span>
-                    Available
-                </div>
-
-                <div>
-                    <span class="legend-box selected-box"></span>
-                    Selected
-                </div>
-
-                <div>
-                    <span class="legend-box booked-box"></span>
-                    Booked
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- Booking Summary -->
-
-        <div class="booking-summary">
-
-            <h3>Booking Summary</h3>
-
-            <p>Selected Seats:
-                <span id="selectedSeats">None</span>
-            </p>
-
-            <p>Total Price:
-                ₹<span id="totalPrice">0</span>
-            </p>
-        
-        
-        <button id="continueBtn">
-         Continue
-        </button>
-
-        </div>
-
-    </section>
-
-    <script type="module" src="js/supabase-client.js" defer></script>
+<script src="js/env-config.js"></script>
+<script type="module" src="js/supabase-client.js" defer></script>
 <script defer>
 
     // ==========================================
@@ -141,10 +108,25 @@
 
     const params = new URLSearchParams(window.location.search);
 
-    const selectedRoute = params.get("route");
-    const selectedBus = params.get("bus");
-    const selectedTime = params.get("time");
-    const selectedPrice = params.get("price");
+    let selectedRoute = params.get("route");
+    let selectedBus = params.get("bus");
+    let selectedTime = params.get("time");
+    let selectedPrice = params.get("price");
+    let busType = params.get("busType") || "";
+    let travelDate = params.get("date") || new Date().toISOString().split('T')[0];
+
+    // Fallback: read from sessionStorage (set by page2 selectBus)
+    if (!selectedRoute) {
+        const stored = JSON.parse(sessionStorage.getItem('ss_selected_bus') || 'null');
+        if (stored) {
+            selectedRoute = stored.route;
+            selectedBus = stored.name;
+            selectedTime = stored.time;
+            selectedPrice = '₹' + stored.price;
+            busType = stored.type || '';
+            travelDate = stored.date || travelDate;
+        }
+    }
 
 
     // ==========================================
@@ -174,10 +156,13 @@
     // SEAT ELEMENTS
     // ==========================================
 
-    const allSeats = document.querySelectorAll(".seat");
+    const allSeats = document.querySelectorAll(".seat:not(.aisle)");
 
     const selectedSeatsDisplay =
         document.getElementById("selectedSeats");
+
+    const seatChips =
+        document.getElementById("seatChips");
 
     const totalPrice =
         document.getElementById("totalPrice");
@@ -195,31 +180,31 @@
     // ==========================================
 
     async function loadBookedSeats() {
+        if (!window.supabase || !selectedBus) return;
 
         try {
             const { data, error } = await window.supabase
                 .from('bookings')
                 .select('seats')
                 .eq('route', selectedRoute)
-                .eq('bus', selectedBus)
-                .eq('time', selectedTime);
+                .eq('bus_name', selectedBus)
+                .eq('time', selectedTime)
+                .eq('date', travelDate)
+                .neq('status', 'cancelled');
 
             if (error) {
                 console.error('Error loading booked seats from Supabase:', error);
                 return;
             }
 
-            // Collect all booked seats
             let bookedSeats = [];
-
             data.forEach(booking => {
                 if (booking.seats) {
-                    const seats = booking.seats.split(',');
+                    const seats = booking.seats.split(',').map(s => s.trim());
                     bookedSeats.push(...seats);
                 }
             });
 
-            // Mark booked seats
             allSeats.forEach(seat => {
                 const seatNumber = seat.textContent.trim();
                 if (bookedSeats.includes(seatNumber)) {
@@ -231,19 +216,9 @@
             });
 
         } catch (error) {
-
-            console.error(
-                'Could not load booked seats:',
-                error
-            );
-
+            console.error('Could not load booked seats:', error);
         }
-
     }
-
-
-
-    // Load booked seats when page opens
 
     loadBookedSeats();
 
@@ -253,60 +228,34 @@
     // ==========================================
 
     allSeats.forEach(seat => {
-
         seat.addEventListener("click", () => {
+            if (seat.classList.contains("booked")) return;
 
-            // Don't allow clicking booked seats
-
-            if (seat.classList.contains("booked")) {
-                return;
-            }
-
-
-            const seatNumber =
-                seat.textContent.trim();
-
+            const seatNumber = seat.textContent.trim();
 
             if (seat.classList.contains("selected")) {
-
                 seat.classList.remove("selected");
-
-                selected =
-                    selected.filter(
-                        item => item !== seatNumber
-                    );
-
+                seat.classList.add("available");
+                selected = selected.filter(item => item !== seatNumber);
             } else {
-
+                seat.classList.remove("available");
                 seat.classList.add("selected");
-
                 selected.push(seatNumber);
-
             }
-
-
-            // Display selected seats
 
             if (selected.length === 0) {
-
-                selectedSeatsDisplay.textContent =
-                    "None";
-
+                selectedSeatsDisplay.textContent = "None";
             } else {
-
-                selectedSeatsDisplay.textContent =
-                    selected.join(", ");
-
+                selectedSeatsDisplay.textContent = selected.join(", ");
             }
 
+            // Update seat chips
+            seatChips.innerHTML = selected
+                .map(s => '<span class="seat-chip">' + s + '</span>')
+                .join('');
 
-            // Calculate total
-
-            totalPrice.textContent =
-                selected.length * seatPrice;
-
+            totalPrice.textContent = selected.length * seatPrice;
         });
-
     });
 
 
@@ -317,41 +266,27 @@
     document
         .getElementById("continueBtn")
         .addEventListener("click", function () {
-
             if (selected.length === 0) {
-
-                alert(
-                    "Please select at least one seat."
-                );
-
+                alert("Please select at least one seat.");
                 return;
             }
 
-
-            const seats =
-                selected.join(",");
-
+            const seats = selected.join(",");
 
             const page4URL =
                 "page4.html" +
-                "?route=" +
-                encodeURIComponent(selectedRoute) +
-                "&bus=" +
-                encodeURIComponent(selectedBus) +
-                "&time=" +
-                encodeURIComponent(selectedTime) +
-                "&price=" +
-                encodeURIComponent(selectedPrice) +
-                "&seats=" +
-                encodeURIComponent(seats);
-
+                "?route=" + encodeURIComponent(selectedRoute) +
+                "&bus=" + encodeURIComponent(selectedBus) +
+                "&time=" + encodeURIComponent(selectedTime) +
+                "&price=" + encodeURIComponent(selectedPrice) +
+                "&seats=" + encodeURIComponent(seats) +
+                "&busType=" + encodeURIComponent(busType) +
+                "&date=" + encodeURIComponent(travelDate);
 
             window.location.href = page4URL;
-
         });
 
 </script>
-        
-                
+
 </body>
 </html>

@@ -1,3 +1,4 @@
+// ── User auth elements (only present on user-login.html) ──────
 const loginMessage = document.getElementById('loginMessage');
 const authForm = document.getElementById('authForm');
 const authButton = document.getElementById('authButton');
@@ -7,13 +8,20 @@ const confirmPasswordRow = document.getElementById('confirmPasswordRow');
 
 let isSignupMode = false;
 
+function showUserMsg(text, type) {
+    if (!loginMessage) return;
+    loginMessage.textContent = text;
+    loginMessage.className = 'auth-message' + (type ? ' ' + type : '');
+    loginMessage.style.display = text ? 'block' : 'none';
+}
+
 function setAuthMode(signup) {
     isSignupMode = signup;
-    authButton.textContent = signup ? 'Sign Up' : 'Login';
-    authToggleText.textContent = signup ? 'Already have an account?' : "Don't have an account?";
-    toggleAuthMode.textContent = signup ? 'Login' : 'Create one';
-    confirmPasswordRow.style.display = signup ? 'block' : 'none';
-    loginMessage.textContent = '';
+    if (authButton) authButton.textContent = signup ? 'Sign Up' : 'Login';
+    if (authToggleText) authToggleText.textContent = signup ? 'Already have an account?' : "Don't have an account?";
+    if (toggleAuthMode) toggleAuthMode.textContent = signup ? 'Login' : 'Create one';
+    if (confirmPasswordRow) confirmPasswordRow.style.display = signup ? 'block' : 'none';
+    showUserMsg('');
 }
 
 async function handleAuthSubmit(event) {
@@ -21,19 +29,19 @@ async function handleAuthSubmit(event) {
 
     const email = document.getElementById('userEmail').value.trim();
     const password = document.getElementById('userPassword').value.trim();
-    const confirmPassword = document.getElementById('confirmPassword').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword')?.value.trim();
 
     if (!email || !password || (isSignupMode && !confirmPassword)) {
-        loginMessage.textContent = 'Please fill in all required fields.';
+        showUserMsg('Please fill in all required fields.', 'error');
         return;
     }
 
     if (isSignupMode && password !== confirmPassword) {
-        loginMessage.textContent = 'Passwords do not match.';
+        showUserMsg('Passwords do not match.', 'error');
         return;
     }
 
-    loginMessage.textContent = isSignupMode ? 'Creating account...' : 'Signing in...';
+    showUserMsg(isSignupMode ? 'Creating account...' : 'Signing in...', 'info');
 
     try {
         let result;
@@ -44,31 +52,86 @@ async function handleAuthSubmit(event) {
         }
 
         if (result.error) {
-            loginMessage.textContent = result.error.message || 'Unable to authenticate.';
+            showUserMsg(result.error.message || 'Unable to authenticate.', 'error');
             return;
         }
 
         if (isSignupMode) {
-            loginMessage.textContent = 'Account created. Please check your email to confirm your account.';
+            showUserMsg('Account created. Please check your email to confirm your account.', 'success');
             return;
         }
+
+        localStorage.setItem('ss_role', 'user');
+        localStorage.setItem('ss_email', email);
 
         if (result.data?.session?.user) {
             window.location.href = 'user-dashboard.html';
             return;
         }
 
-        loginMessage.textContent = 'Login succeeded. Redirecting...';
+        showUserMsg('Login succeeded. Redirecting...', 'info');
         window.location.href = 'user-dashboard.html';
 
     } catch (error) {
         console.error('Auth error:', error);
-        loginMessage.textContent = 'Authentication failed. Try again.';
+        showUserMsg('Authentication failed. Try again.', 'error');
     }
 }
 
-toggleAuthMode.addEventListener('click', () => {
-    setAuthMode(!isSignupMode);
-});
+// ── Admin login (called from admin-login.html) ────────────────
+async function adminLogin(event) {
+    event.preventDefault();
 
-setAuthMode(false);
+    const username = document.getElementById('adminUsername')?.value.trim();
+    const password = document.getElementById('adminPassword')?.value.trim();
+    const msgEl = document.getElementById('adminMsg');
+
+    if (!username || !password) {
+        if (msgEl) {
+            msgEl.textContent = 'Please enter username and password.';
+            msgEl.className = 'auth-message error';
+            msgEl.style.display = 'block';
+        }
+        return;
+    }
+
+    if (msgEl) {
+        msgEl.textContent = 'Signing in...';
+        msgEl.className = 'auth-message info';
+        msgEl.style.display = 'block';
+    }
+
+    try {
+        const res = await fetch('/api/auth/admin-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            localStorage.setItem('ss_role', 'admin');
+            window.location.href = 'admin-dashboard.html';
+        } else {
+            if (msgEl) {
+                msgEl.textContent = data.message || 'Invalid credentials.';
+                msgEl.className = 'auth-message error';
+                msgEl.style.display = 'block';
+            }
+        }
+    } catch (error) {
+        if (msgEl) {
+            msgEl.textContent = 'Connection failed. Is the backend running?';
+            msgEl.className = 'auth-message error';
+            msgEl.style.display = 'block';
+        }
+    }
+}
+
+// ── Guard user-specific event listeners ───────────────────────
+if (toggleAuthMode) {
+    toggleAuthMode.addEventListener('click', () => {
+        setAuthMode(!isSignupMode);
+    });
+    setAuthMode(false);
+}

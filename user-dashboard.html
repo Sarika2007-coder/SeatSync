@@ -1,125 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>User Dashboard - SeatSync</title>
-
     <link rel="stylesheet" href="css/style.css">
-
 </head>
-
 <body>
 
-    <header>
+<nav class="navbar">
+  <a class="logo" href="user-dashboard.html">🚌 Seat<span>Sync</span></a>
+  <ul class="nav-links">
+    <li><a href="user-dashboard.html">Dashboard</a></li>
+    <li><a href="page2.html">Find Buses</a></li>
+  </ul>
+</nav>
 
-        <h1>SeatSync</h1>
+<div class="content-wrap">
 
-        <p>User Dashboard</p>
+  <!-- Header -->
+  <div class="dash-header">
+    <div>
+      <h1>Welcome to SeatSync 👋</h1>
+      <p class="sub">Book your bus seat easily.</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span id="userInfo" class="user-badge" style="display:none;">
+        <span class="avatar">👤</span>
+        <span id="userEmailDisplay"></span>
+      </span>
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
 
-    </header>
+  <!-- Search -->
+  <div class="card" style="margin-bottom:24px;">
+    <h2>Find Your Bus</h2>
+    <p class="sub">Select your route to see available buses</p>
+    <div class="form-group">
+      <label for="route">Bus Route</label>
+      <select id="route" class="form-control">
+        <option value="">-- Select Bus Route --</option>
+        <option value="bangalore-chikmagalur">Bangalore → Chikmagalur</option>
+        <option value="bangalore-tumkur">Bangalore → Tumkur</option>
+        <option value="bangalore-hassan">Bangalore → Hassan</option>
+        <option value="bangalore-mandya">Bangalore → Mandya</option>
+        <option value="bangalore-mysore">Bangalore → Mysore</option>
+      </select>
+    </div>
+    <button class="btn-full" onclick="goToPage2()" style="max-width:300px;">Get Started →</button>
+  </div>
 
+  <!-- Quick cards -->
+  <div class="stats-row">
+    <div class="stat-card" onclick="window.location.href='page5.html'" style="cursor:pointer;">
+      <div class="stat-icon">🎟️</div>
+      <div class="stat-val" id="bookingCount">0</div>
+      <div class="stat-label">My Bookings</div>
+    </div>
+    <div class="stat-card" onclick="logout()" style="cursor:pointer;">
+      <div class="stat-icon">🚪</div>
+      <div class="stat-val" style="font-size:18px;">Sign Out</div>
+      <div class="stat-label">Logout from SeatSync</div>
+    </div>
+  </div>
 
-    <main class="dashboard">
+</div>
 
-        <h2>Welcome to SeatSync 👋</h2>
-
-        <p>Book your bus seat easily.</p>
-    <p id="userInfo" style="margin-top: 10px; color: #475569; font-size: 14px;"></p>
-
-
-        <div class="dashboard-cards">
-
-            
-
-            
-        <div class="search-box">
-
-            <h2>Find Your Bus</h2>
-
-            <p>Select your route to see available buses</p>
-
-            <label for="route">Bus Route</label>
-
-            <select id="route">
-                <option value="">-- Select Bus Route --</option>
-
-                <option value="bangalore-chikmagalur">
-                    Bangalore → chikmagalur
-                </option>
-
-                <option value="bangalore-tumkur">
-                    Bangalore → Tumkur
-                </option>
-
-                <option value="bangalore-hassan">
-                    Bangalore → Hassan
-                </option>
-
-                <option value="bangalore-mandya">
-                    Bangalore → Mandya
-                </option>
-
-                <option value="bangalore-mysore">
-                    Bangalore → mysore
-                </option>
-            </select>
-            <button onclick="goToPage2()">Get Started</button>
+<script src="js/env-config.js"></script>
+<script type="module" src="js/supabase-client.js"></script>
+<script src="js/script.js"></script>
 
 <script>
 function goToPage2() {
     const route = document.getElementById("route").value;
-
     if (route === "") {
         alert("Please select a bus route");
         return;
     }
-
+    sessionStorage.setItem('ss_route', route);
     window.location.href = "page2.html?route=" + route;
 }
 </script>
 
-            
-
-        </div>
-
-    </section>
-
-
-            <div class="dashboard-card">
-
-                <h3>🎟️ My Bookings</h3>
-
-                <p>View your booking details.</p>
-                <a href="page5.html">
-                <button onclick="viewBookings()">
-                    My Bookings
-                </button>
-                </a>
-
-            </div>
-
-
-            <div class="dashboard-card">
-
-                <h3>🚪 Logout</h3>
-
-                <button onclick="logout()">
-                    Logout
-                </button>
-
-            </div>
-
-        </div>
-
-    </main>
-
-    <script type="module" src="js/supabase-client.js"></script>
-    <script src="js/script.js"></script>
-
 </body>
-
 </html>

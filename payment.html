@@ -292,8 +292,9 @@ async function processPayment() {
     });
   } catch (_) { /* backend optional for demo */ }
 
-  // Save to localStorage for my bookings
-  const myBookings = JSON.parse(localStorage.getItem('ss_my_bookings') || '[]');
+  // Save to localStorage for my bookings (per-user)
+  const bookingKey = 'ss_my_bookings_' + (authEmail || 'guest');
+  const myBookings = JSON.parse(localStorage.getItem(bookingKey) || '[]');
   myBookings.push({
     ref,
     route:  booking.route ? booking.route.replace('-',' → ').replace(/\b\w/g,c=>c.toUpperCase()) : '—',
@@ -303,7 +304,7 @@ async function processPayment() {
     total:  booking.grandTotal,
     status: 'confirmed',
   });
-  localStorage.setItem('ss_my_bookings', JSON.stringify(myBookings));
+  localStorage.setItem(bookingKey, JSON.stringify(myBookings));
 
   // Store confirmation
   sessionStorage.setItem('ss_confirmation', JSON.stringify({ ...bookingPayload }));

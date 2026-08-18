@@ -164,10 +164,12 @@ async function cancelThisBooking() {
     });
   } catch (_) {}
 
-  // Update localStorage
-  const myBookings = JSON.parse(localStorage.getItem('ss_my_bookings') || '[]');
+  // Update localStorage (per-user)
+  const userEmail = localStorage.getItem('ss_email') || 'guest';
+  const bookingKey = 'ss_my_bookings_' + userEmail;
+  const myBookings = JSON.parse(localStorage.getItem(bookingKey) || '[]');
   const idx = myBookings.findIndex(b => b.ref === conf.ref);
-  if (idx !== -1) { myBookings[idx].status = 'cancelled'; localStorage.setItem('ss_my_bookings', JSON.stringify(myBookings)); }
+  if (idx !== -1) { myBookings[idx].status = 'cancelled'; localStorage.setItem(bookingKey, JSON.stringify(myBookings)); }
 
   // Update ticket UI
   document.querySelector('.paid-badge').textContent = '🚫 CANCELLED';
