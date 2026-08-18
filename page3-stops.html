@@ -161,33 +161,79 @@ const MOCK_STOPS = {
   ]
 };
 
+let boardingSelectEl = null;
+let droppingSelectEl = null;
+
 async function initializeStops() {
-  // Get schedule ID from booking
   const scheduleId = booking.scheduleId;
   const route = booking.route || '';
-  
+  const journey = JSON.parse(sessionStorage.getItem('ss_selected_journey') || 'null');
+
   if (!scheduleId) {
     alert('Error: Missing schedule information');
     window.location.href = 'page3.html';
     return;
   }
 
-  // Load mock stops based on route
-  const stops = MOCK_STOPS[route] || [];
-  
-  if (stops.length === 0) {
+  let stops = [];
+
+  // Try fetching stops from API using journey routeId
+  if (journey && journey.routeId) {
+    try {
+      const res = await fetch('/api/routes/' + encodeURIComponent(journey.routeId) + '/stops');
+      const data = await res.json();
+      if (data.success && data.stops && data.stops.length) {
+        stops = data.stops;
+      }
+    } catch (err) {
+      console.error('Failed to load stops from API:', err);
+    }
+  }
+
+  // Fallback to MOCK_STOPS
+  if (!stops.length) {
+    stops = MOCK_STOPS[route] || [];
+  }
+
+  if (!stops.length) {
     alert('Error: No stops found for this route');
     window.location.href = 'page3.html';
     return;
   }
 
-  // Manually set stops in segmentBooking
   segmentBooking.stops = stops;
   segmentBooking.scheduleId = scheduleId;
 
-  // Display stop selectors
   displayStops();
   populateSummary();
+
+  // Pre-select boarding from journey data
+  if (journey && journey.boardingStop && boardingSelectEl) {
+    for (const opt of boardingSelectEl.options) {
+      try {
+        const val = JSON.parse(opt.value);
+        if (val.id === journey.boardingStop.id) {
+          boardingSelectEl.value = opt.value;
+          boardingSelectEl.dispatchEvent(new Event('change'));
+          break;
+        }
+      } catch (_) {}
+    }
+  }
+
+  // Pre-select dropping from journey data (after boarding change populates drops)
+  if (journey && journey.droppingStop && droppingSelectEl) {
+    for (const opt of droppingSelectEl.options) {
+      try {
+        const val = JSON.parse(opt.value);
+        if (val.id === journey.droppingStop.id) {
+          droppingSelectEl.value = opt.value;
+          droppingSelectEl.dispatchEvent(new Event('change'));
+          break;
+        }
+      } catch (_) {}
+    }
+  }
 }
 
 function displayStops() {
@@ -196,6 +242,8 @@ function displayStops() {
 
   // Create selectors
   const { boardingSelect, droppingSelect } = segmentBooking.displayStopSelection('stopsContainer');
+  boardingSelectEl = boardingSelect;
+  droppingSelectEl = droppingSelect;
   
   // Show continue button
   document.getElementById('continueBtn').style.display = 'block';

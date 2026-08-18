@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Routes - SeatSync</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+    <link rel="stylesheet"
+          href="css/superadmin.css">
+
+</head>
+
+
+<body>
+
+<div class="dashboard">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="auth-logo">
+            Seat<span>Sync</span>
+        </div>
+
+        <h3>Super Admin</h3>
+
+
+        <nav>
+
+            <a href="superadmin-dashboard.html">
+                🏠 Dashboard
+            </a>
+
+            <a href="manage-admins.html">
+                👨‍💼 Manage Admins
+            </a>
+
+            <a href="manage-users.html">
+                👥 Manage Users
+            </a>
+
+            <a href="manage-buses.html">
+                🚌 Manage Buses
+            </a>
+
+            <a href="manage-routes.html">
+                🛣️ Manage Routes
+            </a>
+
+            <a href="manage-schedules.html">
+                📅 Manage Schedules
+            </a>
+
+            <a href="manage-bookings.html">
+                🎟️ Manage Bookings
+            </a>
+
+            <a href="revenue.html">
+                💰 Revenue
+            </a>
+
+            <a href="activity-logs.html">
+                📋 Activity Logs
+            </a>
+
+        </nav>
+
+
+        <button
+            onclick="logout()"
+            class="btn-full">
+
+            Logout
+
+        </button>
+
+    </aside>
+
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="dashboard-content">
+
+
+        <div class="dashboard-header">
+
+            <h1>
+                Manage Routes
+            </h1>
+
+            <p>
+                Add and manage SeatSync routes.
+            </p>
+
+        </div>
+
+
+
+        <!-- ADD ROUTE -->
+
+        <section class="dashboard-section">
+
+            <h2>
+                Add New Route
+            </h2>
+
+
+            <form id="addRouteForm">
+
+
+                <div class="form-group">
+
+                    <label for="routeSource">
+                        Source
+                    </label>
+
+                    <input
+                        type="text"
+                        id="routeSource"
+                        class="form-control"
+                        placeholder="Example: Bangalore"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="routeDestination">
+                        Destination
+                    </label>
+
+                    <input
+                        type="text"
+                        id="routeDestination"
+                        class="form-control"
+                        placeholder="Example: Mysore"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="routeDistance">
+                        Distance
+                    </label>
+
+                    <input
+                        type="text"
+                        id="routeDistance"
+                        class="form-control"
+                        placeholder="Example: 145 km"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="routeDuration">
+                        Duration
+                    </label>
+
+                    <input
+                        type="text"
+                        id="routeDuration"
+                        class="form-control"
+                        placeholder="Example: 3h 30m"
+                        required
+                    >
+
+                </div>
+
+
+
+                <button
+                    type="submit"
+                    class="btn-full">
+
+                    Add Route
+
+                </button>
+
+
+            </form>
+
+        </section>
+
+
+
+        <!-- EXISTING ROUTES -->
+
+        <section class="dashboard-section">
+
+            <h2>
+                Existing Routes
+            </h2>
+
+
+            <div id="routeList">
+
+                <p>
+                    Loading routes...
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<script src="js/env-config.js"></script>
+
+<script
+    type="module"
+    src="js/supabase-client.js">
+</script>
+
+<script
+    type="module"
+    src="js/superadmin.js">
+</script>
+
+
+</body>
+
+</html>

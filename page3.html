@@ -64,6 +64,9 @@
       <div class="summary-row"><span class="lbl">Date</span><span class="val" id="sumDate">—</span></div>
       <div class="summary-row"><span class="lbl">Departure</span><span class="val" id="sumTime">—</span></div>
       <div class="divider"></div>
+      <div class="summary-row"><span class="lbl">Boarding</span><span class="val" id="sumBoarding">—</span></div>
+      <div class="summary-row"><span class="lbl">Dropping</span><span class="val" id="sumDropping">—</span></div>
+      <div class="divider"></div>
       <div class="summary-row"><span class="lbl">Selected Seats</span></div>
       <div class="seat-chips" id="seatChips"><span class="no-seats">No seats selected</span></div>
       <div class="summary-row" style="margin-top:8px;"><span class="lbl">Passengers</span><span class="val" id="sumPass">0</span></div>
@@ -102,6 +105,15 @@ document.getElementById('sumRoute').textContent      = routeLabel(bus.route);
 document.getElementById('sumDate').textContent       = bus.date || '—';
 document.getElementById('sumTime').textContent       = bus.time;
 document.getElementById('sumPrice').textContent      = '₹' + bus.price;
+
+// Populate boarding/dropping from journey data
+const journey = JSON.parse(sessionStorage.getItem('ss_selected_journey') || 'null');
+if (journey && journey.boardingStop) {
+  document.getElementById('sumBoarding').textContent = journey.boardingStop.name;
+}
+if (journey && journey.droppingStop) {
+  document.getElementById('sumDropping').textContent = journey.droppingStop.name;
+}
 
 // Generate seat grid: rows A–J, cols 1-2 | aisle | 3-4
 const BOOKED = new Set();
@@ -183,7 +195,11 @@ function updateSummary() {
 
 function proceed() {
   if (!selected.size) { alert('Please select at least one seat'); return; }
-  const booking = { ...bus, selectedSeats: Array.from(selected), totalAmount: selected.size * bus.price, tax: selected.size * bus.price * 0.05, grandTotal: (selected.size * bus.price) + (selected.size * bus.price * 0.05) };
+  const journeyData = JSON.parse(sessionStorage.getItem('ss_selected_journey') || 'null');
+  const booking = { ...bus, selectedSeats: Array.from(selected), totalAmount: selected.size * bus.price, tax: selected.size * bus.price * 0.05, grandTotal: (selected.size * bus.price) + (selected.size * bus.price * 0.05),
+    boardingStop: journeyData && journeyData.boardingStop ? { name: journeyData.boardingStop.name, id: journeyData.boardingStop.id, sequence: journeyData.boardingStop.sequence, departureTime: '' } : null,
+    droppingStop: journeyData && journeyData.droppingStop ? { name: journeyData.droppingStop.name, id: journeyData.droppingStop.id, sequence: journeyData.droppingStop.sequence, arrivalTime: '' } : null,
+  };
   sessionStorage.setItem('ss_booking', JSON.stringify(booking));
   window.location.href = 'page3-stops.html';
 }

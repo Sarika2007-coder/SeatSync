@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Super Admin Dashboard - SeatSync</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/superadmin.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="auth-logo">
+            Seat<span>Sync</span>
+        </div>
+
+        <h3>Super Admin</h3>
+
+        <nav>
+
+            <a href="superadmin-dashboard.html">
+                🏠 Dashboard
+            </a>
+
+            <a href="manage-admins.html">
+                👨‍💼 Manage Admins
+            </a>
+
+            <a href="manage-users.html">
+                👥 Manage Users
+            </a>
+
+            <a href="manage-buses.html">
+                🚌 Manage Buses
+            </a>
+
+            <a href="manage-routes.html">
+                🛣️ Manage Routes
+            </a>
+
+            <a href="manage-schedules.html">
+                📅 Manage Schedules
+            </a>
+
+            <a href="manage-bookings.html">
+                🎟️ Manage Bookings
+            </a>
+
+            <a href="revenue.html">
+                💰 Revenue
+            </a>
+
+            <a href="activity-logs.html">
+                📋 Activity Logs
+            </a>
+
+        </nav>
+
+        <button
+            onclick="logout()"
+            class="btn-full">
+
+            Logout
+
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-content">
+
+        <!-- HEADER -->
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Super Admin Dashboard
+                </h1>
+
+                <p>
+                    Welcome back, Super Admin!
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- STATISTICS -->
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <h3>
+                    Total Admins
+                </h3>
+
+                <p id="totalAdmins">
+                    0
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>
+                    Total Users
+                </h3>
+
+                <p id="totalUsers">
+                    0
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>
+                    Total Buses
+                </h3>
+
+                <p id="totalBuses">
+                    0
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>
+                    Total Bookings
+                </h3>
+
+                <p id="totalBookings">
+                    0
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>
+                    Total Revenue
+                </h3>
+
+                <p id="totalRevenue">
+                    ₹0
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- QUICK ACTIONS -->
+        <section class="dashboard-section">
+
+            <h2>
+                Quick Actions
+            </h2>
+
+            <div class="quick-actions">
+
+                <a href="manage-admins.html">
+                    Manage Admins
+                </a>
+
+                <a href="manage-users.html">
+                    Manage Users
+                </a>
+
+                <a href="manage-buses.html">
+                    Manage Buses
+                </a>
+
+                <a href="manage-routes.html">
+                    Manage Routes
+                </a>
+
+                <a href="manage-schedules.html">
+                    Manage Schedules
+                </a>
+
+                <a href="manage-bookings.html">
+                    Manage Bookings
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- RECENT ACTIVITY -->
+        <section class="dashboard-section">
+
+            <h2>
+                Recent Activity
+            </h2>
+
+            <div id="recentActivity">
+
+                <p>
+                    No recent activity.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- SUPABASE CONFIG -->
+<script src="js/env-config.js"></script>
+
+
+<!-- SUPABASE -->
+<script type="module">
+
+    import {
+        createClient
+    } from
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+
+    const cfg =
+        window.__SUPABASE_CONFIG || {};
+
+
+    if (!cfg.url || !cfg.anonKey) {
+
+        console.error(
+            "Supabase configuration is missing."
+        );
+
+    } else {
+
+        window.supabase =
+            createClient(
+                cfg.url,
+                cfg.anonKey
+            );
+
+    }
+
+</script>
+
+
+<!-- SUPER ADMIN JAVASCRIPT -->
+<script type="module" src="js/superadmin.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Activity Logs - SeatSync</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+    <link rel="stylesheet"
+          href="css/superadmin.css">
+
+</head>
+
+
+<body>
+
+<div class="dashboard">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="auth-logo">
+            Seat<span>Sync</span>
+        </div>
+
+        <h3>Super Admin</h3>
+
+        <nav>
+
+            <a href="superadmin-dashboard.html">
+                🏠 Dashboard
+            </a>
+
+            <a href="manage-admins.html">
+                👨‍💼 Manage Admins
+            </a>
+
+            <a href="manage-users.html">
+                👥 Manage Users
+            </a>
+
+            <a href="manage-buses.html">
+                🚌 Manage Buses
+            </a>
+
+            <a href="manage-routes.html">
+                🛣️ Manage Routes
+            </a>
+
+            <a href="manage-schedules.html">
+                📅 Manage Schedules
+            </a>
+
+            <a href="manage-bookings.html">
+                🎟️ Manage Bookings
+            </a>
+
+            <a href="revenue.html">
+                💰 Revenue
+            </a>
+
+            <a href="activity-logs.html">
+                📋 Activity Logs
+            </a>
+
+        </nav>
+
+        <button
+            onclick="logout()"
+            class="btn-full">
+
+            Logout
+
+        </button>
+
+    </aside>
+
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="dashboard-content">
+
+
+        <div class="dashboard-header">
+
+            <h1>
+                Activity Logs
+            </h1>
+
+            <p>
+                Recent booking activity on SeatSync.
+            </p>
+
+        </div>
+
+
+        <!-- NOTE -->
+
+        <section class="dashboard-section">
+
+            <p>
+                <strong>Note:</strong>
+                A dedicated <code>activity_logs</code> table
+                does not exist in Supabase. This page currently
+                shows recent booking activity. To track admin
+                actions (add, delete, update), create an
+                <code>activity_logs</code> table in Supabase
+                with columns: <code>id</code>,
+                <code>action</code>, <code>description</code>,
+                <code>admin_name</code>, <code>created_at</code>.
+            </p>
+
+        </section>
+
+
+        <!-- ACTIVITY LOG -->
+
+        <section class="dashboard-section">
+
+            <h2>
+                Recent Activity
+            </h2>
+
+            <div id="recentActivity">
+
+                <p>
+                    Loading activity...
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<!-- SUPABASE CONFIG -->
+
+<script src="js/env-config.js"></script>
+
+
+<!-- SUPABASE -->
+
+<script type="module">
+
+    import {
+        createClient
+    }
+    from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+
+    const cfg =
+        window.__SUPABASE_CONFIG || {};
+
+
+    if (!cfg.url || !cfg.anonKey) {
+
+        console.error(
+            "Supabase configuration missing."
+        );
+
+        throw new Error(
+            "Supabase configuration missing"
+        );
+
+    }
+
+
+    const supabase =
+        createClient(
+            cfg.url,
+            cfg.anonKey
+        );
+
+
+    window.supabase = supabase;
+
+
+    // ========================================
+    // AUTH GUARD
+    // ========================================
+
+    if (
+        localStorage.getItem("ss_role") !==
+        "superadmin"
+    ) {
+
+        window.location.href =
+            "superadmin-login.html";
+
+        throw new Error(
+            "Not authenticated"
+        );
+
+    }
+
+
+    // ========================================
+    // LOAD RECENT ACTIVITY
+    // ========================================
+
+    async function loadRecentActivity() {
+
+        const container =
+            document.getElementById(
+                "recentActivity"
+            );
+
+
+        if (!container) return;
+
+
+        try {
+
+            const {
+                data,
+                error
+            } =
+                await supabase
+                    .from("activity_logs")
+                    .select("*")
+                    .order(
+                        "created_at",
+                        {
+                            ascending: false
+                        }
+                    )
+                    .limit(50);
+
+
+            if (error) {
+
+                console.error(
+                    "Activity error:",
+                    error
+                );
+
+                container.innerHTML = `
+                    <p>Unable to load activity.</p>
+                `;
+
+                return;
+
+            }
+
+
+            if (
+                !data ||
+                data.length === 0
+            ) {
+
+                container.innerHTML = `
+                    <p>No recent activity.</p>
+                `;
+
+                return;
+
+            }
+
+
+            container.innerHTML = "";
+
+
+            data.forEach(
+                log => {
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    item.className =
+                        "bus-card";
+
+
+                    const dateStr =
+                        log.created_at
+                            ? new Date(
+                                log.created_at
+                              ).toLocaleString(
+                                "en-IN"
+                              )
+                            : "—";
+
+
+                    item.innerHTML = `
+
+                        <h3>
+                            📋 ${log.action}
+                        </h3>
+
+                        <p>
+                            <strong>Description:</strong>
+                            ${log.description}
+                        </p>
+
+                        <p>
+                            <strong>Admin:</strong>
+                            ${log.admin_name || "Super Admin"}
+                        </p>
+
+                        <p>
+                            <strong>Time:</strong>
+                            ${dateStr}
+                        </p>
+
+                    `;
+
+
+                    container.appendChild(item);
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            container.innerHTML =
+                "<p>Error loading activity.</p>";
+
+        }
+
+    }
+
+
+    // ========================================
+    // LOGOUT
+    // ========================================
+
+    function logout() {
+
+        localStorage.removeItem("ss_role");
+
+        window.location.href =
+            "superadmin-login.html";
+
+    }
+
+
+    // ========================================
+    // START
+    // ========================================
+
+    loadRecentActivity();
+
+
+</script>
+
+
+</body>
+
+</html>

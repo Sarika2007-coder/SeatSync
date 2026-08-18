@@ -96,7 +96,20 @@
       </select>
     </div>
     <button class="btn-full" onclick="applyFilter()" style="max-width:160px;margin-bottom:0;">Search →</button>
-  </div>
+  </div><div id="destinationWeather" style="
+    margin: 20px 0;
+    padding: 18px;
+    border-radius: 12px;
+    background: #f5f8ff;
+    border: 1px solid #dbe4ff;
+    display: none;
+">
+    <h3>🌦️ Weather at Destination</h3>
+    <p id="weatherLocation">Loading...</p>
+    <p id="weatherTemperature"></p>
+    <p id="weatherCondition"></p>
+    <p id="weatherWind"></p>
+</div>
 
   <!-- Results -->
   <div class="results-header">
@@ -105,7 +118,6 @@
   </div>
 
   <div id="busList"></div>
-</div>
 
 <footer><strong>SeatSync</strong> &copy; 2024</footer>
 
@@ -158,12 +170,24 @@ function isDeparted(busTime, date) {
 }
 
 function applyFilter() {
-  const route = document.getElementById('routeFilter').value;
-  const date  = document.getElementById('dateFilter').value;
-  const pass  = parseInt(document.getElementById('passFilter').value);
-  loadAndRenderBuses(route, date, pass);
-}
+    const route = document.getElementById('routeFilter').value;
+    const date = document.getElementById('dateFilter').value;
+    const pass = parseInt(document.getElementById('passFilter').value);
 
+    const routeSelect = document.getElementById('routeFilter');
+
+    if (route) {
+        const routeText =
+            routeSelect.options[routeSelect.selectedIndex].text;
+
+        const destination =
+            routeText.split('→').pop().trim();
+
+        showDestinationWeather(destination);
+    }
+
+    loadAndRenderBuses(route, date, pass);
+}
 async function loadAndRenderBuses(route, date, passengers) {
   if (!route) { renderBuses([], route, date, passengers); return; }
   const list = document.getElementById('busList');
@@ -185,6 +209,7 @@ async function loadAndRenderBuses(route, date, passengers) {
     }
   } catch (_) { /* backend unavailable — use hardcoded only */ }
 
+  allLoadedBuses[route] = buses;
   renderBuses(buses, route, date, passengers);
 }
 
@@ -255,16 +280,285 @@ function renderBuses(buses, route, date, passengers) {
 }
 
 function selectBus(busId, route, date, passengers) {
-  const buses = Object.values(BUS_DATA).flat();
-  const bus   = buses.find(b => b.id === busId);
+  let bus = null;
+  const hardcoded = Object.values(BUS_DATA).flat();
+  bus = hardcoded.find(b => b.id === busId);
+  if (!bus && allLoadedBuses[route]) {
+    bus = allLoadedBuses[route].find(b => b.id === busId);
+  }
   if (!bus) return;
-  // Generate a schedule ID from route and bus id
   const scheduleId = btoa(`${route}-${busId}-${date}`);
   sessionStorage.setItem('ss_selected_bus', JSON.stringify({ ...bus, route, date, passengers, scheduleId }));
   window.location.href = 'page3.html';
 }
 
-// Init
+// ── Journey Selector Functions ────────────────────────────────
+let routesData = [];
+let journeyStops = [];
+let allLoadedBuses = {};
+
+const FALLBACK_ROUTES = [
+  { id: 'fr-1', name: 'Bangalore → Chikmagalur', origin: 'Bangalore', destination: 'Chikmagalur', distance_km: '265 km', duration: '5h 00m', active: true },
+  { id: 'fr-2', name: 'Bangalore → Tumkur',      origin: 'Bangalore', destination: 'Tumkur',      distance_km: '70 km',  duration: '1h 30m', active: true },
+  { id: 'fr-3', name: 'Bangalore → Hassan',       origin: 'Bangalore', destination: 'Hassan',       distance_km: '190 km', duration: '3h 30m', active: true },
+  { id: 'fr-4', name: 'Bangalore → Mandya',       origin: 'Bangalore', destination: 'Mandya',       distance_km: '150 km', duration: '2h 30m', active: true },
+  { id: 'fr-5', name: 'Bangalore → Mysore',       origin: 'Bangalore', destination: 'Mysore',       distance_km: '150 km', duration: '2h 45m', active: true },
+  { id: 'fr-6', name: 'Bangalore → Gokarna',      origin: 'Bangalore', destination: 'Gokarna',      distance_km: '480 km', duration: '8h 00m', active: true },
+  { id: 'fr-7', name: 'Bangalore → Udupi',        origin: 'Bangalore', destination: 'Udupi',        distance_km: '400 km', duration: '7h 00m', active: true }
+];
+
+const FALLBACK_STOPS = {
+  'Bangalore → Chikmagalur': [
+    { id: 'cs-1',  name: 'Bangalore',         sequence: 1, arrival_time: '06:00 AM', departure_time: '06:00 AM' },
+    { id: 'cs-2',  name: 'Nelamangala',        sequence: 2, arrival_time: '06:45 AM', departure_time: '06:50 AM' },
+    { id: 'cs-3',  name: 'Kunigal',            sequence: 3, arrival_time: '07:30 AM', departure_time: '07:35 AM' },
+    { id: 'cs-4',  name: 'Arsikere',           sequence: 4, arrival_time: '08:45 AM', departure_time: '08:50 AM' },
+    { id: 'cs-5',  name: 'Kadur',              sequence: 5, arrival_time: '09:30 AM', departure_time: '09:35 AM' },
+    { id: 'cs-6',  name: 'Chikmagalur',        sequence: 6, arrival_time: '10:30 AM', departure_time: '10:30 AM' }
+  ],
+  'Bangalore → Tumkur': [
+    { id: 'ts-1',  name: 'Bangalore',          sequence: 1, arrival_time: '06:30 AM', departure_time: '06:30 AM' },
+    { id: 'ts-2',  name: 'Yelahanka',          sequence: 2, arrival_time: '06:50 AM', departure_time: '06:55 AM' },
+    { id: 'ts-3',  name: 'Nelamangala',        sequence: 3, arrival_time: '07:15 AM', departure_time: '07:20 AM' },
+    { id: 'ts-4',  name: 'Tumkur',             sequence: 4, arrival_time: '08:00 AM', departure_time: '08:00 AM' }
+  ],
+  'Bangalore → Hassan': [
+    { id: 'hs-1',  name: 'Bangalore',          sequence: 1, arrival_time: '07:00 AM', departure_time: '07:00 AM' },
+    { id: 'hs-2',  name: 'Ramanagara',         sequence: 2, arrival_time: '07:40 AM', departure_time: '07:45 AM' },
+    { id: 'hs-3',  name: 'Channarayapatna',    sequence: 3, arrival_time: '09:00 AM', departure_time: '09:05 AM' },
+    { id: 'hs-4',  name: 'Hassan',             sequence: 4, arrival_time: '09:45 AM', departure_time: '09:45 AM' }
+  ],
+  'Bangalore → Mandya': [
+    { id: 'ms-1',  name: 'Bangalore',          sequence: 1, arrival_time: '07:30 AM', departure_time: '07:30 AM' },
+    { id: 'ms-2',  name: 'Ramanagara',         sequence: 2, arrival_time: '08:10 AM', departure_time: '08:15 AM' },
+    { id: 'ms-3',  name: 'Channapatna',        sequence: 3, arrival_time: '08:40 AM', departure_time: '08:45 AM' },
+    { id: 'ms-4',  name: 'Maddur',             sequence: 4, arrival_time: '09:05 AM', departure_time: '09:10 AM' },
+    { id: 'ms-5',  name: 'Mandya',             sequence: 5, arrival_time: '09:40 AM', departure_time: '09:40 AM' }
+  ],
+  'Bangalore → Mysore': [
+    { id: 'my-1',  name: 'Bangalore',          sequence: 1, arrival_time: '06:00 AM', departure_time: '06:00 AM' },
+    { id: 'my-2',  name: 'Ramanagara',         sequence: 2, arrival_time: '06:40 AM', departure_time: '06:45 AM' },
+    { id: 'my-3',  name: 'Channapatna',        sequence: 3, arrival_time: '07:10 AM', departure_time: '07:15 AM' },
+    { id: 'my-4',  name: 'Maddur',             sequence: 4, arrival_time: '07:35 AM', departure_time: '07:40 AM' },
+    { id: 'my-5',  name: 'Mandya',             sequence: 5, arrival_time: '08:00 AM', departure_time: '08:05 AM' },
+    { id: 'my-6',  name: 'Srirangapatna',      sequence: 6, arrival_time: '08:25 AM', departure_time: '08:30 AM' },
+    { id: 'my-7',  name: 'Mysore',             sequence: 7, arrival_time: '09:00 AM', departure_time: '09:00 AM' }
+  ],
+  'Bangalore → Gokarna': [
+    { id: 'gk-1',  name: 'Bangalore',          sequence: 1, arrival_time: '08:00 PM', departure_time: '08:00 PM' },
+    { id: 'gk-2',  name: 'Tumkur',             sequence: 2, arrival_time: '09:30 PM', departure_time: '09:35 PM' },
+    { id: 'gk-3',  name: 'Davangere',          sequence: 3, arrival_time: '12:30 AM', departure_time: '12:35 AM' },
+    { id: 'gk-4',  name: 'Hospet',             sequence: 4, arrival_time: '02:30 AM', departure_time: '02:35 AM' },
+    { id: 'gk-5',  name: 'Sirsi',              sequence: 5, arrival_time: '04:30 AM', departure_time: '04:35 AM' },
+    { id: 'gk-6',  name: 'Yellapur',           sequence: 6, arrival_time: '05:30 AM', departure_time: '05:35 AM' },
+    { id: 'gk-7',  name: 'Gokarna',            sequence: 7, arrival_time: '06:30 AM', departure_time: '06:30 AM' }
+  ],
+  'Bangalore → Udupi': [
+    { id: 'up-1',  name: 'Bangalore',          sequence: 1, arrival_time: '09:00 PM', departure_time: '09:00 PM' },
+    { id: 'up-2',  name: 'Tumkur',             sequence: 2, arrival_time: '10:30 PM', departure_time: '10:35 PM' },
+    { id: 'up-3',  name: 'Davangere',          sequence: 3, arrival_time: '01:30 AM', departure_time: '01:35 AM' },
+    { id: 'up-4',  name: 'Shimoga',            sequence: 4, arrival_time: '03:00 AM', departure_time: '03:05 AM' },
+    { id: 'up-5',  name: 'Udupi',              sequence: 5, arrival_time: '05:00 AM', departure_time: '05:00 AM' }
+  ]
+};
+
+function deriveSlug(source, destination) {
+  return source.toLowerCase().replace(/\s+/g, '-') + '-' + destination.toLowerCase().replace(/\s+/g, '-');
+}
+
+async function loadJourneyRoutes() {
+  let apiRoutes = [];
+  try {
+    const res = await fetch('/api/routes');
+    const data = await res.json();
+    if (data.success && data.routes && data.routes.length) {
+      apiRoutes = data.routes;
+    }
+  } catch (err) {
+    console.error('API routes fetch failed, using fallback:', err);
+  }
+
+  routesData = apiRoutes.length ? apiRoutes : FALLBACK_ROUTES;
+
+  const select = document.getElementById('journeyRoute');
+  routesData.forEach(r => {
+    const option = document.createElement('option');
+    option.value = r.id;
+    option.textContent = r.name;
+    option.dataset.route = JSON.stringify(r);
+    select.appendChild(option);
+  });
+}
+
+async function onRouteSelected() {
+  const select = document.getElementById('journeyRoute');
+  const routeId = select.value;
+  const boardingSelect = document.getElementById('journeyBoarding');
+  const droppingSelect = document.getElementById('journeyDropping');
+  const searchBtn = document.getElementById('searchButton');
+
+  boardingSelect.innerHTML = '<option value="">— Select Boarding —</option>';
+  droppingSelect.innerHTML = '<option value="">— Select Dropping —</option>';
+  boardingSelect.disabled = true;
+  droppingSelect.disabled = true;
+  searchBtn.disabled = true;
+  document.getElementById('journeyMsg').style.display = 'none';
+
+  if (!routeId) return;
+
+  const routeOption = select.options[select.selectedIndex];
+  const routeInfo = JSON.parse(routeOption.dataset.route || '{}');
+  const routeName = routeInfo.name || '';
+
+  journeyStops = [];
+
+  try {
+    const res = await fetch('/api/routes/' + encodeURIComponent(routeId) + '/stops');
+    const data = await res.json();
+    if (data.success && data.stops && data.stops.length) {
+      journeyStops = data.stops;
+    }
+  } catch (err) {
+    console.log('Stops API unavailable, using fallback stops');
+  }
+
+  if (!journeyStops.length && FALLBACK_STOPS[routeName]) {
+    journeyStops = FALLBACK_STOPS[routeName];
+  }
+
+  if (!journeyStops.length && routeInfo.origin && routeInfo.destination) {
+    journeyStops = [
+      { id: 'orig', name: routeInfo.origin, sequence: 1, arrival_time: '', departure_time: '' },
+      { id: 'dest', name: routeInfo.destination, sequence: 2, arrival_time: '', departure_time: '' }
+    ];
+  }
+
+  if (!journeyStops.length) {
+    document.getElementById('journeyMsg').textContent = 'No stops found for this route.';
+    document.getElementById('journeyMsg').style.display = 'block';
+    return;
+  }
+
+  journeyStops.forEach(stop => {
+    const option = document.createElement('option');
+    option.value = JSON.stringify({ id: stop.id, sequence: stop.sequence, name: stop.name });
+    option.textContent = stop.name + (stop.departure_time ? ' (' + stop.departure_time + ')' : '');
+    boardingSelect.appendChild(option);
+  });
+  boardingSelect.disabled = false;
+}
+
+function onBoardingSelected() {
+  const boardingSelect = document.getElementById('journeyBoarding');
+  const droppingSelect = document.getElementById('journeyDropping');
+  const searchBtn = document.getElementById('searchButton');
+  const msgDiv = document.getElementById('journeyMsg');
+
+  droppingSelect.innerHTML = '<option value="">— Select Dropping —</option>';
+  searchBtn.disabled = true;
+  msgDiv.style.display = 'none';
+
+  if (!boardingSelect.value) { droppingSelect.disabled = true; return; }
+
+  const boarding = JSON.parse(boardingSelect.value);
+  let hasValidDrops = false;
+
+  journeyStops.forEach(stop => {
+    if (stop.sequence > boarding.sequence) {
+      const option = document.createElement('option');
+      option.value = JSON.stringify({ id: stop.id, sequence: stop.sequence, name: stop.name });
+      option.textContent = stop.name + (stop.arrival_time ? ' (' + stop.arrival_time + ')' : '');
+      droppingSelect.appendChild(option);
+      hasValidDrops = true;
+    }
+  });
+
+  droppingSelect.disabled = !hasValidDrops;
+
+  if (!hasValidDrops) {
+    msgDiv.className = 'auth-message error';
+    msgDiv.textContent = 'No valid dropping points available after this boarding point.';
+    msgDiv.style.display = 'block';
+  }
+}
+
+function onDroppingSelected() {
+  const routeId = document.getElementById('journeyRoute').value;
+  const boarding = document.getElementById('journeyBoarding').value;
+  const dropping = document.getElementById('journeyDropping').value;
+  const msgDiv = document.getElementById('journeyMsg');
+
+  if (boarding && dropping) {
+    const boardingInfo = JSON.parse(boarding);
+    const droppingInfo = JSON.parse(dropping);
+    if (boardingInfo.sequence >= droppingInfo.sequence) {
+      msgDiv.className = 'auth-message error';
+      msgDiv.textContent = 'Please select a dropping point after the boarding point.';
+      msgDiv.style.display = 'block';
+      document.getElementById('searchButton').disabled = true;
+      return;
+    }
+    msgDiv.style.display = 'none';
+  }
+
+  document.getElementById('searchButton').disabled = !(routeId && boarding && dropping);
+}
+
+function searchBuses() {
+  const routeId = document.getElementById('journeyRoute').value;
+  const boarding = document.getElementById('journeyBoarding').value;
+  const dropping = document.getElementById('journeyDropping').value;
+  const date = document.getElementById('dateFilter').value;
+  const passengers = document.getElementById('passFilter').value;
+  const msgDiv = document.getElementById('journeyMsg');
+
+  if (!routeId || !boarding || !dropping) {
+    alert('Please select route, boarding and dropping points.');
+    return;
+  }
+
+  if (!date) {
+    alert('Please select a travel date.');
+    return;
+  }
+
+  const routeOption = document.getElementById('journeyRoute').options[document.getElementById('journeyRoute').selectedIndex];
+  const routeInfo = JSON.parse(routeOption.dataset.route || '{}');
+  const boardingInfo = JSON.parse(boarding);
+  const droppingInfo = JSON.parse(dropping);
+
+  if (boardingInfo.sequence >= droppingInfo.sequence) {
+    alert('Please select a dropping point after the boarding point.');
+    return;
+  }
+
+  const journey = {
+    routeId: routeId,
+    routeName: routeInfo.name || '',
+    origin: routeInfo.origin || boardingInfo.name,
+    destination: routeInfo.destination || droppingInfo.name,
+    boardingStop: { id: boardingInfo.id, name: boardingInfo.name, sequence: boardingInfo.sequence },
+    droppingStop: { id: droppingInfo.id, name: droppingInfo.name, sequence: droppingInfo.sequence },
+    travelDate: date,
+    passengers: parseInt(passengers)
+  };
+  sessionStorage.setItem('ss_selected_journey', JSON.stringify(journey));
+
+  const slug = deriveSlug(routeInfo.origin || boardingInfo.name, routeInfo.destination || droppingInfo.name);
+
+  sessionStorage.setItem('ss_route', slug);
+  sessionStorage.setItem('ss_date', date);
+  sessionStorage.setItem('ss_passengers', passengers);
+
+  document.getElementById('routeFilter').value = slug;
+  document.getElementById('dateFilter').value = date;
+  document.getElementById('passFilter').value = passengers;
+
+  msgDiv.style.display = 'none';
+  loadAndRenderBuses(slug, date, parseInt(passengers));
+}
+
+// ── Init ──────────────────────────────────────────────────────
 (function() {
   const date = new Date().toISOString().split('T')[0];
   document.getElementById('dateFilter').value = sessionStorage.getItem('ss_date') || date;
@@ -277,7 +571,95 @@ function selectBus(busId, route, date, passengers) {
   } else {
     renderBuses([], '', '', 1);
   }
+  loadJourneyRoutes();
 })();
+async function showDestinationWeather(destination) {
+    const weatherBox = document.getElementById('destinationWeather');
+
+    const locationText = document.getElementById('weatherLocation');
+    const temperatureText = document.getElementById('weatherTemperature');
+    const conditionText = document.getElementById('weatherCondition');
+    const windText = document.getElementById('weatherWind');
+
+    weatherBox.style.display = 'block';
+
+    locationText.textContent = `📍 Destination: ${destination}`;
+    temperatureText.textContent = '🌡️ Loading...';
+    conditionText.textContent = '☁️ Loading...';
+    windText.textContent = '';
+
+    try {
+        const geoResponse = await fetch(
+            `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(destination)}&count=1&language=en&format=json`
+        );
+
+        const geoData = await geoResponse.json();
+
+        if (!geoData.results || geoData.results.length === 0) {
+            throw new Error('Destination not found');
+        }
+
+        const location = geoData.results[0];
+
+        const weatherResponse = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current=temperature_2m,weather_code,wind_speed_10m&timezone=auto`
+        );
+
+        const weatherData = await weatherResponse.json();
+        const current = weatherData.current;
+
+        locationText.textContent =
+            `📍 Destination: ${location.name}`;
+
+        temperatureText.textContent =
+            `🌡️ Temperature: ${current.temperature_2m}°C`;
+
+        conditionText.textContent =
+            `☁️ Condition: ${getWeatherCondition(current.weather_code)}`;
+
+        windText.textContent =
+            `💨 Wind Speed: ${current.wind_speed_10m} km/h`;
+
+    } catch (error) {
+        console.error('Weather error:', error);
+
+        locationText.textContent =
+            `📍 Destination: ${destination}`;
+
+        temperatureText.textContent =
+            '⚠️ Weather information unavailable';
+
+        conditionText.textContent = '';
+        windText.textContent = '';
+    }
+}
+
+function getWeatherCondition(code) {
+    if (code === 0) return '☀️ Clear Sky';
+
+    if ([1, 2, 3].includes(code))
+        return '🌤️ Partly Cloudy';
+
+    if ([45, 48].includes(code))
+        return '🌫️ Foggy';
+
+    if ([51, 53, 55, 56, 57].includes(code))
+        return '🌦️ Drizzle';
+
+    if ([61, 63, 65, 66, 67].includes(code))
+        return '🌧️ Rain';
+
+    if ([71, 73, 75, 77].includes(code))
+        return '❄️ Snow';
+
+    if ([80, 81, 82].includes(code))
+        return '🌧️ Rain Showers';
+
+    if ([95, 96, 99].includes(code))
+        return '⛈️ Thunderstorm';
+
+    return '🌤️ Weather information available';
+}
 </script>
 </body>
 </html>

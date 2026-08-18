@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Buses – SeatSync</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="logo" href="user-dashboard.html">🚌 Seat<span>Sync</span></a>
+  <ul class="nav-links">
+    <li><a href="user-dashboard.html">Dashboard</a></li>
+    <li><a href="page2.html">Find Buses</a></li>
+  </ul>
+</nav>
+
+<!-- Steps -->
+<div class="steps-bar">
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Search</span></div>
+  <div class="step-sep"></div>
+  <div class="step active"><div class="step-num">2</div><span class="step-label">Select Bus</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">3</div><span class="step-label">Choose Seats</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">4</div><span class="step-label">Passenger Details</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">5</div><span class="step-label">Payment</span></div>
+</div>
+
+<div class="content-wrap">
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="form-group">
+      <label>Route</label>
+      <select id="routeFilter" class="form-control" onchange="applyFilter()">
+        <option value="">— Select Route —</option>
+        <option value="bangalore-chikmagalur">Bangalore → Chikmagalur</option>
+        <option value="bangalore-tumkur">Bangalore → Tumkur</option>
+        <option value="bangalore-hassan">Bangalore → Hassan</option>
+        <option value="bangalore-mandya">Bangalore → Mandya</option>
+        <option value="bangalore-mysore">Bangalore → Mysore</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Travel Date</label>
+      <input type="date" id="dateFilter" class="form-control" onchange="applyFilter()">
+    </div>
+    <div class="form-group">
+      <label>Passengers</label>
+      <select id="passFilter" class="form-control">
+        <option value="1">1 Passenger</option>
+        <option value="2">2 Passengers</option>
+        <option value="3">3 Passengers</option>
+        <option value="4">4 Passengers</option>
+        <option value="5">5 Passengers</option>
+      </select>
+    </div>
+    <button class="btn-full" onclick="applyFilter()" style="max-width:160px;margin-bottom:0;">Search →</button>
+  </div><div id="destinationWeather" style="
+    margin: 20px 0;
+    padding: 18px;
+    border-radius: 12px;
+    background: #f5f8ff;
+    border: 1px solid #dbe4ff;
+    display: none;
+">
+    <h3>🌦️ Weather at Destination</h3>
+    <p id="weatherLocation">Loading...</p>
+    <p id="weatherTemperature"></p>
+    <p id="weatherCondition"></p>
+    <p id="weatherWind"></p>
+</div>
+
+  <!-- Results -->
+  <div class="results-header">
+    <h2 id="resultsTitle">Select a route to see buses</h2>
+    <span class="results-count" id="resultsCount"></span>
+  </div>
+
+  <div id="busList"></div>
+  <div id="destinationWeather" style="display:none;">
+    <h2 id="weatherLocation"></h2>
+    <p id="weatherTemperature"></p>
+    <p id="weatherCondition"></p>
+    <p id="weatherWind"></p>
+</div>
+
+<footer><strong>SeatSync</strong> &copy; 2024</footer>
+
+<script>
+const BUS_DATA = {
+  "bangalore-chikmagalur": [
+    { id:'bc1', name:'KSRTC Airavat',      type:'AC Sleeper',     time:'07:00 AM', duration:'4h 30m', seats:18, price:750,  rating:4.5 },
+    { id:'bc2', name:'KSRTC Ordinary',     type:'Non-AC Seater',  time:'08:00 AM', duration:'5h 00m', seats:32, price:400,  rating:3.8 },
+    { id:'bc3', name:'VRL Travels',        type:'Volvo AC',       time:'09:30 AM', duration:'4h 00m', seats:8,  price:800,  rating:4.7 },
+    { id:'bc4', name:'Sugama Tourist',     type:'AC Seater',      time:'02:00 PM', duration:'4h 45m', seats:22, price:500,  rating:4.2 },
+  ],
+  "bangalore-tumkur": [
+    { id:'bt1', name:'KSRTC Express',      type:'Non-AC Seater',  time:'06:30 AM', duration:'1h 30m', seats:40, price:180,  rating:3.9 },
+    { id:'bt2', name:'VRL Travels',        type:'AC Seater',      time:'08:00 AM', duration:'1h 15m', seats:15, price:480,  rating:4.3 },
+    { id:'bt3', name:'KSRTC Rajahamsa',    type:'AC Seater',      time:'10:00 AM', duration:'1h 30m', seats:25, price:500,  rating:4.4 },
+  ],
+  "bangalore-hassan": [
+    { id:'bh1', name:'KSRTC Airavat',      type:'AC Sleeper',     time:'07:30 AM', duration:'3h 00m', seats:12, price:350,  rating:4.5 },
+    { id:'bh2', name:'KSRTC Rajahamsa',    type:'AC Seater',      time:'09:00 AM', duration:'3h 30m', seats:20, price:600,  rating:4.3 },
+    { id:'bh3', name:'VRL Travels',        type:'Volvo AC',       time:'11:00 AM', duration:'2h 45m', seats:5,  price:400,  rating:4.6 },
+  ],
+  "bangalore-mandya": [
+    { id:'bm1', name:'KSRTC Express',      type:'Non-AC Seater',  time:'08:00 AM', duration:'2h 00m', seats:35, price:200,  rating:4.0 },
+    { id:'bm2', name:'KSRTC Rajahamsa',    type:'AC Seater',      time:'10:30 AM', duration:'1h 45m', seats:18, price:500,  rating:4.4 },
+    { id:'bm3', name:'VRL Travels',        type:'AC Seater',      time:'11:00 AM', duration:'2h 00m', seats:22, price:350,  rating:4.2 },
+    { id:'bm4', name:'KSRTC Ordinary',     type:'Non-AC Seater',  time:'01:00 PM', duration:'2h 30m', seats:40, price:170,  rating:3.7 },
+  ],
+  "bangalore-mysore": [
+    { id:'by1', name:'KSRTC Airavat',      type:'AC Sleeper',     time:'06:00 AM', duration:'2h 30m', seats:10, price:350,  rating:4.6 },
+    { id:'by2', name:'KSRTC Rajahamsa',    type:'AC Seater',      time:'09:00 AM', duration:'2h 45m', seats:24, price:300,  rating:4.4 },
+    { id:'by3', name:'VRL Travels',        type:'Volvo AC',       time:'04:00 PM', duration:'2h 15m', seats:6,  price:400,  rating:4.7 },
+  ]
+};
+
+function routeLabel(r) {
+  if (!r) return '';
+  return r.replace('-', ' → ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// Returns true if this bus departure has already passed on the given date
+function isDeparted(busTime, date) {
+  const today = new Date().toISOString().split('T')[0];
+  if (date !== today) return false;          // future dates: never expired
+  const [time, period] = busTime.split(' ');
+  let [h, m] = time.split(':').map(Number);
+  if (period === 'PM' && h !== 12) h += 12;
+  if (period === 'AM' && h === 12) h = 0;
+  const dep  = new Date(); dep.setHours(h, m, 0, 0);
+  return new Date() > dep;
+}
+
+function applyFilter() {
+    const route = document.getElementById('routeFilter').value;
+    const date = document.getElementById('dateFilter').value;
+    const pass = parseInt(document.getElementById('passFilter').value);
+
+    const routeSelect = document.getElementById('routeFilter');
+
+    if (route) {
+        const routeText =
+            routeSelect.options[routeSelect.selectedIndex].text;
+
+        const destination =
+            routeText.split('→').pop().trim();
+
+        showDestinationWeather(destination);
+    }
+
+    loadAndRenderBuses(route, date, pass);
+}
+async function loadAndRenderBuses(route, date, passengers) {
+  if (!route) { renderBuses([], route, date, passengers); return; }
+  const list = document.getElementById('busList');
+  list.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><h3>Loading buses…</h3></div>';
+
+  // Merge: hardcoded base data + admin-added buses from backend
+  let buses = [...(BUS_DATA[route] || [])];
+  try {
+    const res  = await fetch('/api/buses/' + encodeURIComponent(route));
+    const data = await res.json();
+    if (data.success && data.buses.length) {
+      // Add backend buses (avoid duplicates by name)
+      const names = new Set(buses.map(b => b.name.toLowerCase()));
+      data.buses.forEach(b => {
+        if (!names.has(b.name.toLowerCase())) {
+          buses.push({ id: b.id, name: b.name, type: b.type, time: b.time, duration: b.duration, seats: b.seats, price: b.price, rating: b.rating });
+        }
+      });
+    }
+  } catch (_) { /* backend unavailable — use hardcoded only */ }
+
+  renderBuses(buses, route, date, passengers);
+}
+
+function renderBuses(buses, route, date, passengers) {
+  const list  = document.getElementById('busList');
+  const title = document.getElementById('resultsTitle');
+  const count = document.getElementById('resultsCount');
+
+  if (!route) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><h3>Select a Route</h3><p>Choose a route above to see available buses.</p></div>';
+    title.textContent = 'Available Buses';
+    count.textContent = '';
+    return;
+  }
+
+  // buses is now passed in directly (merged hardcoded + backend)
+  const active   = buses.filter(b => !isDeparted(b.time, date));
+  const departed = buses.filter(b =>  isDeparted(b.time, date));
+
+  title.textContent = routeLabel(route);
+  count.textContent = active.length + ' bus' + (active.length !== 1 ? 'es' : '') + ' available';
+
+  if (!active.length && !departed.length) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">🚌</div><h3>No buses found</h3><p>Try a different route or date.</p></div>';
+    return;
+  }
+
+  const renderCard = (b, expired) => {
+    const avail = expired ? '❌ Departed'
+      : b.seats > 10 ? `✅ ${b.seats} seats`
+      : b.seats > 0  ? `⚠️ Only ${b.seats} left`
+      : '❌ Full';
+    const cls   = expired ? 'bus-avail low' : b.seats > 10 ? 'bus-avail' : 'bus-avail low';
+    const stars = '⭐'.repeat(Math.floor(b.rating)) + (b.rating % 1 >= .5 ? '½' : '');
+    const btn   = expired
+      ? `<button class="btn-select" disabled style="background:var(--muted);cursor:not-allowed;">Departed</button>`
+      : `<button class="btn-select" onclick="selectBus('${b.id}','${route}','${date}',${passengers})">Select →</button>`;
+    return `
+    <div class="bus-card" style="${expired ? 'opacity:.5;' : ''}">
+      <div>
+        <div class="bus-name">${b.name}</div>
+        <div class="bus-type">${b.type}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px;">${stars} ${b.rating}</div>
+      </div>
+      <div>
+        <div class="bus-time-big">${b.time}</div>
+        <div class="bus-time-lbl">Departure</div>
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:600;">${b.duration}</div>
+        <div class="bus-time-lbl">Duration</div>
+      </div>
+      <div>
+        <div class="${cls}">${avail}</div>
+        <div class="bus-price-big" style="margin-top:4px;">₹${b.price}</div>
+        <div class="bus-price-lbl">per seat</div>
+      </div>
+      ${btn}
+    </div>`;
+  };
+
+  let html = active.map(b => renderCard(b, false)).join('');
+  if (departed.length) {
+    html += `<div style="margin:24px 0 12px;font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;">Departed buses (${departed.length})</div>`;
+    html += departed.map(b => renderCard(b, true)).join('');
+  }
+  list.innerHTML = html;
+}
+
+function selectBus(busId, route, date, passengers) {
+  const buses = Object.values(BUS_DATA).flat();
+  const bus   = buses.find(b => b.id === busId);
+  if (!bus) return;
+  sessionStorage.setItem('ss_selected_bus', JSON.stringify({ ...bus, route, date, passengers }));
+  window.location.href = 'page3.html';
+}
+
+// Init
+(function() {
+  const date = new Date().toISOString().split('T')[0];
+  document.getElementById('dateFilter').value = sessionStorage.getItem('ss_date') || date;
+  const route = sessionStorage.getItem('ss_route') || '';
+  const pass  = parseInt(sessionStorage.getItem('ss_passengers') || '1');
+  if (route) {
+    document.getElementById('routeFilter').value = route;
+    document.getElementById('passFilter').value  = pass;
+    loadAndRenderBuses(route, document.getElementById('dateFilter').value, pass);
+  } else {
+    renderBuses([], '', '', 1);
+  }
+})();
+async function showDestinationWeather(destination) {
+    const weatherBox = document.getElementById('destinationWeather');
+
+    const locationText = document.getElementById('weatherLocation');
+    const temperatureText = document.getElementById('weatherTemperature');
+    const conditionText = document.getElementById('weatherCondition');
+    const windText = document.getElementById('weatherWind');
+
+    weatherBox.style.display = 'block';
+
+    locationText.textContent = `📍 Destination: ${destination}`;
+    temperatureText.textContent = '🌡️ Loading...';
+    conditionText.textContent = '☁️ Loading...';
+    windText.textContent = '';
+
+    try {
+        const geoResponse = await fetch(
+            `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(destination)}&count=1&language=en&format=json`
+        );
+
+        const geoData = await geoResponse.json();
+
+        if (!geoData.results || geoData.results.length === 0) {
+            throw new Error('Destination not found');
+        }
+
+        const location = geoData.results[0];
+
+        const weatherResponse = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current=temperature_2m,weather_code,wind_speed_10m&timezone=auto`
+        );
+
+        const weatherData = await weatherResponse.json();
+        const current = weatherData.current;
+
+        locationText.textContent =
+            `📍 Destination: ${location.name}`;
+
+        temperatureText.textContent =
+            `🌡️ Temperature: ${current.temperature_2m}°C`;
+
+        conditionText.textContent =
+            `☁️ Condition: ${getWeatherCondition(current.weather_code)}`;
+
+        windText.textContent =
+            `💨 Wind Speed: ${current.wind_speed_10m} km/h`;
+
+    } catch (error) {
+        console.error('Weather error:', error);
+
+        locationText.textContent =
+            `📍 Destination: ${destination}`;
+
+        temperatureText.textContent =
+            '⚠️ Weather information unavailable';
+
+        conditionText.textContent = '';
+        windText.textContent = '';
+    }
+}
+
+function getWeatherCondition(code) {
+    if (code === 0) return '☀️ Clear Sky';
+
+    if ([1, 2, 3].includes(code))
+        return '🌤️ Partly Cloudy';
+
+    if ([45, 48].includes(code))
+        return '🌫️ Foggy';
+
+    if ([51, 53, 55, 56, 57].includes(code))
+        return '🌦️ Drizzle';
+
+    if ([61, 63, 65, 66, 67].includes(code))
+        return '🌧️ Rain';
+
+    if ([71, 73, 75, 77].includes(code))
+        return '❄️ Snow';
+
+    if ([80, 81, 82].includes(code))
+        return '🌧️ Rain Showers';
+
+    if ([95, 96, 99].includes(code))
+        return '⛈️ Thunderstorm';
+
+    return '🌤️ Weather information available';
+}
+</script>
+</body>
+</html>

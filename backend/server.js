@@ -110,15 +110,26 @@ app.get("/api/routes", async (req, res) => {
     try {
         const { data, error } = await supabase
             .from("routes")
-            .select("*")
+            .select("id, created_at, source, destination, distance, duration, active")
             .eq("active", true)
-            .order("name");
-        
+            .order("source");
+
         if (error) {
             return res.status(500).json({ success: false, message: error.message });
         }
-        
-        res.json({ success: true, routes: data || [] });
+
+        const routes = (data || []).map(r => ({
+            id: r.id,
+            name: `${r.source} → ${r.destination}`,
+            origin: r.source,
+            destination: r.destination,
+            distance_km: r.distance,
+            duration: r.duration,
+            active: r.active,
+            created_at: r.created_at
+        }));
+
+        res.json({ success: true, routes });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }

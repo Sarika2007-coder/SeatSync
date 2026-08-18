@@ -139,6 +139,10 @@
       <div class="order-row"><span class="lbl">Route</span><span class="val" id="ordRoute">—</span></div>
       <div class="order-row"><span class="lbl">Date</span><span class="val" id="ordDate">—</span></div>
       <div class="order-row"><span class="lbl">Departure</span><span class="val" id="ordTime">—</span></div>
+      <div class="divider"></div>
+      <div class="order-row"><span class="lbl">Boarding</span><span class="val" id="ordBoarding">—</span></div>
+      <div class="order-row"><span class="lbl">Dropping</span><span class="val" id="ordDropping">—</span></div>
+      <div class="divider"></div>
       <div class="order-row">
         <span class="lbl">Seats</span>
         <div class="order-chips" id="ordChips"></div>
@@ -179,6 +183,14 @@ document.getElementById('ordTax').textContent   = '₹' + (booking.tax || 0);
 document.getElementById('ordTotal').textContent = '₹' + (booking.grandTotal || booking.totalAmount);
 document.getElementById('payBtnAmount').textContent = booking.grandTotal || booking.totalAmount;
 document.getElementById('ordChips').innerHTML   = seats.map(s => `<span class="order-chip">${s}</span>`).join('');
+
+// Populate boarding/dropping
+if (booking.boardingStop) {
+  document.getElementById('ordBoarding').textContent = booking.boardingStop.name + (booking.boardingStop.departureTime ? ' (' + booking.boardingStop.departureTime + ')' : '');
+}
+if (booking.droppingStop) {
+  document.getElementById('ordDropping').textContent = booking.droppingStop.name + (booking.droppingStop.arrivalTime ? ' (' + booking.droppingStop.arrivalTime + ')' : '');
+}
 
 // Tab switching
 let activeTab = 'card';
@@ -271,6 +283,8 @@ async function processPayment() {
     paymentMethod: activeTab,
     status:       'confirmed',
     bookedAt:     new Date().toISOString(),
+    boardingStop: booking.boardingStop || null,
+    droppingStop: booking.droppingStop || null,
   };
 
   try {
@@ -291,6 +305,8 @@ async function processPayment() {
     seats:  booking.selectedSeats.join(', '),
     total:  booking.grandTotal,
     status: 'confirmed',
+    boardingStop: booking.boardingStop ? booking.boardingStop.name : '—',
+    droppingStop: booking.droppingStop ? booking.droppingStop.name : '—',
   });
   localStorage.setItem('ss_my_bookings', JSON.stringify(myBookings));
 
