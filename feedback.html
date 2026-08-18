@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SeatSync - Feedback & Review</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #f4f8f4;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 20px;
+        }
+
+        .feedback-container {
+            width: 100%;
+            max-width: 600px;
+
+            background: white;
+            padding: 35px;
+
+            border-radius: 18px;
+
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1b5e20;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .rating-title {
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin: 15px 0 5px;
+        }
+
+        .star {
+            border: none;
+            background: transparent;
+
+            font-size: 48px;
+            color: #d0d0d0;
+
+            cursor: pointer;
+            padding: 0;
+
+            line-height: 1;
+
+            transition: 0.2s;
+        }
+
+        .star:hover {
+            transform: scale(1.15);
+        }
+
+        .star.selected {
+            color: #f5b301;
+        }
+
+        #ratingText {
+            text-align: center;
+
+            min-height: 25px;
+
+            color: #555;
+            font-weight: bold;
+
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+
+            color: #333;
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+        textarea {
+            width: 100%;
+
+            min-height: 140px;
+
+            padding: 14px;
+
+            border: 1px solid #ccc;
+            border-radius: 10px;
+
+            resize: vertical;
+
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #2e7d32;
+
+            box-shadow:
+                0 0 0 2px rgba(46, 125, 50, 0.1);
+        }
+
+        .counter {
+            text-align: right;
+
+            color: #777;
+
+            font-size: 13px;
+
+            margin-top: 5px;
+        }
+
+        #submitFeedback {
+            width: 100%;
+
+            margin-top: 22px;
+
+            padding: 14px;
+
+            border: none;
+            border-radius: 10px;
+
+            background: #2e7d32;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        #submitFeedback:hover {
+            background: #1b5e20;
+        }
+
+        #submitFeedback:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        #message {
+            text-align: center;
+
+            margin-top: 15px;
+
+            font-weight: bold;
+
+            min-height: 25px;
+        }
+
+        .back-button {
+            display: block;
+
+            text-align: center;
+
+            margin-top: 18px;
+
+            color: #2e7d32;
+
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 500px) {
+
+            .feedback-container {
+                padding: 25px 18px;
+            }
+
+            .star {
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="feedback-container">
+
+    <h1>Rate Your Journey</h1>
+
+    <p class="subtitle">
+        Your feedback helps us improve SeatSync.
+    </p>
+
+
+    <!-- =========================
+         RATING
+    ========================== -->
+
+    <div class="rating-title">
+        How was your journey?
+    </div>
+
+    <div class="stars">
+
+        <button
+            type="button"
+            class="star"
+            data-rating="1"
+            aria-label="1 star">
+            ★
+        </button>
+
+        <button
+            type="button"
+            class="star"
+            data-rating="2"
+            aria-label="2 stars">
+            ★
+        </button>
+
+        <button
+            type="button"
+            class="star"
+            data-rating="3"
+            aria-label="3 stars">
+            ★
+        </button>
+
+        <button
+            type="button"
+            class="star"
+            data-rating="4"
+            aria-label="4 stars">
+            ★
+        </button>
+
+        <button
+            type="button"
+            class="star"
+            data-rating="5"
+            aria-label="5 stars">
+            ★
+        </button>
+
+    </div>
+
+    <p id="ratingText">
+        Select a rating
+    </p>
+
+
+    <!-- =========================
+         COMMENT
+    ========================== -->
+
+    <label for="comment">
+        Your Feedback
+    </label>
+
+    <textarea
+        id="comment"
+        maxlength="500"
+        placeholder="Write your feedback here..."
+    ></textarea>
+
+    <div class="counter">
+        <span id="charCount">0</span>/500
+    </div>
+
+
+    <!-- =========================
+         SUBMIT
+    ========================== -->
+
+    <button
+        type="button"
+        id="submitFeedback">
+
+        Submit Feedback
+
+    </button>
+
+    <p id="message"></p>
+
+    <a
+        href="index.html"
+        class="back-button">
+
+        ← Back to SeatSync
+
+    </a>
+
+</div>
+
+
+<!-- ==========================================
+     YOUR EXISTING CONFIGURATION
+=========================================== -->
+
+<script src="/js/env-config.js"></script>
+
+
+<!-- ==========================================
+     YOUR EXISTING SUPABASE CLIENT
+     IMPORTANT: IT IS A MODULE
+=========================================== -->
+
+<script type="module">
+
+    import "/js/supabase-client.js";
+
+
+    /*
+    ==========================================
+    WAIT UNTIL EXISTING SUPABASE CLIENT
+    IS AVAILABLE
+    ==========================================
+    */
+
+    function waitForSupabase() {
+
+        return new Promise(function(resolve, reject) {
+
+            let attempts = 0;
+
+            const maxAttempts = 100;
+
+
+            const check = setInterval(function() {
+
+                attempts++;
+
+
+                if (
+                    window.supabase &&
+                    window.supabase.auth
+                ) {
+
+                    clearInterval(check);
+
+                    resolve(window.supabase);
+
+                    return;
+                }
+
+
+                if (attempts >= maxAttempts) {
+
+                    clearInterval(check);
+
+                    reject(
+                        new Error(
+                            "Supabase client could not be loaded."
+                        )
+                    );
+
+                }
+
+            }, 100);
+
+        });
+
+    }
+
+
+    /*
+    ==========================================
+    PAGE VARIABLES
+    ==========================================
+    */
+
+    let selectedRating = 0;
+
+    const stars =
+        document.querySelectorAll(".star");
+
+    const ratingText =
+        document.getElementById("ratingText");
+
+    const comment =
+        document.getElementById("comment");
+
+    const charCount =
+        document.getElementById("charCount");
+
+    const submitButton =
+        document.getElementById("submitFeedback");
+
+    const message =
+        document.getElementById("message");
+
+
+    const ratingNames = {
+
+        1: "Very Poor",
+
+        2: "Poor",
+
+        3: "Average",
+
+        4: "Good",
+
+        5: "Excellent"
+
+    };
+
+
+    /*
+    ==========================================
+    STAR RATING
+    ==========================================
+    */
+
+    stars.forEach(function(star) {
+
+        star.addEventListener("click", function() {
+
+            selectedRating =
+                Number(this.dataset.rating);
+
+
+            stars.forEach(function(item) {
+
+                const itemRating =
+                    Number(item.dataset.rating);
+
+
+                if (itemRating <= selectedRating) {
+
+                    item.classList.add("selected");
+
+                } else {
+
+                    item.classList.remove("selected");
+
+                }
+
+            });
+
+
+            ratingText.textContent =
+                selectedRating +
+                " / 5 - " +
+                ratingNames[selectedRating];
+
+
+            message.textContent = "";
+
+        });
+
+    });
+
+
+    /*
+    ==========================================
+    COMMENT CHARACTER COUNTER
+    ==========================================
+    */
+
+    comment.addEventListener(
+        "input",
+        function() {
+
+            charCount.textContent =
+                comment.value.length;
+
+        }
+    );
+
+
+    /*
+    ==========================================
+    SUBMIT FEEDBACK
+    ==========================================
+    */
+
+    submitButton.addEventListener(
+        "click",
+        async function() {
+
+            message.textContent = "";
+            message.style.color = "";
+
+
+            /*
+            CHECK RATING
+            */
+
+            if (selectedRating === 0) {
+
+                message.textContent =
+                    "Please select a rating from 1 to 5 stars.";
+
+                message.style.color = "red";
+
+                return;
+            }
+
+
+            /*
+            CHECK COMMENT
+            */
+
+            const commentText =
+                comment.value.trim();
+
+
+            if (commentText.length === 0) {
+
+                message.textContent =
+                    "Please write your feedback.";
+
+                message.style.color = "red";
+
+                comment.focus();
+
+                return;
+            }
+
+
+            /*
+            WAIT FOR SUPABASE
+            */
+
+            let supabase;
+
+
+            try {
+
+                supabase =
+                    await waitForSupabase();
+
+            } catch (error) {
+
+                console.error(error);
+
+                message.textContent =
+                    "Supabase connection failed.";
+
+                message.style.color = "red";
+
+                return;
+            }
+
+
+            /*
+            CHECK LOGGED-IN USER
+            */
+
+            const {
+                data: { user },
+                error: userError
+
+            } =
+                await supabase.auth.getUser();
+
+
+            if (userError) {
+
+                console.error(
+                    "Authentication error:",
+                    userError
+                );
+
+                message.textContent =
+                    "Unable to check login status.";
+
+                message.style.color = "red";
+
+                return;
+            }
+
+
+            if (!user) {
+
+                message.textContent =
+                    "Please login before submitting feedback.";
+
+                message.style.color = "red";
+
+                return;
+            }
+
+
+            /*
+            DISABLE BUTTON
+            */
+
+            submitButton.disabled = true;
+
+            submitButton.textContent =
+                "Submitting...";
+
+
+            /*
+            INSERT FEEDBACK
+            */
+
+            try {
+
+                const { error } =
+                    await supabase
+                    .from("feedback")
+                    .insert({
+
+                        rating: selectedRating,
+
+                        comment: commentText,
+
+                        user_id: user.id
+
+                    });
+
+
+                if (error) {
+
+                    console.error(
+                        "Supabase insert error:",
+                        error
+                    );
+
+                    message.textContent =
+                        "Unable to submit feedback: " +
+                        error.message;
+
+                    message.style.color = "red";
+
+                    return;
+                }
+
+
+                /*
+                SUCCESS
+                */
+
+                message.textContent =
+                    "✓ Thank you! Your feedback has been submitted successfully.";
+
+                message.style.color =
+                    "#2e7d32";
+                message.style.position = "fixed";
+                message.style.top = "50%";
+                message.style.left = "50%";
+                message.style.transform = "translate(-50%, -50%)";
+                message.style.background = "white";
+                message.style.padding = "25px";
+                message.style.borderRadius = "12px";
+                message.style.boxShadow = "0 5px 25px rgba(0,0,0,0.2)";
+                message.style.zIndex = "1000";
+                setTimeout(() => {
+                       window.location.href = "index.html";
+                }, 2000);
+            
+
+
+                /*
+                RESET RATING
+                */
+
+                selectedRating = 0;
+
+
+                stars.forEach(function(star) {
+
+                    star.classList.remove("selected");
+
+                });
+
+
+                ratingText.textContent =
+                    "Select a rating";
+
+
+                /*
+                RESET COMMENT
+                */
+
+                comment.value = "";
+
+                charCount.textContent = "0";
+
+
+            } catch (error) {
+
+                console.error(
+                    "Feedback submission failed:",
+                    error
+                );
+
+                message.textContent =
+                    "Unable to submit feedback. Please try again.";
+
+                message.style.color = "red";
+
+            } finally {
+
+                submitButton.disabled = false;
+
+                submitButton.textContent =
+                    "Submit Feedback";
+
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+</html>

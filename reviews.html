@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SeatSync - Reviews</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f8f4;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1b5e20;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .review {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .stars {
+            color: #f5b301;
+            font-size: 22px;
+        }
+
+        .comment {
+            margin-top: 10px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .date {
+            margin-top: 10px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        #message {
+            text-align: center;
+            color: #666;
+            margin-top: 30px;
+        }
+
+        .back-button {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Passenger Reviews</h1>
+
+    <p class="subtitle">
+        See what other passengers say about their SeatSync journey.
+    </p>
+
+    <div id="reviews"></div>
+
+    <p id="message">Loading reviews...</p>
+
+    <a href="index.html" class="back-button">
+        ← Back to SeatSync
+    </a>
+
+</div>
+
+<script src="/js/env-config.js"></script>
+
+<script type="module">
+
+    import "/js/supabase-client.js";
+
+
+    function waitForSupabase() {
+
+        return new Promise(function(resolve, reject) {
+
+            let attempts = 0;
+
+            const check = setInterval(function() {
+
+                attempts++;
+
+                if (
+                    window.supabase &&
+                    window.supabase.auth
+                ) {
+
+                    clearInterval(check);
+
+                    resolve(window.supabase);
+
+                    return;
+                }
+
+                if (attempts >= 100) {
+
+                    clearInterval(check);
+
+                    reject(
+                        new Error(
+                            "Supabase client could not be loaded."
+                        )
+                    );
+                }
+
+            }, 100);
+
+        });
+
+    }
+
+
+    async function loadReviews() {
+
+        const reviewsContainer =
+            document.getElementById("reviews");
+
+        const message =
+            document.getElementById("message");
+
+
+        try {
+
+            const supabase =
+                await waitForSupabase();
+
+
+            const { data, error } =
+                await supabase
+                .from("feedback")
+                .select("rating, comment, created_at")
+                .order("created_at", {
+                    ascending: false
+                });
+
+
+            if (error) {
+
+                console.error(error);
+
+                message.textContent =
+                    "Unable to load reviews.";
+
+                return;
+            }
+
+
+            if (!data || data.length === 0) {
+
+                message.textContent =
+                    "No reviews yet.";
+
+                return;
+            }
+
+
+            message.textContent = "";
+
+
+            data.forEach(function(review) {
+
+                const reviewBox =
+                    document.createElement("div");
+
+                reviewBox.className = "review";
+
+
+                const stars =
+                    "★".repeat(review.rating) +
+                    "☆".repeat(5 - review.rating);
+
+
+                const comment =
+                    document.createElement("div");
+
+                comment.className = "comment";
+
+                comment.textContent =
+                    review.comment;
+
+
+                const starElement =
+                    document.createElement("div");
+
+                starElement.className = "stars";
+
+                starElement.textContent =
+                    stars;
+
+
+                const date =
+                    document.createElement("div");
+
+                date.className = "date";
+
+                if (review.created_at) {
+
+                    date.textContent =
+                        new Date(
+                            review.created_at
+                        ).toLocaleDateString();
+                }
+
+
+                reviewBox.appendChild(
+                    starElement
+                );
+
+                reviewBox.appendChild(
+                    comment
+                );
+
+                reviewBox.appendChild(
+                    date
+                );
+
+
+                reviewsContainer.appendChild(
+                    reviewBox
+                );
+
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            message.textContent =
+                "Unable to connect to Supabase.";
+
+        }
+
+    }
+
+
+    loadReviews();
+
+</script>
+
+</body>
+</html>
