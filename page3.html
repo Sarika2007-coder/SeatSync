@@ -73,7 +73,7 @@
         <span class="val" id="sumTotal">₹0</span>
       </div>
       <button class="btn-full" style="margin-top:20px;" id="continueBtn" onclick="proceed()" disabled>
-        Continue to Passenger Details →
+        Select Stops →
       </button>
     </div>
 
@@ -183,9 +183,9 @@ function updateSummary() {
 
 function proceed() {
   if (!selected.size) { alert('Please select at least one seat'); return; }
-  const booking = { ...bus, selectedSeats: Array.from(selected), totalAmount: selected.size * bus.price };
+  const booking = { ...bus, selectedSeats: Array.from(selected), totalAmount: selected.size * bus.price, tax: selected.size * bus.price * 0.05, grandTotal: (selected.size * bus.price) + (selected.size * bus.price * 0.05) };
   sessionStorage.setItem('ss_booking', JSON.stringify(booking));
-  window.location.href = 'page4.html';
+  window.location.href = 'page3-stops.html';
 }
 
 // Fetch real booked seats from Supabase, then render grid

@@ -30,6 +30,44 @@
 </div>
 
 <div class="content-wrap">
+  <!-- JOURNEY SELECTOR (NEW - Phase 2) -->
+  <div class="journey-selector-card">
+    <h2>Your Journey</h2>
+    <p class="sub">Select your boarding and dropping points</p>
+    
+    <div id="journeyMsg" class="auth-message" style="display:none;"></div>
+    
+    <div class="three-col">
+      <!-- Route Selection -->
+      <div class="form-group">
+        <label>Bus Route</label>
+        <select id="journeyRoute" class="form-control" onchange="onRouteSelected()">
+          <option value="">— Select Route —</option>
+        </select>
+      </div>
+      
+      <!-- Boarding Point Selection -->
+      <div class="form-group">
+        <label>Boarding Point</label>
+        <select id="journeyBoarding" class="form-control" onchange="onBoardingSelected()" disabled>
+          <option value="">— Select Boarding —</option>
+        </select>
+      </div>
+      
+      <!-- Dropping Point Selection -->
+      <div class="form-group">
+        <label>Dropping Point</label>
+        <select id="journeyDropping" class="form-control" onchange="onDroppingSelected()" disabled>
+          <option value="">— Select Dropping —</option>
+        </select>
+      </div>
+    </div>
+    
+    <button class="btn-full" id="searchButton" onclick="searchBuses()" disabled style="max-width:200px;">
+      Search Buses →
+    </button>
+  </div>
+
   <!-- Filter bar -->
   <div class="filter-bar">
     <div class="form-group">
@@ -220,7 +258,9 @@ function selectBus(busId, route, date, passengers) {
   const buses = Object.values(BUS_DATA).flat();
   const bus   = buses.find(b => b.id === busId);
   if (!bus) return;
-  sessionStorage.setItem('ss_selected_bus', JSON.stringify({ ...bus, route, date, passengers }));
+  // Generate a schedule ID from route and bus id
+  const scheduleId = btoa(`${route}-${busId}-${date}`);
+  sessionStorage.setItem('ss_selected_bus', JSON.stringify({ ...bus, route, date, passengers, scheduleId }));
   window.location.href = 'page3.html';
 }
 

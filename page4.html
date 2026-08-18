@@ -22,9 +22,11 @@
   <div class="step-sep"></div>
   <div class="step done"><div class="step-num">✓</div><span class="step-label">Choose Seats</span></div>
   <div class="step-sep"></div>
-  <div class="step active"><div class="step-num">4</div><span class="step-label">Passenger Details</span></div>
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Select Stops</span></div>
   <div class="step-sep"></div>
-  <div class="step"><div class="step-num">5</div><span class="step-label">Payment</span></div>
+  <div class="step active"><div class="step-num">5</div><span class="step-label">Passenger Details</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">6</div><span class="step-label">Payment</span></div>
 </div>
 
 <div class="content-wrap">
@@ -66,6 +68,9 @@
       <div class="summary-row"><span class="lbl">Date</span><span class="val" id="sumDate">—</span></div>
       <div class="summary-row"><span class="lbl">Departure</span><span class="val" id="sumTime">—</span></div>
       <div class="divider"></div>
+      <div class="summary-row"><span class="lbl">Boarding Point</span><span class="val" id="sumBoarding">—</span></div>
+      <div class="summary-row"><span class="lbl">Dropping Point</span><span class="val" id="sumDropping">—</span></div>
+      <div class="divider"></div>
       <div class="summary-row"><span class="lbl">Seats</span></div>
       <div class="seat-chips" id="seatChips"></div>
       <div class="divider"></div>
@@ -95,6 +100,8 @@ document.getElementById('sumBus').textContent    = booking.name;
 document.getElementById('sumRoute').textContent  = routeLabel(booking.route);
 document.getElementById('sumDate').textContent   = booking.date || '—';
 document.getElementById('sumTime').textContent   = booking.time;
+document.getElementById('sumBoarding').textContent = booking.boardingStop ? `${booking.boardingStop.name} (${booking.boardingStop.departureTime})` : '—';
+document.getElementById('sumDropping').textContent = booking.droppingStop ? `${booking.droppingStop.name} (${booking.droppingStop.arrivalTime})` : '—';
 
 const seats   = booking.selectedSeats || [];
 const sub     = booking.totalAmount;

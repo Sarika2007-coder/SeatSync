@@ -103,6 +103,46 @@ app.delete("/bus/:id", async (req, res) => {
     res.json({ success: true, message: "Bus removed." });
 });
 
+// ── Routes & Stops (NEW) ──────────────────────────────────────
+
+// Get all active routes
+app.get("/api/routes", async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from("routes")
+            .select("*")
+            .eq("active", true)
+            .order("name");
+        
+        if (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+        
+        res.json({ success: true, routes: data || [] });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Get all stops for a specific route (ordered by sequence)
+app.get("/api/routes/:id/stops", async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from("stops")
+            .select("*")
+            .eq("route_id", req.params.id)
+            .order("sequence");
+        
+        if (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+        
+        res.json({ success: true, stops: data || [] });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 // ── Seat availability ─────────────────────────────────────────
 
 app.get("/seats/booked", async (req, res) => {
@@ -179,6 +219,209 @@ app.get("/bookings", async (req, res) => {
         bookedAt:      r.booked_at,
     }));
     res.json({ success: true, bookings });
+});
+
+// ── SEGMENT-BASED BOOKING (Intermediate Stops) ────────────────
+
+// Get available segments for a bus schedule
+app.get("/api/segments/:scheduleId", async (req, res) => {
+    try {
+        const { scheduleId } = req.params;
+        
+        const { data: schedule, error: schedError } = await supabase
+            .from("bus_schedules")
+            .select("route_id")
+            .eq("id", scheduleId)
+            .single();
+        
+        if (schedError) return res.status(500).json({ success: false, message: schedError.message });
+        if (!schedule) return res.status(404).json({ success: false, message: "Schedule not found" });
+        
+        // Get all stops for this route, ordered by sequence
+        const { data: stops, error: stopsError } = await supabase
+            .from("stops")
+            .select("id, name, sequence, arrival_time, departure_time")
+            .eq("route_id", schedule.route_id)
+            .order("sequence");
+        
+        if (stopsError) return res.status(500).json({ success: false, message: stopsError.message });
+        
+        res.json({ success: true, stops: stops || [] });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Get segment-aware seat availability
+app.get("/api/seats/segment-availability", async (req, res) => {
+    try {
+        const { scheduleId, boardingStopSeq, droppingStopSeq } = req.query;
+        
+        if (!scheduleId || boardingStopSeq === undefined || droppingStopSeq === undefined) {
+            return res.status(400).json({ success: false, message: "scheduleId, boardingStopSeq, and droppingStopSeq required" });
+        }
+        
+        // Get the bus_id from the schedule
+        const { data: schedule, error: schedError } = await supabase
+            .from("bus_schedules")
+            .select("bus_id, available_seats")
+            .eq("id", scheduleId)
+            .single();
+        
+        if (schedError) return res.status(500).json({ success: false, message: schedError.message });
+        if (!schedule) return res.status(404).json({ success: false, message: "Schedule not found" });
+        
+        const busId = schedule.bus_id;
+        const boarding = parseInt(boardingStopSeq);
+        const dropping = parseInt(droppingStopSeq);
+        
+        // Get all seats for this bus
+        const { data: allSeats, error: seatsError } = await supabase
+            .from("bus_seats")
+            .select("id, seat_number, row, column")
+            .eq("bus_id", busId);
+        
+        if (seatsError) return res.status(500).json({ success: false, message: seatsError.message });
+        
+        // Get bookings that overlap with the requested segment
+        const { data: bookings, error: bookingsError } = await supabase
+            .from("bookings_v2")
+            .select("seat_id, boarding_sequence, dropping_sequence")
+            .eq("schedule_id", scheduleId);
+        
+        if (bookingsError) return res.status(500).json({ success: false, message: bookingsError.message });
+        
+        // Determine which seats are available for this segment
+        const bookedSeatIds = new Set();
+        (bookings || []).forEach(booking => {
+            // A seat is booked for this segment if:
+            // The booking starts before or at our dropping point AND ends at or after our boarding point
+            if (booking.boarding_sequence <= dropping && booking.dropping_sequence >= boarding) {
+                bookedSeatIds.add(booking.seat_id);
+            }
+        });
+        
+        const availableSeats = (allSeats || []).filter(seat => !bookedSeatIds.has(seat.id));
+        
+        res.json({ 
+            success: true, 
+            availableSeats,
+            bookedCount: bookedSeatIds.size,
+            totalSeats: allSeats.length
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Book a seat with intermediate stops
+app.post("/api/bookings/segment", async (req, res) => {
+    try {
+        const {
+            userId,
+            scheduleId,
+            busId,
+            seatId,
+            seatNumber,
+            boardingStopId,
+            boardingStopName,
+            boardingStopSeq,
+            droppingStopId,
+            droppingStopName,
+            droppingStopSeq,
+            passengerName,
+            passengerPhone,
+            passengerAge,
+            passengerGender,
+            amount,
+            tax,
+            grandTotal,
+            paymentMethod,
+            contactEmail,
+            contactPhone
+        } = req.body;
+        
+        // Validation
+        if (!scheduleId || !busId || !seatId || !boardingStopId || !droppingStopId) {
+            return res.status(400).json({ success: false, message: "Missing required fields" });
+        }
+        
+        if (boardingStopSeq >= droppingStopSeq) {
+            return res.status(400).json({ success: false, message: "Dropping stop must be after boarding stop" });
+        }
+        
+        // Create booking
+        const { data: booking, error } = await supabase
+            .from("bookings_v2")
+            .insert([{
+                user_id: userId,
+                bus_id: busId,
+                schedule_id: scheduleId,
+                seat_id: seatId,
+                seat_number: seatNumber,
+                boarding_stop_id: boardingStopId,
+                boarding_stop: boardingStopName,
+                boarding_sequence: boardingStopSeq,
+                dropping_stop_id: droppingStopId,
+                dropping_stop: droppingStopName,
+                dropping_sequence: droppingStopSeq,
+                passenger_name: passengerName,
+                passenger_phone: passengerPhone,
+                passenger_age: passengerAge,
+                passenger_gender: passengerGender,
+                amount,
+                tax,
+                grand_total: grandTotal,
+                payment_method: paymentMethod,
+                contact_email: contactEmail,
+                contact_phone: contactPhone,
+                booking_status: "confirmed",
+                payment_status: "completed"
+            }])
+            .select()
+            .single();
+        
+        if (error) return res.status(500).json({ success: false, message: error.message });
+        
+        res.json({ 
+            success: true, 
+            message: "Booking confirmed!",
+            booking
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Update exit stop (mark passenger as alighting at an intermediate stop)
+app.patch("/api/bookings/:bookingId/exit-stop", async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+        const { exitStopId, exitStopName, exitStopSeq } = req.body;
+        
+        if (!exitStopId) {
+            return res.status(400).json({ success: false, message: "exitStopId required" });
+        }
+        
+        // Update the dropping stop to the intermediate exit stop
+        const { error } = await supabase
+            .from("bookings_v2")
+            .update({
+                dropping_stop_id: exitStopId,
+                dropping_stop: exitStopName,
+                dropping_sequence: exitStopSeq
+            })
+            .eq("id", bookingId);
+        
+        if (error) return res.status(500).json({ success: false, message: error.message });
+        
+        res.json({ 
+            success: true, 
+            message: "Exit stop updated. Seat availability updated for other passengers." 
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
 });
 
 const PORT = process.env.PORT || 3000;

@@ -186,6 +186,19 @@ select.form-control {
 }
 .role-btn:hover { background: var(--accent-h); }
 
+/* ── Journey Selector (Phase 2) ──────────────────────────────── */
+.journey-selector-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.journey-selector-card h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; color: #fff; }
+.journey-selector-card .sub { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+@media (max-width: 1024px) { .three-col { grid-template-columns: 1fr; } }
+
 /* ── Features ───────────────────────────────────────────────── */
 .features { background: var(--primary); padding: 80px 8%; text-align: center; color: #fff; }
 .features h2 { font-size: 34px; font-weight: 800; margin-bottom: 12px; }

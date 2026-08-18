@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Stops – SeatSync</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="logo" href="user-dashboard.html">🚌 Seat<span>Sync</span></a>
+  <ul class="nav-links">
+    <li><a href="page3.html">← Back to Seats</a></li>
+  </ul>
+</nav>
+
+<div class="steps-bar">
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Search</span></div>
+  <div class="step-sep"></div>
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Select Bus</span></div>
+  <div class="step-sep"></div>
+  <div class="step done"><div class="step-num">✓</div><span class="step-label">Choose Seats</span></div>
+  <div class="step-sep"></div>
+  <div class="step active"><div class="step-num">4</div><span class="step-label">Select Stops</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">5</div><span class="step-label">Passenger Details</span></div>
+  <div class="step-sep"></div>
+  <div class="step"><div class="step-num">6</div><span class="step-label">Payment</span></div>
+</div>
+
+<div class="content-wrap">
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start;" id="mainGrid">
+
+    <!-- Stop selection -->
+    <div>
+      <div class="card">
+        <h2>🚏 Select Your Stops</h2>
+        <p class="sub">Choose where you board and drop off the bus</p>
+        
+        <div id="stopsContainer" style="margin-top: 20px;">
+          <div class="loading-spinner" style="margin: 30px auto;"></div>
+          <p style="text-align: center; color: #999;">Loading stops...</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <button class="btn-full" id="continueBtn" onclick="proceedToPassengerDetails()" style="display: none;">
+          Continue to Passenger Details →
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="card summary-card">
+      <h3>Trip Summary</h3>
+      <div class="summary-row"><span class="lbl">Bus</span><span class="val" id="sumBus">—</span></div>
+      <div class="summary-row"><span class="lbl">Route</span><span class="val" id="sumRoute">—</span></div>
+      <div class="summary-row"><span class="lbl">Date</span><span class="val" id="sumDate">—</span></div>
+      <div class="summary-row"><span class="lbl">Departure</span><span class="val" id="sumTime">—</span></div>
+      <div class="divider"></div>
+      <div class="summary-row"><span class="lbl">Seats</span></div>
+      <div class="seat-chips" id="seatChips"></div>
+      <div class="divider"></div>
+      <div class="summary-row"><span class="lbl">Boarding</span><span class="val" id="sumBoarding">—</span></div>
+      <div class="summary-row"><span class="lbl">Dropping</span><span class="val" id="sumDropping">—</span></div>
+      <div class="divider"></div>
+      <div class="summary-row"><span class="lbl">Subtotal</span><span class="val" id="sumSubtotal">₹0</span></div>
+      <div class="summary-row"><span class="lbl">Taxes (5%)</span><span class="val" id="sumTax">₹0</span></div>
+      <div class="summary-total">
+        <span>Grand Total</span>
+        <span class="val" id="sumTotal">₹0</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer><strong>SeatSync</strong> &copy; 2024</footer>
+
+<style>
+.stop-selector-group {
+  margin-bottom: 20px;
+}
+
+.stop-selector {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 2px solid #e0e0e0;
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.stop-selector:hover {
+  border-color: #ff6b6b;
+}
+
+.stop-selector:focus {
+  outline: none;
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+
+.stop-info {
+  background: #f5f5f5;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #666;
+  margin-top: 8px;
+}
+
+.stop-time {
+  font-weight: bold;
+  color: #333;
+}
+</style>
+
+<script src="js/segment-booking.js"></script>
+<script>
+const booking = JSON.parse(sessionStorage.getItem('ss_booking') || 'null');
+if (!booking) { window.location.href = 'user-dashboard.html'; }
+
+// Mock stops data by route
+const MOCK_STOPS = {
+  'bangalore-chikmagalur': [
+    { id: 'stop-1', name: 'Bengaluru', sequence: 1, arrival_time: '10:00 AM', departure_time: '10:00 AM' },
+    { id: 'stop-2', name: 'Nelamangala', sequence: 2, arrival_time: '10:40 AM', departure_time: '10:45 AM' },
+    { id: 'stop-3', name: 'Chikballapur', sequence: 3, arrival_time: '11:25 AM', departure_time: '11:30 AM' },
+    { id: 'stop-4', name: 'Kanakapura', sequence: 4, arrival_time: '12:30 PM', departure_time: '12:35 PM' },
+    { id: 'stop-5', name: 'Chikmagalur', sequence: 5, arrival_time: '2:30 PM', departure_time: '2:30 PM' }
+  ],
+  'bangalore-tumkur': [
+    { id: 'stop-1', name: 'Bengaluru', sequence: 1, arrival_time: '6:30 AM', departure_time: '6:30 AM' },
+    { id: 'stop-2', name: 'Kanakapura', sequence: 2, arrival_time: '7:10 AM', departure_time: '7:15 AM' },
+    { id: 'stop-3', name: 'Tumkur', sequence: 3, arrival_time: '8:00 AM', departure_time: '8:00 AM' }
+  ],
+  'bangalore-hassan': [
+    { id: 'stop-1', name: 'Bengaluru', sequence: 1, arrival_time: '7:30 AM', departure_time: '7:30 AM' },
+    { id: 'stop-2', name: 'Kanakapura', sequence: 2, arrival_time: '8:20 AM', departure_time: '8:25 AM' },
+    { id: 'stop-3', name: 'Channarayapatna', sequence: 3, arrival_time: '9:15 AM', departure_time: '9:20 AM' },
+    { id: 'stop-4', name: 'Hassan', sequence: 4, arrival_time: '10:30 AM', departure_time: '10:30 AM' }
+  ],
+  'bangalore-mandya': [
+    { id: 'stop-1', name: 'Bengaluru', sequence: 1, arrival_time: '8:00 AM', departure_time: '8:00 AM' },
+    { id: 'stop-2', name: 'Ramanagara', sequence: 2, arrival_time: '8:45 AM', departure_time: '8:50 AM' },
+    { id: 'stop-3', name: 'Channapatna', sequence: 3, arrival_time: '9:15 AM', departure_time: '9:20 AM' },
+    { id: 'stop-4', name: 'Maddur', sequence: 4, arrival_time: '9:45 AM', departure_time: '9:50 AM' },
+    { id: 'stop-5', name: 'Mandya', sequence: 5, arrival_time: '10:15 AM', departure_time: '10:15 AM' }
+  ],
+  'bangalore-mysore': [
+    { id: 'stop-1', name: 'Bengaluru', sequence: 1, arrival_time: '10:00 AM', departure_time: '10:00 AM' },
+    { id: 'stop-2', name: 'Ramanagara', sequence: 2, arrival_time: '10:45 AM', departure_time: '10:50 AM' },
+    { id: 'stop-3', name: 'Channapatna', sequence: 3, arrival_time: '11:15 AM', departure_time: '11:20 AM' },
+    { id: 'stop-4', name: 'Maddur', sequence: 4, arrival_time: '11:45 AM', departure_time: '11:50 AM' },
+    { id: 'stop-5', name: 'Mandya', sequence: 5, arrival_time: '12:15 PM', departure_time: '12:20 PM' },
+    { id: 'stop-6', name: 'Mysuru', sequence: 6, arrival_time: '1:00 PM', departure_time: '1:00 PM' }
+  ]
+};
+
+async function initializeStops() {
+  // Get schedule ID from booking
+  const scheduleId = booking.scheduleId;
+  const route = booking.route || '';
+  
+  if (!scheduleId) {
+    alert('Error: Missing schedule information');
+    window.location.href = 'page3.html';
+    return;
+  }
+
+  // Load mock stops based on route
+  const stops = MOCK_STOPS[route] || [];
+  
+  if (stops.length === 0) {
+    alert('Error: No stops found for this route');
+    window.location.href = 'page3.html';
+    return;
+  }
+
+  // Manually set stops in segmentBooking
+  segmentBooking.stops = stops;
+  segmentBooking.scheduleId = scheduleId;
+
+  // Display stop selectors
+  displayStops();
+  populateSummary();
+}
+
+function displayStops() {
+  const container = document.getElementById('stopsContainer');
+  container.innerHTML = '';
+
+  // Create selectors
+  const { boardingSelect, droppingSelect } = segmentBooking.displayStopSelection('stopsContainer');
+  
+  // Show continue button
+  document.getElementById('continueBtn').style.display = 'block';
+
+  // Auto-update summary when selections change
+  boardingSelect.addEventListener('change', updateSummary);
+  droppingSelect.addEventListener('change', updateSummary);
+}
+
+function updateSummary() {
+  const selected = segmentBooking.getSelectedStops();
+  const boarding = selected.boarding;
+  const dropping = selected.dropping;
+
+  if (boarding) {
+    document.getElementById('sumBoarding').textContent = `${boarding.name} (${boarding.departureTime || '—'})`;
+  }
+  if (dropping) {
+    document.getElementById('sumDropping').textContent = `${dropping.name} (${dropping.arrivalTime || '—'})`;
+  }
+}
+
+function populateSummary() {
+  const seats = booking.selectedSeats || [];
+  const route = booking.route || '';
+
+  document.getElementById('sumBus').textContent = booking.name;
+  document.getElementById('sumRoute').textContent = route
+    .replace('-', ' → ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+  document.getElementById('sumDate').textContent = booking.date || '—';
+  document.getElementById('sumTime').textContent = booking.time;
+  document.getElementById('sumSubtotal').textContent = '₹' + booking.totalAmount;
+  document.getElementById('sumTax').textContent = '₹' + (booking.tax || 0);
+  document.getElementById('sumTotal').textContent = '₹' + (booking.grandTotal || booking.totalAmount);
+  
+  const seatChipsHtml = seats.map(s => `<span class="seat-chip">${s}</span>`).join('');
+  document.getElementById('seatChips').innerHTML = seatChipsHtml;
+
+  // Initialize boarding and dropping as "—"
+  document.getElementById('sumBoarding').textContent = '—';
+  document.getElementById('sumDropping').textContent = '—';
+}
+
+function proceedToPassengerDetails() {
+  // Validate stops selection
+  if (!segmentBooking.validateSegment()) {
+    return;
+  }
+
+  // Store selected stops in booking session
+  const selected = segmentBooking.getSelectedStops();
+  booking.boardingStop = selected.boarding;
+  booking.droppingStop = selected.dropping;
+  booking.scheduleId = segmentBooking.scheduleId;
+
+  sessionStorage.setItem('ss_booking', JSON.stringify(booking));
+
+  // Proceed to passenger details
+  window.location.href = 'page4.html';
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', initializeStops);
+</script>
+
+</body>
+</html>
