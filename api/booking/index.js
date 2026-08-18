@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
     const { error } = await supabase.from('bookings').insert([
       {
         ref: b.ref,
-        user_email: b.contactEmail,
+        user_email: b.userEmail || b.contactEmail,
         route: b.route,
         bus_name: b.busName,
         bus_type: b.busType,

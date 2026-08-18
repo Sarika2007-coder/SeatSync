@@ -127,7 +127,7 @@ app.post("/booking", async (req, res) => {
     const b = req.body;
     const { error } = await supabase.from("bookings").insert([{
         ref:            b.ref,
-        user_email:     b.contactEmail,
+        user_email:     b.userEmail || b.contactEmail,
         route:          b.route,
         bus_name:       b.busName,
         bus_type:       b.busType,
@@ -179,6 +179,130 @@ app.get("/bookings", async (req, res) => {
         bookedAt:      r.booked_at,
     }));
     res.json({ success: true, bookings });
+});
+
+// ── /api/* aliases (so frontend /api/booking etc. work on localhost) ──
+app.post("/api/auth/admin-login", (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password)
+        return res.status(400).json({ success: false, message: "Username and password required." });
+    if (username === ADMIN_USERNAME && hashPassword(password) === ADMIN_PW_HASH)
+        return res.json({ success: true });
+    res.status(401).json({ success: false, message: "Invalid admin credentials." });
+});
+
+app.post("/api/booking", async (req, res) => {
+    const b = req.body;
+    const { error } = await supabase.from("bookings").insert([{
+        ref:            b.ref,
+        user_email:     b.userEmail || b.contactEmail,
+        route:          b.route,
+        bus_name:       b.busName,
+        bus_type:       b.busType,
+        date:           b.date,
+        time:           b.time,
+        seats:          b.seats,
+        passengers:     b.passengers,
+        contact_email:  b.contactEmail,
+        contact_phone:  b.contactPhone,
+        total_amount:   b.totalAmount,
+        tax:            b.tax,
+        grand_total:    b.grandTotal,
+        payment_method: b.paymentMethod,
+        status:         b.status || "confirmed",
+        booked_at:      b.bookedAt || new Date().toISOString(),
+    }]);
+    if (error) { console.error("Insert error:", error.message); return res.status(500).json({ success: false, message: error.message }); }
+    console.log("Booking saved:", b.ref);
+    res.json({ success: true, message: "Booking saved successfully!" });
+});
+
+app.post("/api/booking/cancel", async (req, res) => {
+    const { ref } = req.body;
+    if (!ref) return res.status(400).json({ success: false, message: "ref required." });
+    const { error } = await supabase.from("bookings").update({ status: "cancelled" }).eq("ref", ref);
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    res.json({ success: true, message: "Booking cancelled." });
+});
+
+app.get("/api/bookings", async (req, res) => {
+    const { data, error } = await supabase.from("bookings").select("*").order("booked_at", { ascending: false });
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    const bookings = (data || []).map(r => ({
+        ref:           r.ref,
+        route:         r.route,
+        busName:       r.bus_name,
+        busType:       r.bus_type,
+        date:          r.date,
+        time:          r.time,
+        seats:         r.seats,
+        passengers:    r.passengers,
+        contactEmail:  r.contact_email,
+        contactPhone:  r.contact_phone,
+        totalAmount:   r.total_amount,
+        tax:           r.tax,
+        grandTotal:    r.grand_total,
+        paymentMethod: r.payment_method,
+        status:        r.status,
+        bookedAt:      r.booked_at,
+    }));
+    res.json({ success: true, bookings });
+});
+
+// ── /api/* bus aliases ──
+app.post("/api/bus", async (req, res) => {
+    const { route, name, type, time, duration, seats, price, rating } = req.body;
+    if (!route || !name || !type || !time || !price)
+        return res.status(400).json({ success: false, message: "route, name, type, time and price are required." });
+    const { data, error } = await supabase.from("buses").insert([{
+        route, name, type, time,
+        duration: duration || "—",
+        seats:    parseInt(seats)  || 40,
+        price:    parseFloat(price),
+        rating:   parseFloat(rating) || 4.0,
+        active:   true,
+    }]).select().single();
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    console.log("Bus added:", name, "on", route);
+    res.json({ success: true, bus: data });
+});
+
+app.get("/api/buses", async (req, res) => {
+    const { data, error } = await supabase
+        .from("buses").select("*")
+        .order("route").order("time");
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    res.json({ success: true, buses: data || [] });
+});
+
+app.get("/api/buses/:route", async (req, res) => {
+    const { data, error } = await supabase
+        .from("buses").select("*")
+        .eq("route", req.params.route)
+        .eq("active", true)
+        .order("time");
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    res.json({ success: true, buses: data || [] });
+});
+
+app.delete("/api/bus/:id", async (req, res) => {
+    const { error } = await supabase.from("buses")
+        .update({ active: false }).eq("id", req.params.id);
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    res.json({ success: true, message: "Bus removed." });
+});
+
+app.get("/api/seats/booked", async (req, res) => {
+    const { busId, date } = req.query;
+    if (!busId || !date)
+        return res.status(400).json({ success: false, message: "busId and date required." });
+    const { data, error } = await supabase.from("bookings").select("seats")
+        .eq("bus_name", busId).eq("date", date).neq("status", "cancelled");
+    if (error) return res.status(500).json({ success: false, message: error.message });
+    const booked = (data || [])
+        .flatMap(r => (r.seats || "").split(",").map(s => s.trim()))
+        .filter(Boolean);
+    res.json({ success: true, booked });
 });
 
 const PORT = process.env.PORT || 3000;

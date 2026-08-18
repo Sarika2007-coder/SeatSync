@@ -1,265 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard – SeatSync</title>
-  <link rel="stylesheet" href="css/style.css">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>User Dashboard - SeatSync</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
 </head>
+
 <body>
 
-<nav class="navbar">
-  <div class="logo">🚌 Seat<span>Sync</span></div>
-  <ul class="nav-links">
-    <li><a href="user-dashboard.html">Dashboard</a></li>
-    <li><a href="page2.html">Find Buses</a></li>
-  </ul>
-  <div style="display:flex;align-items:center;gap:12px;">
-    <div class="user-badge">
-      <div class="avatar" id="userAvatar">U</div>
-      <span id="userEmailDisplay">User</span>
-    </div>
-    <button class="btn-logout" onclick="logout()">Sign Out</button>
-  </div>
-</nav>
+    <header>
 
-<div class="content-wrap">
-  <!-- Header -->
-  <div class="dash-header">
-    <div>
-      <h1>Good day, <span id="userName">Traveller</span> 👋</h1>
-      <p class="sub">Ready for your next journey?</p>
-    </div>
-  </div>
+        <h1>SeatSync</h1>
 
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-icon">🎟️</div>
-      <div class="stat-val" id="statBookings">0</div>
-      <div class="stat-label">My Bookings</div>
-    </div>
-    <div class="stat-card" style="border-left-color:var(--success)">
-      <div class="stat-icon">✅</div>
-      <div class="stat-val" id="statConfirmed" style="color:var(--success)">0</div>
-      <div class="stat-label">Confirmed</div>
-    </div>
-    <div class="stat-card" style="border-left-color:var(--warning)">
-      <div class="stat-icon">🚌</div>
-      <div class="stat-val" style="color:var(--warning)">5</div>
-      <div class="stat-label">Routes Available</div>
-    </div>
-    <div class="stat-card" style="border-left-color:var(--sky)">
-      <div class="stat-icon">💳</div>
-      <div class="stat-val" style="color:var(--sky)">3</div>
-      <div class="stat-label">Payment Methods</div>
-    </div>
-  </div>
+        <p>User Dashboard</p>
 
-  <!-- Main grid: search + recent bookings -->
-  <div class="dash-grid">
+    </header>
 
-    <!-- Search card -->
-    <div class="card">
-      <h2>Book a Bus Ticket</h2>
-      <p class="sub">Select your route and travel details</p>
 
-      <div class="form-group">
-        <label>Bus Route</label>
-        <select id="routeSelect" class="form-control">
-          <option value="">— Select Route —</option>
-          <option value="bangalore-chikmagalur">Bangalore → Chikmagalur</option>
-          <option value="bangalore-tumkur">Bangalore → Tumkur</option>
-          <option value="bangalore-hassan">Bangalore → Hassan</option>
-          <option value="bangalore-mandya">Bangalore → Mandya</option>
-          <option value="bangalore-mysore">Bangalore → Mysore</option>
-        </select>
-      </div>
+    <main class="dashboard">
 
-      <div class="form-group">
-        <label>Travel Date</label>
-        <input type="date" id="travelDate" class="form-control">
-      </div>
+        <h2>Welcome to SeatSync 👋</h2>
 
-      <div class="form-group">
-        <label>Number of Passengers</label>
-        <select id="passengers" class="form-control">
-          <option value="1">1 Passenger</option>
-          <option value="2">2 Passengers</option>
-          <option value="3">3 Passengers</option>
-          <option value="4">4 Passengers</option>
-          <option value="5">5 Passengers</option>
-        </select>
-      </div>
+        <p>Book your bus seat easily.</p>
+    <p id="userInfo" style="margin-top: 10px; color: #475569; font-size: 14px;"></p>
 
-      <button class="btn-full" onclick="searchBuses()">Search Available Buses →</button>
-    </div>
 
-    <!-- Quick actions -->
-    <div>
-      <div class="card">
-        <h2>Quick Actions</h2>
-        <p class="sub">Manage your travel</p>
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <button class="btn-full" onclick="window.location.href='page2.html'" style="background:var(--primary)">🔍 Browse All Buses</button>
-          <button class="btn-full" onclick="showMyBookings()" style="background:var(--success)">🎟️ View My Bookings</button>
-        </div>
-      </div>
+        <div class="dashboard-cards">
 
-      <div class="card" id="recentCard">
-        <h2>Recent Booking</h2>
-        <p class="sub" id="recentStatus">No bookings yet</p>
-        <div id="recentBooking"></div>
-      </div>
-    </div>
-  </div>
+            
 
-  <!-- My Bookings section (shown on demand) -->
-  <div id="bookingsSection" class="hidden">
-    <div class="card table-card">
-      <h2>🎟️ My Bookings</h2>
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Ref</th><th>Route</th><th>Bus</th><th>Date</th><th>Seats</th><th>Amount</th><th>Status</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="bookingsTableBody">
-            <tr><td colspan="8" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
+            
+        <div class="search-box">
 
-<footer><strong>SeatSync</strong> — Smart Bus Booking &copy; 2024</footer>
+            <h2>Find Your Bus</h2>
 
-<script src="js/env-config.js"></script>
-<script type="module" src="js/supabase-client.js" defer></script>
-<script src="js/login.js" defer></script>
+            <p>Select your route to see available buses</p>
+
+            <label for="route">Bus Route</label>
+
+            <select id="route">
+                <option value="">-- Select Bus Route --</option>
+
+                <option value="bangalore-chikmagalur">
+                    Bangalore → chikmagalur
+                </option>
+
+                <option value="bangalore-tumkur">
+                    Bangalore → Tumkur
+                </option>
+
+                <option value="bangalore-hassan">
+                    Bangalore → Hassan
+                </option>
+
+                <option value="bangalore-mandya">
+                    Bangalore → Mandya
+                </option>
+
+                <option value="bangalore-mysore">
+                    Bangalore → mysore
+                </option>
+            </select>
+            <button onclick="goToPage2()">Get Started</button>
+
 <script>
-  // Set default date to today
-  document.getElementById('travelDate').value = new Date().toISOString().split('T')[0];
+function goToPage2() {
+    const route = document.getElementById("route").value;
 
-  // Pre-fill from quick search on index
-  const ssRoute = sessionStorage.getItem('ss_route');
-  const ssDate  = sessionStorage.getItem('ss_date');
-  const ssPass  = sessionStorage.getItem('ss_passengers');
-  if (ssRoute) document.getElementById('routeSelect').value = ssRoute;
-  if (ssDate)  document.getElementById('travelDate').value  = ssDate;
-  if (ssPass)  document.getElementById('passengers').value  = ssPass;
-
-  // Load user info
-  window.addEventListener('load', async () => {
-    const email = localStorage.getItem('ss_email') || '';
-    if (email) {
-      document.getElementById('userEmailDisplay').textContent = email;
-      const name = email.split('@')[0];
-      document.getElementById('userName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
-      document.getElementById('userAvatar').textContent = name[0].toUpperCase();
+    if (route === "") {
+        alert("Please select a bus route");
+        return;
     }
-    loadStats();
-  });
 
-  function loadStats() {
-    const bookings = JSON.parse(localStorage.getItem('ss_my_bookings') || '[]');
-    document.getElementById('statBookings').textContent  = bookings.length;
-    document.getElementById('statConfirmed').textContent = bookings.filter(b => b.status === 'confirmed').length;
-    if (bookings.length > 0) {
-      const last = bookings[bookings.length - 1];
-      document.getElementById('recentStatus').textContent = `Booking ${last.ref}`;
-      document.getElementById('recentBooking').innerHTML = `
-        <div style="font-size:14px;line-height:2;margin-top:8px;">
-          <div><strong>Route:</strong> ${last.route}</div>
-          <div><strong>Date:</strong> ${last.date}</div>
-          <div><strong>Seats:</strong> ${last.seats}</div>
-          <div><strong>Amount:</strong> ₹${last.total}</div>
-          <span class="badge badge-success">Confirmed</span>
-        </div>`;
-    }
-  }
-
-  function searchBuses() {
-    const route = document.getElementById('routeSelect').value;
-    const date  = document.getElementById('travelDate').value;
-    const pass  = document.getElementById('passengers').value;
-    if (!route) { alert('Please select a route'); return; }
-    sessionStorage.setItem('ss_route', route);
-    sessionStorage.setItem('ss_date', date);
-    sessionStorage.setItem('ss_passengers', pass);
-    window.location.href = 'page2.html';
-  }
-
-  function showMyBookings() {
-    const sec = document.getElementById('bookingsSection');
-    sec.classList.toggle('hidden');
-    if (!sec.classList.contains('hidden')) {
-      renderMyBookings();
-      sec.scrollIntoView({ behavior: 'smooth' });
-    }
-  }
-
-  function renderMyBookings() {
-    const bookings = JSON.parse(localStorage.getItem('ss_my_bookings') || '[]');
-    const tbody = document.getElementById('bookingsTableBody');
-    if (!bookings.length) {
-      tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">🎟️</div><h3>No bookings yet</h3><p>Book your first bus ticket to see it here.</p></div></td></tr>';
-      return;
-    }
-    tbody.innerHTML = bookings.map((b, i) => {
-      const cancelled = b.status === 'cancelled';
-      const badge = cancelled
-        ? '<span class="badge badge-danger">Cancelled</span>'
-        : '<span class="badge badge-success">Confirmed</span>';
-      const action = cancelled
-        ? '<span style="font-size:12px;color:var(--muted);">—</span>'
-        : `<button class="btn-tbl" onclick="cancelUserBooking(${i})">Cancel</button>`;
-      return `
-      <tr style="${cancelled ? 'opacity:.55;' : ''}">
-        <td><strong>${b.ref}</strong></td>
-        <td>${b.route || '-'}</td>
-        <td>${b.bus || '-'}</td>
-        <td>${b.date || '-'}</td>
-        <td>${b.seats || '-'}</td>
-        <td><strong>₹${b.total || 0}</strong></td>
-        <td>${badge}</td>
-        <td>${action}</td>
-      </tr>`;
-    }).join('');
-  }
-
-  async function cancelUserBooking(idx) {
-    const bookings = JSON.parse(localStorage.getItem('ss_my_bookings') || '[]');
-    const b = bookings[idx];
-    if (!b || b.status === 'cancelled') return;
-    if (!confirm(`Cancel booking ${b.ref}?\nRoute: ${b.route}\nDate: ${b.date}\n\nThis cannot be undone.`)) return;
-
-    // Call backend to remove from bookings.json
-    try {
-      await fetch('/api/booking/cancel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ref: b.ref })
-      });
-    } catch (_) { /* backend best-effort */ }
-
-    // Mark as cancelled in localStorage
-    bookings[idx].status = 'cancelled';
-    localStorage.setItem('ss_my_bookings', JSON.stringify(bookings));
-    loadStats();
-    renderMyBookings();
-    showToast('Booking ' + b.ref + ' cancelled.', 'success');
-  }
-
-  function showToast(msg, type) {
-    const t = document.createElement('div');
-    t.className = 'toast ' + (type || '');
-    t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 3500);
-  }
+    window.location.href = "page2.html?route=" + route;
+}
 </script>
+
+            
+
+        </div>
+
+    </section>
+
+
+            <div class="dashboard-card">
+
+                <h3>🎟️ My Bookings</h3>
+
+                <p>View your booking details.</p>
+                <a href="page5.html">
+                <button onclick="viewBookings()">
+                    My Bookings
+                </button>
+                </a>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <h3>🚪 Logout</h3>
+
+                <button onclick="logout()">
+                    Logout
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <script type="module" src="js/supabase-client.js"></script>
+    <script src="js/script.js"></script>
+
 </body>
+
 </html>

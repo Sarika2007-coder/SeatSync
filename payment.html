@@ -157,6 +157,8 @@
 
 <footer><strong>SeatSync</strong> &copy; 2024</footer>
 
+<script src="js/env-config.js"></script>
+<script type="module" src="js/supabase-client.js" defer></script>
 <script>
 const booking = JSON.parse(sessionStorage.getItem('ss_booking') || 'null');
 if (!booking) { window.location.href = 'page4.html'; }
@@ -250,6 +252,16 @@ async function processPayment() {
   await delay(1500);
   msg.textContent = 'Confirming your booking…';
 
+  // Get the currently authenticated Supabase user's email
+  let authEmail = '';
+  try {
+    if (window.supabaseAuth) {
+      const session = await window.supabaseAuth.getSession();
+      authEmail = session?.user?.email || '';
+    }
+  } catch (_) {}
+  if (!authEmail) authEmail = localStorage.getItem('ss_email') || '';
+
   // Save to backend
   const ref = 'SS' + Date.now().toString().slice(-8).toUpperCase();
   const bookingPayload = {
@@ -261,6 +273,7 @@ async function processPayment() {
     time:         booking.time,
     seats:        booking.selectedSeats.join(', '),
     passengers:   booking.passengers,
+    userEmail:    authEmail,
     contactEmail: booking.contactEmail,
     contactPhone: booking.contactPhone,
     totalAmount:  booking.totalAmount,
